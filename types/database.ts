@@ -38,7 +38,6 @@ export type TransactionType =
 
 export interface UserProfile {
   id: string
-  username: string
   email: string
   role: UserRole
   full_name: string
@@ -46,6 +45,11 @@ export interface UserProfile {
   is_active: boolean
   created_at: string
   updated_at: string
+}
+
+// Extended user profile with auth metadata (for client-side use)
+export interface UserProfileWithMeta extends UserProfile {
+  display_name?: string | null
 }
 
 export interface Account {
@@ -147,10 +151,10 @@ export interface CashoutRequest {
   created_at: string
   updated_at: string
   // Additional properties for pages
-  agent?: UserProfile
+  agent?: UserProfileWithMeta
   notes?: string
   processed_at?: string
-  processed_by_user?: UserProfile
+  processed_by_user?: UserProfileWithMeta
 }
 
 export interface Transaction {
@@ -182,29 +186,29 @@ export interface Penalty {
 
 // Extended types with relations
 export interface AccountWithRelations extends Account {
-  assigned_agent?: UserProfile
+  assigned_agent?: UserProfileWithMeta
   loans?: Loan[]
 }
 
 export interface LoanWithRelations extends Loan {
   account?: Account
-  creator?: UserProfile
-  approver?: UserProfile
+  creator?: UserProfileWithMeta
+  approver?: UserProfileWithMeta
   payments?: Payment[]
   penalties?: Penalty[]
-  agent?: UserProfile
+  agent?: UserProfileWithMeta
 }
 
 export interface PaymentWithRelations extends Payment {
   loan?: LoanWithRelations
-  receiver?: UserProfile
+  receiver?: UserProfileWithMeta
 }
 
 export interface TransactionWithRelations extends Transaction {
-  user?: UserProfile
+  user?: UserProfileWithMeta
 }
 
 export interface CashoutWithRelations extends CashoutRequest {
-  agent?: UserProfile
-  processed_by_user?: UserProfile
+  agent?: UserProfileWithMeta
+  processed_by_user?: UserProfileWithMeta
 }

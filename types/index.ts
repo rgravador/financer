@@ -8,10 +8,10 @@ export interface LoginForm {
 }
 
 export interface SignupForm {
-  username: string
   email: string
   password: string
   full_name: string
+  display_name?: string
   role: 'admin' | 'agent'
 }
 
@@ -81,7 +81,7 @@ export interface AgentPerformance {
   // Additional properties expected by pages
   id?: string
   full_name?: string
-  username?: string
+  email?: string
   activeLoans?: number
   totalCollected?: number
   totalCommissions?: number

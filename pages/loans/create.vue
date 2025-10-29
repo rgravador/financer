@@ -40,6 +40,7 @@
                     :rules="[rules.required, rules.positive]"
                     variant="outlined"
                     class="mb-4"
+                    autocomplete="off"
                   />
 
                   <div class="mb-4">
@@ -66,6 +67,7 @@
                       :rules="[rules.required, rules.interestRate]"
                       variant="outlined"
                       suffix="%"
+                      autocomplete="off"
                     />
                   </div>
 
@@ -98,6 +100,7 @@
                     prepend-inner-icon="mdi-calendar-start"
                     variant="outlined"
                     hint="Leave empty to use approval date"
+                    autocomplete="off"
                   />
                 </v-col>
 

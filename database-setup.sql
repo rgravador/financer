@@ -13,9 +13,9 @@ CREATE TYPE cashout_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE transaction_type AS ENUM ('create_account', 'update_account', 'create_loan', 'approve_loan', 'reject_loan', 'receive_payment', 'cashout_request', 'cashout_approved', 'cashout_rejected', 'commission_update');
 
 -- 1. users_profile table
+-- Note: display_name is stored in auth.users metadata, not in this table
 CREATE TABLE users_profile (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
   role user_role NOT NULL DEFAULT 'agent',
   full_name TEXT NOT NULL,
@@ -155,21 +155,18 @@ ALTER TABLE penalties ENABLE ROW LEVEL SECURITY;
 -- RLS Policies for users_profile
 CREATE POLICY "Users can view own profile" ON users_profile FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON users_profile FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Admins can view all profiles" ON users_profile FOR SELECT USING (
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
-);
+CREATE POLICY "Users can insert own profile" ON users_profile FOR INSERT WITH CHECK (auth.uid() = id);
+-- Note: Admin access is handled by service role, not RLS policies to avoid infinite recursion
 
 -- RLS Policies for accounts
 CREATE POLICY "Agents can view assigned accounts" ON accounts FOR SELECT USING (
-  assigned_agent_id = auth.uid() OR
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  assigned_agent_id = auth.uid() OR is_admin()
 );
 CREATE POLICY "Agents can create accounts" ON accounts FOR INSERT WITH CHECK (
   assigned_agent_id = auth.uid()
 );
 CREATE POLICY "Agents can update assigned accounts" ON accounts FOR UPDATE USING (
-  assigned_agent_id = auth.uid() OR
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  assigned_agent_id = auth.uid() OR is_admin()
 );
 
 -- RLS Policies for loans
@@ -177,15 +174,14 @@ CREATE POLICY "Users can view loans for their accounts" ON loans FOR SELECT USIN
   EXISTS (
     SELECT 1 FROM accounts
     WHERE accounts.id = loans.account_id
-    AND (accounts.assigned_agent_id = auth.uid() OR
-         EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin'))
+    AND (accounts.assigned_agent_id = auth.uid() OR is_admin())
   )
 );
 CREATE POLICY "Agents can create loans for assigned accounts" ON loans FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM accounts WHERE id = account_id AND assigned_agent_id = auth.uid())
 );
 CREATE POLICY "Admins can update loans" ON loans FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  is_admin()
 );
 
 -- RLS Policies for payments
@@ -194,8 +190,7 @@ CREATE POLICY "Users can view payments for their loans" ON payments FOR SELECT U
     SELECT 1 FROM loans
     JOIN accounts ON loans.account_id = accounts.id
     WHERE loans.id = payments.loan_id
-    AND (accounts.assigned_agent_id = auth.uid() OR
-         EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin'))
+    AND (accounts.assigned_agent_id = auth.uid() OR is_admin())
   )
 );
 CREATE POLICY "Agents can create payments" ON payments FOR INSERT WITH CHECK (
@@ -212,27 +207,27 @@ CREATE POLICY "Users can update own notifications" ON notifications FOR UPDATE U
 
 -- RLS Policies for earnings
 CREATE POLICY "Agents can view own earnings" ON earnings FOR SELECT USING (
-  agent_id = auth.uid() OR
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  agent_id = auth.uid() OR is_admin()
+);
+CREATE POLICY "Agents can insert own earnings" ON earnings FOR INSERT WITH CHECK (
+  agent_id = auth.uid()
 );
 CREATE POLICY "Admins can update earnings" ON earnings FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  is_admin()
 );
 
 -- RLS Policies for cashout_requests
 CREATE POLICY "Agents can view own cashout requests" ON cashout_requests FOR SELECT USING (
-  agent_id = auth.uid() OR
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  agent_id = auth.uid() OR is_admin()
 );
 CREATE POLICY "Agents can create cashout requests" ON cashout_requests FOR INSERT WITH CHECK (agent_id = auth.uid());
 CREATE POLICY "Admins can update cashout requests" ON cashout_requests FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  is_admin()
 );
 
 -- RLS Policies for transactions (read-only for users)
 CREATE POLICY "Users can view relevant transactions" ON transactions FOR SELECT USING (
-  user_id = auth.uid() OR
-  EXISTS (SELECT 1 FROM users_profile WHERE id = auth.uid() AND role = 'admin')
+  user_id = auth.uid() OR is_admin()
 );
 
 -- Create indexes for better performance
@@ -247,6 +242,17 @@ CREATE INDEX idx_cashout_agent ON cashout_requests(agent_id);
 CREATE INDEX idx_cashout_status ON cashout_requests(status);
 CREATE INDEX idx_transactions_user ON transactions(user_id);
 
+-- Helper function to check if current user is admin (bypasses RLS to avoid infinite recursion)
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM users_profile
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Function to automatically create earnings record for new agents
 CREATE OR REPLACE FUNCTION create_agent_earnings()
 RETURNS TRIGGER AS $$
@@ -257,7 +263,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER trigger_create_agent_earnings
 AFTER INSERT ON users_profile

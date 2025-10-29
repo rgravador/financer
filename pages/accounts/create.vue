@@ -21,6 +21,7 @@
                 :rules="[rules.required]"
                 variant="outlined"
                 class="mb-4"
+                autocomplete="off"
               />
 
               <v-text-field
@@ -31,6 +32,7 @@
                 variant="outlined"
                 hint="Phone number or email"
                 class="mb-4"
+                autocomplete="off"
               />
 
               <v-textarea

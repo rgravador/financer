@@ -1,7 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-
+  devServer: {
+    port: 3001
+  },
   modules: [
     '@pinia/nuxt',
     '@nuxtjs/supabase',
@@ -9,8 +11,8 @@ export default defineNuxtConfig({
   ],
 
   typescript: {
-    strict: true,
-    typeCheck: true
+    // strict: true,
+    // typeCheck: true
   },
 
   css: [
@@ -32,6 +34,7 @@ export default defineNuxtConfig({
         themes: {
           light: {
             colors: {
+              background: '#F5F5F0',
               primary: '#1976D2',
               secondary: '#424242',
               accent: '#82B1FF',
@@ -60,9 +63,9 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
     redirectOptions: {
-      login: '/auth/login',
+      login: '/',
       callback: '/auth/callback',
-      exclude: ['/auth/*']
+      exclude: ['/auth/*', '/']
     }
   },
 

@@ -84,7 +84,7 @@
                     <td>
                       <div>
                         <div class="font-weight-bold">{{ cashout.agent?.full_name }}</div>
-                        <div class="text-caption text-grey">{{ cashout.agent?.username }}</div>
+                        <div class="text-caption text-grey">{{ cashout.agent?.display_name || cashout.agent?.email }}</div>
                       </div>
                     </td>
                     <td>{{ formatDate(cashout.created_at) }}</td>

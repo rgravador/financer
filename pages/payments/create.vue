@@ -60,6 +60,7 @@
                     :rules="[rules.required, rules.positive]"
                     variant="outlined"
                     class="mb-4"
+                    autocomplete="off"
                   />
 
                   <v-text-field
@@ -71,6 +72,7 @@
                     variant="outlined"
                     :max="today"
                     class="mb-4"
+                    autocomplete="off"
                   />
 
                   <v-textarea

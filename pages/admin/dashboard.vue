@@ -205,7 +205,7 @@
                       </v-avatar>
                       <div>
                         <div class="font-weight-bold">{{ agent.full_name }}</div>
-                        <div class="text-caption text-grey">{{ agent.username }}</div>
+                        <div class="text-caption text-grey">{{ agent.display_name || agent.email }}</div>
                       </div>
                     </div>
                   </td>

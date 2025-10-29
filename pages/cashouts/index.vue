@@ -209,6 +209,7 @@
               variant="outlined"
               class="mb-4"
               hint="Enter amount you want to withdraw"
+              autocomplete="off"
             />
 
             <v-textarea

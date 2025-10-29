@@ -34,6 +34,7 @@
                   density="compact"
                   clearable
                   prepend-inner-icon="mdi-magnify"
+                  autocomplete="off"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -147,7 +148,7 @@
                   <td>
                     <div v-if="transaction.user">
                       <div class="font-weight-bold text-body-2">{{ transaction.user.full_name }}</div>
-                      <div class="text-caption text-grey">{{ transaction.user.username }}</div>
+                      <div class="text-caption text-grey">{{ transaction.user.display_name || transaction.user.email }}</div>
                     </div>
                     <span v-else class="text-grey">-</span>
                   </td>
@@ -295,7 +296,8 @@ const filteredTransactions = computed(() => {
     const searchLower = filterUser.value.toLowerCase()
     transactions = transactions.filter(t =>
       t.user?.full_name.toLowerCase().includes(searchLower) ||
-      t.user?.username.toLowerCase().includes(searchLower)
+      t.user?.display_name?.toLowerCase().includes(searchLower) ||
+      t.user?.email.toLowerCase().includes(searchLower)
     )
   }
 

@@ -1,12 +1,15 @@
 import type {
   UserProfile,
+  UserRole,
   Account,
+  AccountStatus,
   Loan,
   Payment,
   Notification,
   Earnings,
   CashoutRequest,
   Transaction,
+  TransactionType,
   Penalty
 } from './database'
 
@@ -23,9 +26,17 @@ export type Database = {
     Tables: {
       users_profile: {
         Row: UserProfile
-        Insert: Omit<UserProfile, 'created_at' | 'updated_at'> & { created_at?: string; updated_at?: string }
+        Insert: {
+          id: string
+          email: string
+          role: UserRole
+          full_name: string
+          avatar_url?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
         Update: {
-          username?: string
           email?: string
           role?: UserRole
           full_name?: string

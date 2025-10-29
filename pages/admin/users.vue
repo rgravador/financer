@@ -67,6 +67,7 @@
               density="compact"
               hide-details
               clearable
+              autocomplete="off"
               style="max-width: 300px;"
             />
           </v-card-title>
@@ -94,7 +95,7 @@
                       </v-avatar>
                       <div>
                         <div class="font-weight-bold">{{ user.full_name }}</div>
-                        <div class="text-caption text-grey">{{ user.username }}</div>
+                        <div class="text-caption text-grey">{{ user.display_name || user.email }}</div>
                       </div>
                     </div>
                   </td>
@@ -162,7 +163,7 @@
                   </v-avatar>
                   <div class="flex-grow-1">
                     <div class="font-weight-bold">{{ user.full_name }}</div>
-                    <div class="text-caption text-grey">{{ user.username }}</div>
+                    <div class="text-caption text-grey">{{ user.display_name || user.email }}</div>
                   </div>
                   <v-chip
                     size="small"
@@ -279,7 +280,8 @@ const filteredUsers = computed(() => {
   const searchLower = search.value.toLowerCase()
   return adminStore.users.filter(user =>
     user.full_name.toLowerCase().includes(searchLower) ||
-    user.username.toLowerCase().includes(searchLower)
+    (user.display_name?.toLowerCase().includes(searchLower)) ||
+    user.email.toLowerCase().includes(searchLower)
   )
 })
 

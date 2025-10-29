@@ -224,6 +224,7 @@
               ]"
               variant="outlined"
               class="mb-4"
+              autocomplete="off"
             />
 
             <v-textarea

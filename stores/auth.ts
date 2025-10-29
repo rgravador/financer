@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import type { UserProfile } from '~/types'
+import type { UserProfileWithMeta } from '~/types'
 
 interface AuthState {
-  user: UserProfile | null
+  user: UserProfileWithMeta | null
   loading: boolean
   session: any | null
 }
@@ -44,26 +44,31 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async signup(userData: { email: string; password: string; username: string; full_name: string; role: 'admin' | 'agent' }) {
+    async signup(userData: { email: string; password: string; full_name: string; display_name?: string; role: 'admin' | 'agent' }) {
       this.loading = true
       try {
         const supabase = useTypedSupabaseClient()
 
-        // Create auth user
+        // Create auth user with metadata
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: userData.email,
-          password: userData.password
+          password: userData.password,
+          options: {
+            data: {
+              display_name: userData.display_name || userData.full_name,
+              full_name: userData.full_name
+            }
+          }
         })
 
         if (authError) throw authError
 
-        // Create user profile
-        const { error: profileError } = await supabase
+        // Create user profile (without display_name)
+        const { error: profileError } = await (supabase
           .from('users_profile')
-          .insert({
-            id: authData.user!.id,
+          .insert as any)({
+            id: authData.user?.id || '',
             email: userData.email,
-            username: userData.username,
             full_name: userData.full_name,
             role: userData.role
           })
@@ -96,7 +101,13 @@ export const useAuthStore = defineStore('auth', {
 
       if (error) throw error
 
-      this.user = data
+      // Get display name from auth metadata
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      const displayName = authUser?.user_metadata?.display_name || null
+
+      this.user = Object.assign({}, data, {
+        display_name: displayName
+      }) as UserProfileWithMeta
     },
 
     async refreshSession() {

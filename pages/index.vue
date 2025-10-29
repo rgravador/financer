@@ -1,86 +1,66 @@
 <template>
-  <v-container>
-    <v-row justify="center" class="mt-10">
-      <v-col cols="12" md="8" lg="6">
-        <v-card>
-          <v-card-title class="text-h4 text-center py-6">
-            Welcome to LoanStar
+  <v-container class="fill-height" fluid>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="8" md="6" lg="4">
+        <v-card class="elevation-12">
+          <v-card-title class="bg-primary text-center py-6">
+            <div class="text-h4 text-white">LoanStar</div>
+            <div class="text-subtitle-2 text-white">Lending Management System</div>
           </v-card-title>
-          <v-cardSubtitle class="text-center pb-4">
-            Lending Management System
-          </v-cardSubtitle>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" class="text-center">
-                <p class="text-body-1 mb-4">
-                  A comprehensive web application for managing lending operations with support for:
-                </p>
-                <v-list>
-                  <v-list-item>
-                    <v-list-item-title>
-                      <v-icon icon="mdi-account-group" class="mr-2" />
-                      Multi-role system (Admin & Agent)
-                    </v-list-item-title>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-title>
-                      <v-icon icon="mdi-account-multiple" class="mr-2" />
-                      Borrower account management
-                    </v-list-item-title>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-title>
-                      <v-icon icon="mdi-file-document" class="mr-2" />
-                      Loan creation & approval workflow
-                    </v-list-item-title>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-title>
-                      <v-icon icon="mdi-cash-multiple" class="mr-2" />
-                      Payment tracking & commission management
-                    </v-list-item-title>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-title>
-                      <v-icon icon="mdi-bell" class="mr-2" />
-                      Real-time notifications
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-col>
-            </v-row>
+
+          <v-card-text class="pt-6">
+            <v-form ref="formRef" v-model="formValid" @submit.prevent="handleLogin">
+              <v-text-field
+                v-model="form.email"
+                label="Email"
+                type="email"
+                prepend-inner-icon="mdi-email"
+                :rules="[rules.required, rules.email]"
+                variant="outlined"
+                class="mb-3"
+                autocomplete="off"
+              />
+
+              <v-text-field
+                v-model="form.password"
+                label="Password"
+                :type="showPassword ? 'text' : 'password'"
+                prepend-inner-icon="mdi-lock"
+                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :rules="[rules.required]"
+                variant="outlined"
+                autocomplete="off"
+                @click:append-inner="showPassword = !showPassword"
+              />
+
+              <v-alert v-if="error" type="error" variant="tonal" class="mb-3">
+                {{ error }}
+              </v-alert>
+
+              <v-btn
+                type="submit"
+                color="primary"
+                size="large"
+                block
+                :loading="loading"
+                :disabled="!formValid"
+              >
+                Login
+              </v-btn>
+            </v-form>
           </v-card-text>
-          <v-card-actions class="justify-center pb-6">
-            <v-btn
-              color="primary"
-              size="large"
-              to="/auth/login"
-              prepend-icon="mdi-login"
-            >
-              Login
+
+          <v-divider />
+
+          <v-card-actions class="pa-4">
+            <v-btn variant="text" size="small" to="/auth/reset-password">
+              Forgot Password?
             </v-btn>
-            <v-btn
-              color="secondary"
-              size="large"
-              to="/auth/signup"
-              prepend-icon="mdi-account-plus"
-              variant="outlined"
-            >
+            <v-spacer />
+            <v-btn variant="text" size="small" to="/auth/signup">
               Sign Up
             </v-btn>
           </v-card-actions>
-        </v-card>
-
-        <v-card class="mt-6">
-          <v-card-title>Project Status</v-card-title>
-          <v-card-text>
-            <v-alert type="info" variant="tonal">
-              <strong>Foundation Complete:</strong> The project structure, TypeScript types, business logic composables (amortization, penalties, commissions), and authentication store have been created.
-            </v-alert>
-            <v-alert type="warning" variant="tonal" class="mt-3">
-              <strong>Next Steps:</strong> Complete the remaining Pinia stores, tRPC endpoints, UI components, and pages. See README.md for detailed instructions.
-            </v-alert>
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -89,6 +69,51 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
+  layout: 'auth',
+  middleware: 'guest'
 })
+
+const formRef = ref()
+const formValid = ref(false)
+const showPassword = ref(false)
+const loading = ref(false)
+const error = ref('')
+
+const form = reactive({
+  email: '',
+  password: ''
+})
+
+const rules = {
+  required: (v: string) => !!v || 'Field is required',
+  email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+}
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLogin = async () => {
+  if (!formRef.value) return
+
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+
+  loading.value = true
+  error.value = ''
+
+  const result = await authStore.login(form.email, form.password)
+
+  if (result.success) {
+    // Redirect based on role
+    if (authStore.isAdmin) {
+      router.push('/admin/dashboard')
+    } else {
+      router.push('/dashboard')
+    }
+  } else {
+    error.value = result.error || 'Login failed'
+  }
+
+  loading.value = false
+}
 </script>
