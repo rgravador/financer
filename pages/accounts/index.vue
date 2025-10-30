@@ -23,7 +23,7 @@
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
         <p class="mt-4 text-grey">
-          Loading accounts... {{ loading }}
+          Loading accounts...
         </p>
       </v-col>
     </v-row>

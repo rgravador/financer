@@ -8,10 +8,15 @@
     >
       <v-list>
         <v-list-item>
-          <div class="d-flex flex-column justify-center align-center">
+          <div class="d-flex flex-column justify-center align-center pa-1">
             <img class="rounded-circle mt-4" :style="{height: '100px', width: '100px'}" src="https://uyxjwoujwpvzgrxyqzmc.supabase.co/storage/v1/object/public/avatars/profile.jpeg" alt="">
             <div class="text-uppercase mt-4 font-weight-bold">
               {{ user?.full_name || '-' }}
+            </div>
+            <div class="d-flex align-center justify-space-evenly mt-4" :style="{height: '30px'}">
+              <v-btn variant="plain" class="text-none" append-icon="mdi-arrow-right">
+                View profile
+              </v-btn>
             </div>
           </div>
         </v-list-item>
@@ -160,7 +165,7 @@
         </v-card>
       </v-menu>
 
-      <v-btn variant="plain" @click="auth.logout()">
+      <v-btn variant="plain" @click="logout()">
         <v-icon>mdi-logout</v-icon>
         Logout
       </v-btn>
@@ -229,7 +234,7 @@ const auth = useAuth()
 const ui = useUI()
 const notifications = useNotifications()
 
-const { user } = auth
+const { user, logout } = auth
 const bottomNav = ref('dashboard')
 
 // Get page title - use a simple reactive approach

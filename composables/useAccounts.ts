@@ -10,7 +10,7 @@ export const useAccounts = () => {
   // Filters
   const filters = ref({
     search: '',
-    status: null as string | null
+    status: 'active'
   })
 
   // Computed
