@@ -1,13 +1,13 @@
 export default defineNuxtRouteMiddleware(async (_to, _from) => {
-  const authStore = useAuthStore()
+  const { isAuthenticated, refreshSession } = useAuth()
 
   // Try to refresh session if not authenticated
-  if (!authStore.isAuthenticated) {
-    await authStore.refreshSession()
+  if (!isAuthenticated.value) {
+    await refreshSession()
   }
 
   // Redirect to login if not authenticated
-  if (!authStore.isAuthenticated) {
+  if (!isAuthenticated.value) {
     return navigateTo('/auth/login')
   }
 })

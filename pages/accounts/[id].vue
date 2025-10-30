@@ -175,8 +175,8 @@ definePageMeta({
 })
 
 const route = useRoute()
-const accountsStore = useAccountsStore()
-const uiStore = useUIStore()
+const accountsStore = useAccounts()
+const uiStore = useUI()
 
 const account = computed(() => accountsStore.selectedAccount)
 

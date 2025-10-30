@@ -335,8 +335,8 @@ definePageMeta({
   middleware: ['auth', 'admin']
 })
 
-const loansStore = useLoansStore()
-const uiStore = useUIStore()
+const loansStore = useLoans()
+const uiStore = useUI()
 
 const approveDialog = ref(false)
 const rejectDialog = ref(false)

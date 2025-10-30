@@ -120,8 +120,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const paymentsStore = usePaymentsStore()
-const uiStore = useUIStore()
+const paymentsStore = usePayments()
+const uiStore = useUI()
 
 // Fetch payments on mount
 onMounted(async () => {

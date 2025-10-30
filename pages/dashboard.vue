@@ -5,7 +5,7 @@
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
             <h1 class="text-h4">Dashboard</h1>
-            <p class="text-subtitle-1 text-grey">Welcome back, {{ authStore.user?.full_name }}</p>
+            <p class="text-subtitle-1 text-grey">Welcome back, {{ auth.user?.full_name }}</p>
           </div>
           <v-btn color="primary" prepend-icon="mdi-plus" to="/accounts/create">
             Add Account
@@ -22,7 +22,7 @@
             <div class="d-flex justify-space-between align-center">
               <div>
                 <p class="text-caption text-grey">Total Accounts</p>
-                <h2 class="text-h4">{{ accountsStore.accounts.length }}</h2>
+                <h2 class="text-h4">{{ accountsCount }}</h2>
               </div>
               <v-avatar color="primary" size="48">
                 <v-icon size="28">mdi-account-multiple</v-icon>
@@ -38,7 +38,7 @@
             <div class="d-flex justify-space-between align-center">
               <div>
                 <p class="text-caption text-grey">Active Loans</p>
-                <h2 class="text-h4">{{ loansStore.activeLoans.length }}</h2>
+                <h2 class="text-h4">{{ activeLoansCount }}</h2>
               </div>
               <v-avatar color="success" size="48">
                 <v-icon size="28">mdi-file-document</v-icon>
@@ -54,7 +54,7 @@
             <div class="d-flex justify-space-between align-center">
               <div>
                 <p class="text-caption text-grey">Collectible Earnings</p>
-                <h2 class="text-h5">{{ formatCurrency(earningsStore.collectibleBalance) }}</h2>
+                <h2 class="text-h5">{{ formatCurrency(earnings.availableEarnings) }}</h2>
               </div>
               <v-avatar color="warning" size="48">
                 <v-icon size="28">mdi-currency-usd</v-icon>
@@ -70,7 +70,7 @@
             <div class="d-flex justify-space-between align-center">
               <div>
                 <p class="text-caption text-grey">Overdue Loans</p>
-                <h2 class="text-h4">{{ loansStore.overdueLoans.length }}</h2>
+                <h2 class="text-h4">{{ overdueLoansCount }}</h2>
               </div>
               <v-avatar color="error" size="48">
                 <v-icon size="28">mdi-alert-circle</v-icon>
@@ -92,9 +92,9 @@
 
           <v-divider />
 
-          <v-list v-if="notificationsStore.notifications.length > 0">
+          <v-list v-if="notifications.notifications.length > 0">
             <v-list-item
-              v-for="notification in notificationsStore.recentNotifications"
+              v-for="notification in notifications.recentNotifications"
               :key="notification.id"
               :class="{ 'bg-grey-lighten-4': !notification.is_read }"
             >
@@ -113,7 +113,7 @@
                   icon
                   size="small"
                   variant="text"
-                  @click="notificationsStore.markAsRead(notification.id)"
+                  @click="notifications.markAsRead(notification.id)"
                 >
                   <v-icon>mdi-check</v-icon>
                 </v-btn>
@@ -137,9 +137,9 @@
 
           <v-divider />
 
-          <v-list v-if="paymentsStore.recentPayments.length > 0">
+          <v-list v-if="recentPayments.length > 0">
             <v-list-item
-              v-for="payment in paymentsStore.recentPayments.slice(0, 5)"
+              v-for="payment in recentPayments"
               :key="payment.id"
             >
               <v-list-item-title>{{ formatCurrency(payment.amount) }}</v-list-item-title>
@@ -204,21 +204,27 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const authStore = useAuthStore()
-const accountsStore = useAccountsStore()
-const loansStore = useLoansStore()
-const paymentsStore = usePaymentsStore()
-const earningsStore = useEarningsStore()
-const notificationsStore = useNotificationsStore()
+const auth = useAuth()
+const accounts = useAccounts()
+const loans = useLoans()
+const payments = usePayments()
+const earnings = useEarnings()
+const notifications = useNotifications()
+
+// Computed properties for template
+const activeLoansCount = computed(() => loans.loans.value.filter((l: any) => l.status === 'active').length)
+const overdueLoansCount = computed(() => loans.loans.value.filter((l: any) => l.status === 'active' && new Date(l.end_date) < new Date()).length)
+const accountsCount = computed(() => accounts.accounts.value.length)
+const recentPayments = computed(() => payments.payments.value.slice(0, 5))
 
 // Fetch data on mount
 onMounted(async () => {
   await Promise.all([
-    accountsStore.fetchAccounts(),
-    loansStore.fetchLoans(),
-    paymentsStore.fetchPayments(),
-    earningsStore.fetchEarnings(),
-    notificationsStore.fetchNotifications()
+    accounts.fetchAccounts(),
+    loans.fetchLoans(),
+    payments.fetchPayments(),
+    earnings.fetchEarnings(),
+    notifications.fetchNotifications()
   ])
 })
 

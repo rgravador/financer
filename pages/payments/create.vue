@@ -191,9 +191,9 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
-const loansStore = useLoansStore()
-const paymentsStore = usePaymentsStore()
-const uiStore = useUIStore()
+const loansStore = useLoans()
+const paymentsStore = usePayments()
+const uiStore = useUI()
 
 const formRef = ref()
 const formValid = ref(false)

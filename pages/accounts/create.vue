@@ -97,8 +97,8 @@ definePageMeta({
 })
 
 const router = useRouter()
-const accountsStore = useAccountsStore()
-const uiStore = useUIStore()
+const accountsStore = useAccounts()
+const uiStore = useUI()
 
 const formRef = ref()
 const formValid = ref(false)

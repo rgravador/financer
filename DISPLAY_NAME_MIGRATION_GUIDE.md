@@ -91,7 +91,7 @@ END $$;
 The auth store automatically includes display_name in the user object:
 ```vue
 <script setup>
-const authStore = useAuthStore()
+const authStore = useAuth()
 const displayName = authStore.user?.display_name
 </script>
 

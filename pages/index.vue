@@ -18,7 +18,7 @@
                 :rules="[rules.required, rules.email]"
                 variant="outlined"
                 class="mb-3"
-                autocomplete="off"
+                autocomplete="username"
               />
 
               <v-text-field
@@ -29,7 +29,7 @@
                 :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :rules="[rules.required]"
                 variant="outlined"
-                autocomplete="off"
+                autocomplete="current-password"
                 @click:append-inner="showPassword = !showPassword"
               />
 
@@ -89,7 +89,7 @@ const rules = {
   email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
 }
 
-const authStore = useAuthStore()
+const { login } = useAuth()
 const router = useRouter()
 
 const handleLogin = async () => {
@@ -101,15 +101,11 @@ const handleLogin = async () => {
   loading.value = true
   error.value = ''
 
-  const result = await authStore.login(form.email, form.password)
+  const result = await login(form.email, form.password)
 
   if (result.success) {
-    // Redirect based on role
-    if (authStore.isAdmin) {
-      router.push('/admin/dashboard')
-    } else {
-      router.push('/dashboard')
-    }
+    // Redirect to dashboard
+    router.push('/dashboard')
   } else {
     error.value = result.error || 'Login failed'
   }

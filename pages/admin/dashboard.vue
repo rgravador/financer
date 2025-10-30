@@ -317,8 +317,8 @@ definePageMeta({
   middleware: ['auth', 'admin']
 })
 
-const adminStore = useAdminStore()
-const uiStore = useUIStore()
+const adminStore = useAdmin()
+const uiStore = useUI()
 
 const stats = computed(() => adminStore.dashboardStats)
 const agentPerformance = computed(() => adminStore.agentPerformance)

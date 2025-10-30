@@ -254,8 +254,8 @@ definePageMeta({
   middleware: ['auth', 'admin']
 })
 
-const adminStore = useAdminStore()
-const uiStore = useUIStore()
+const adminStore = useAdmin()
+const uiStore = useUI()
 
 const filterType = ref('')
 const filterUser = ref('')

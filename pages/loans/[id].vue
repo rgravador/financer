@@ -254,9 +254,9 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
-const loansStore = useLoansStore()
-const uiStore = useUIStore()
+const authStore = useAuth()
+const loansStore = useLoans()
+const uiStore = useUI()
 
 const approveLoanDialog = ref(false)
 const rejectLoanDialog = ref(false)

@@ -23,7 +23,7 @@
             class="mb-4 white-input"
             hide-details="auto"
             density="comfortable"
-            autocomplete="off"
+            autocomplete="username"
           />
 
           <v-text-field
@@ -40,7 +40,7 @@
             class="mb-4 white-input"
             hide-details="auto"
             density="comfortable"
-            autocomplete="off"
+            autocomplete="current-password"
             @click:append-inner="showPassword = !showPassword"
           />
 
@@ -97,7 +97,7 @@ const rules = {
   email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
 }
 
-const authStore = useAuthStore()
+const { login, isAdmin } = useAuth()
 const router = useRouter()
 
 const handleLogin = async () => {
@@ -109,11 +109,11 @@ const handleLogin = async () => {
   loading.value = true
   error.value = ''
 
-  const result = await authStore.login(form.email, form.password)
+  const result = await login(form.email, form.password)
 
   if (result.success) {
     // Redirect based on role
-    if (authStore.isAdmin) {
+    if (isAdmin.value) {
       router.push('/admin/dashboard')
     } else {
       router.push('/dashboard')

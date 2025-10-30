@@ -5,7 +5,6 @@ export default defineNuxtConfig({
     port: 3001
   },
   modules: [
-    '@pinia/nuxt',
     '@nuxtjs/supabase',
     'vuetify-nuxt-module'
   ],
@@ -69,9 +68,6 @@ export default defineNuxtConfig({
     }
   },
 
-  pinia: {
-    storesDirs: ['./stores/**']
-  },
 
   runtimeConfig: {
     public: {

@@ -1,9 +1,9 @@
 export default defineNuxtRouteMiddleware((_to, _from) => {
-  const authStore = useAuthStore()
+  const { isAuthenticated, isAdmin } = useAuth()
 
   // Redirect to dashboard if already authenticated
-  if (authStore.isAuthenticated) {
-    if (authStore.isAdmin) {
+  if (isAuthenticated.value) {
+    if (isAdmin.value) {
       return navigateTo('/admin/dashboard')
     } else {
       return navigateTo('/dashboard')

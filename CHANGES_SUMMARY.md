@@ -103,7 +103,7 @@ this.user = Object.assign({}, data, {
 </template>
 
 <script setup>
-const authStore = useAuthStore()
+const authStore = useAuth()
 </script>
 ```
 

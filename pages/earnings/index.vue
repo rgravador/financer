@@ -266,10 +266,10 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const earningsStore = useEarningsStore()
-const cashoutsStore = useCashoutsStore()
-const paymentsStore = usePaymentsStore()
-const uiStore = useUIStore()
+const earningsStore = useEarnings()
+const cashoutsStore = useCashouts()
+const paymentsStore = usePayments()
+const uiStore = useUI()
 
 const cashoutDialog = ref(false)
 const cashoutFormRef = ref()

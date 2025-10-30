@@ -36,7 +36,7 @@
             class="mb-4 white-input"
             hide-details="auto"
             density="comfortable"
-            autocomplete="off"
+            autocomplete="username"
           />
 
           <v-text-field
@@ -52,7 +52,7 @@
             class="mb-4 white-input"
             hide-details="auto"
             density="comfortable"
-            autocomplete="off"
+            autocomplete="new-password"
             @click:append-inner="showPassword = !showPassword"
           />
 
@@ -69,7 +69,7 @@
             class="mb-4 white-input"
             hide-details="auto"
             density="comfortable"
-            autocomplete="off"
+            autocomplete="new-password"
             @click:append-inner="showConfirmPassword = !showConfirmPassword"
           />
 
@@ -135,7 +135,7 @@ const rules = {
   passwordMatch: (v: string) => v === form.password || 'Passwords must match'
 }
 
-const authStore = useAuthStore()
+const { signup } = useAuth()
 const router = useRouter()
 
 const handleSignup = async () => {
@@ -148,7 +148,7 @@ const handleSignup = async () => {
   error.value = ''
   success.value = false
 
-  const result = await authStore.signup({
+  const result = await signup({
     email: form.email,
     password: form.password,
     full_name: form.full_name,

@@ -124,8 +124,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const loansStore = useLoansStore()
-const uiStore = useUIStore()
+const loansStore = useLoans()
+const uiStore = useUI()
 
 const activeTab = ref('all')
 

@@ -277,8 +277,8 @@ definePageMeta({
   middleware: ['auth', 'admin']
 })
 
-const cashoutsStore = useCashoutsStore()
-const uiStore = useUIStore()
+const cashoutsStore = useCashouts()
+const uiStore = useUI()
 
 const tab = ref('pending')
 const approveDialog = ref(false)

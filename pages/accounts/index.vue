@@ -133,8 +133,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const accountsStore = useAccountsStore()
-const uiStore = useUIStore()
+const accountsStore = useAccounts()
+const uiStore = useUI()
 
 const statusOptions = [
   { title: 'Active', value: 'active' },
