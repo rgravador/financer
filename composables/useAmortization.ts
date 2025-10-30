@@ -4,7 +4,7 @@ import { addPaymentPeriod, formatDateInput } from '~/utils/formatters'
 /**
  * Calculate amortization schedule for a loan
  */
-export function useAmortization() {
+export function useAmortization () {
   /**
    * Generate complete amortization schedule
    */

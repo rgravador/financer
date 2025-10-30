@@ -4,7 +4,9 @@
     <v-row v-if="accountsStore.loading" class="mt-8">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading account details...</p>
+        <p class="mt-4 text-grey">
+          Loading account details...
+        </p>
       </v-col>
     </v-row>
 
@@ -17,7 +19,9 @@
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
             <div class="ml-4">
-              <h1 class="text-h4">{{ account.name }}</h1>
+              <h1 class="text-h4">
+                {{ account.name }}
+              </h1>
               <v-chip :color="getStatusColor(account.status)" size="small" class="mt-2">
                 {{ account.status }}
               </v-chip>
@@ -34,33 +38,49 @@
             <v-divider />
             <v-card-text>
               <div class="mb-4">
-                <div class="text-caption text-grey mb-1">Contact Information</div>
+                <div class="text-caption text-grey mb-1">
+                  Contact Information
+                </div>
                 <div class="d-flex align-center">
-                  <v-icon size="small" class="mr-2">mdi-phone</v-icon>
+                  <v-icon size="small" class="mr-2">
+                    mdi-phone
+                  </v-icon>
                   <span>{{ account.contact_info }}</span>
                 </div>
               </div>
 
               <div class="mb-4">
-                <div class="text-caption text-grey mb-1">Address</div>
+                <div class="text-caption text-grey mb-1">
+                  Address
+                </div>
                 <div class="d-flex align-start">
-                  <v-icon size="small" class="mr-2 mt-1">mdi-map-marker</v-icon>
+                  <v-icon size="small" class="mr-2 mt-1">
+                    mdi-map-marker
+                  </v-icon>
                   <span>{{ account.address }}</span>
                 </div>
               </div>
 
               <div class="mb-4">
-                <div class="text-caption text-grey mb-1">Assigned Agent</div>
+                <div class="text-caption text-grey mb-1">
+                  Assigned Agent
+                </div>
                 <div class="d-flex align-center">
-                  <v-icon size="small" class="mr-2">mdi-account</v-icon>
+                  <v-icon size="small" class="mr-2">
+                    mdi-account
+                  </v-icon>
                   <span>{{ account.assigned_agent?.full_name || 'N/A' }}</span>
                 </div>
               </div>
 
               <div class="mb-4">
-                <div class="text-caption text-grey mb-1">Created</div>
+                <div class="text-caption text-grey mb-1">
+                  Created
+                </div>
                 <div class="d-flex align-center">
-                  <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
+                  <v-icon size="small" class="mr-2">
+                    mdi-calendar
+                  </v-icon>
                   <span>{{ formatDate(account.created_at) }}</span>
                 </div>
               </div>
@@ -138,8 +158,12 @@
             </v-list>
 
             <v-card-text v-else class="text-center text-grey py-8">
-              <v-icon size="64" color="grey-lighten-2">mdi-file-document-outline</v-icon>
-              <p class="mt-4">No loans yet</p>
+              <v-icon size="64" color="grey-lighten-2">
+                mdi-file-document-outline
+              </v-icon>
+              <p class="mt-4">
+                No loans yet
+              </p>
               <v-btn
                 color="primary"
                 prepend-icon="mdi-plus"
@@ -157,8 +181,12 @@
     <!-- Error State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="error">mdi-alert-circle-outline</v-icon>
-        <h3 class="text-h6 mt-4">Account not found</h3>
+        <v-icon size="120" color="error">
+          mdi-alert-circle-outline
+        </v-icon>
+        <h3 class="text-h6 mt-4">
+          Account not found
+        </h3>
         <v-btn color="primary" class="mt-4" @click="$router.back()">
           Go Back
         </v-btn>

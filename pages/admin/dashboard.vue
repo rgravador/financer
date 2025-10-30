@@ -3,8 +3,12 @@
     <v-row>
       <v-col cols="12">
         <div class="mb-4">
-          <h1 class="text-h4">Admin Dashboard</h1>
-          <p class="text-subtitle-1 text-grey">System overview and performance metrics</p>
+          <h1 class="text-h4">
+            Admin Dashboard
+          </h1>
+          <p class="text-subtitle-1 text-grey">
+            System overview and performance metrics
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -13,7 +17,9 @@
     <v-row v-if="adminStore.loading">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading dashboard...</p>
+        <p class="mt-4 text-grey">
+          Loading dashboard...
+        </p>
       </v-col>
     </v-row>
 
@@ -22,16 +28,22 @@
       <!-- System Stats -->
       <v-row>
         <v-col cols="12">
-          <h3 class="text-h6 mb-3">System Statistics</h3>
+          <h3 class="text-h6 mb-3">
+            System Statistics
+          </h3>
         </v-col>
         <v-col cols="12" sm="6" md="3">
           <v-card>
             <v-card-text>
               <div class="d-flex align-center mb-2">
-                <v-icon color="primary" class="mr-2">mdi-account-group</v-icon>
+                <v-icon color="primary" class="mr-2">
+                  mdi-account-group
+                </v-icon>
                 <span class="text-caption text-grey">Total Users</span>
               </div>
-              <div class="text-h4">{{ stats.totalUsers }}</div>
+              <div class="text-h4">
+                {{ stats.totalUsers }}
+              </div>
               <div class="text-caption text-grey mt-1">
                 {{ stats.activeAgents }} active agents
               </div>
@@ -42,11 +54,17 @@
           <v-card>
             <v-card-text>
               <div class="d-flex align-center mb-2">
-                <v-icon color="info" class="mr-2">mdi-account-multiple</v-icon>
+                <v-icon color="info" class="mr-2">
+                  mdi-account-multiple
+                </v-icon>
                 <span class="text-caption text-grey">Total Accounts</span>
               </div>
-              <div class="text-h4">{{ stats.totalAccounts }}</div>
-              <div class="text-caption text-success mt-1">Borrower accounts</div>
+              <div class="text-h4">
+                {{ stats.totalAccounts }}
+              </div>
+              <div class="text-caption text-success mt-1">
+                Borrower accounts
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -54,10 +72,14 @@
           <v-card>
             <v-card-text>
               <div class="d-flex align-center mb-2">
-                <v-icon color="warning" class="mr-2">mdi-file-document</v-icon>
+                <v-icon color="warning" class="mr-2">
+                  mdi-file-document
+                </v-icon>
                 <span class="text-caption text-grey">Total Loans</span>
               </div>
-              <div class="text-h4">{{ stats.totalLoans }}</div>
+              <div class="text-h4">
+                {{ stats.totalLoans }}
+              </div>
               <div class="text-caption mt-1">
                 <span class="text-success">{{ stats.activeLoans }} active</span>
               </div>
@@ -68,11 +90,17 @@
           <v-card>
             <v-card-text>
               <div class="d-flex align-center mb-2">
-                <v-icon color="success" class="mr-2">mdi-cash-multiple</v-icon>
+                <v-icon color="success" class="mr-2">
+                  mdi-cash-multiple
+                </v-icon>
                 <span class="text-caption text-grey">Total Disbursed</span>
               </div>
-              <div class="text-h4">{{ formatCurrency(stats.totalDisbursed) }}</div>
-              <div class="text-caption text-grey mt-1">Principal amount</div>
+              <div class="text-h4">
+                {{ formatCurrency(stats.totalDisbursed) }}
+              </div>
+              <div class="text-caption text-grey mt-1">
+                Principal amount
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -81,37 +109,55 @@
       <!-- Financial Overview -->
       <v-row class="mt-4">
         <v-col cols="12">
-          <h3 class="text-h6 mb-3">Financial Overview</h3>
+          <h3 class="text-h6 mb-3">
+            Financial Overview
+          </h3>
         </v-col>
         <v-col cols="12" sm="6" md="3">
           <v-card>
             <v-card-text>
-              <div class="text-caption text-grey mb-2">Total Collected</div>
-              <div class="text-h5 text-success">{{ formatCurrency(stats.totalCollected) }}</div>
+              <div class="text-caption text-grey mb-2">
+                Total Collected
+              </div>
+              <div class="text-h5 text-success">
+                {{ formatCurrency(stats.totalCollected) }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
         <v-col cols="12" sm="6" md="3">
           <v-card>
             <v-card-text>
-              <div class="text-caption text-grey mb-2">Outstanding Balance</div>
-              <div class="text-h5 text-warning">{{ formatCurrency(stats.outstandingBalance) }}</div>
+              <div class="text-caption text-grey mb-2">
+                Outstanding Balance
+              </div>
+              <div class="text-h5 text-warning">
+                {{ formatCurrency(stats.outstandingBalance) }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
         <v-col cols="12" sm="6" md="3">
           <v-card>
             <v-card-text>
-              <div class="text-caption text-grey mb-2">Total Penalties</div>
-              <div class="text-h5 text-error">{{ formatCurrency(stats.totalPenalties) }}</div>
+              <div class="text-caption text-grey mb-2">
+                Total Penalties
+              </div>
+              <div class="text-h5 text-error">
+                {{ formatCurrency(stats.totalPenalties) }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
         <v-col cols="12" sm="6" md="3">
           <v-card>
             <v-card-text>
-              <div class="text-caption text-grey mb-2">Total Commissions</div>
-              <div class="text-h5">{{ formatCurrency(stats.totalCommissions) }}</div>
+              <div class="text-caption text-grey mb-2">
+                Total Commissions
+              </div>
+              <div class="text-h5">
+                {{ formatCurrency(stats.totalCommissions) }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -120,7 +166,9 @@
       <!-- Pending Actions -->
       <v-row class="mt-4">
         <v-col cols="12">
-          <h3 class="text-h6 mb-3">Pending Actions</h3>
+          <h3 class="text-h6 mb-3">
+            Pending Actions
+          </h3>
         </v-col>
         <v-col cols="12" sm="6" md="4">
           <v-card
@@ -130,11 +178,17 @@
             <v-card-text>
               <div class="d-flex justify-space-between align-center">
                 <div>
-                  <div class="text-caption text-grey">Pending Loan Approvals</div>
-                  <div class="text-h4 text-warning mt-2">{{ stats.pendingLoans }}</div>
+                  <div class="text-caption text-grey">
+                    Pending Loan Approvals
+                  </div>
+                  <div class="text-h4 text-warning mt-2">
+                    {{ stats.pendingLoans }}
+                  </div>
                 </div>
                 <v-avatar color="warning" size="56">
-                  <v-icon size="32">mdi-clock-alert</v-icon>
+                  <v-icon size="32">
+                    mdi-clock-alert
+                  </v-icon>
                 </v-avatar>
               </div>
             </v-card-text>
@@ -148,11 +202,17 @@
             <v-card-text>
               <div class="d-flex justify-space-between align-center">
                 <div>
-                  <div class="text-caption text-grey">Pending Cashouts</div>
-                  <div class="text-h4 text-info mt-2">{{ stats.pendingCashouts }}</div>
+                  <div class="text-caption text-grey">
+                    Pending Cashouts
+                  </div>
+                  <div class="text-h4 text-info mt-2">
+                    {{ stats.pendingCashouts }}
+                  </div>
                 </div>
                 <v-avatar color="info" size="56">
-                  <v-icon size="32">mdi-cash-clock</v-icon>
+                  <v-icon size="32">
+                    mdi-cash-clock
+                  </v-icon>
                 </v-avatar>
               </div>
             </v-card-text>
@@ -163,11 +223,17 @@
             <v-card-text>
               <div class="d-flex justify-space-between align-center">
                 <div>
-                  <div class="text-caption text-grey">Overdue Loans</div>
-                  <div class="text-h4 text-error mt-2">{{ stats.overdueLoans }}</div>
+                  <div class="text-caption text-grey">
+                    Overdue Loans
+                  </div>
+                  <div class="text-h4 text-error mt-2">
+                    {{ stats.overdueLoans }}
+                  </div>
                 </div>
                 <v-avatar color="error" size="56">
-                  <v-icon size="32">mdi-alert</v-icon>
+                  <v-icon size="32">
+                    mdi-alert
+                  </v-icon>
                 </v-avatar>
               </div>
             </v-card-text>
@@ -204,14 +270,20 @@
                         <span class="text-caption">{{ getInitials(agent.full_name) }}</span>
                       </v-avatar>
                       <div>
-                        <div class="font-weight-bold">{{ agent.full_name }}</div>
-                        <div class="text-caption text-grey">{{ agent.display_name || agent.email }}</div>
+                        <div class="font-weight-bold">
+                          {{ agent.full_name }}
+                        </div>
+                        <div class="text-caption text-grey">
+                          {{ agent.display_name || agent.email }}
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td>{{ agent.activeLoans }}</td>
                   <td>{{ formatCurrency(agent.totalCollected) }}</td>
-                  <td class="text-success">{{ formatCurrency(agent.totalCommissions) }}</td>
+                  <td class="text-success">
+                    {{ formatCurrency(agent.totalCommissions) }}
+                  </td>
                   <td>
                     <v-chip
                       size="small"

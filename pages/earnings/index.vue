@@ -4,8 +4,12 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
-            <h1 class="text-h4">My Earnings</h1>
-            <p class="text-subtitle-1 text-grey">Commission tracking and cashout management</p>
+            <h1 class="text-h4">
+              My Earnings
+            </h1>
+            <p class="text-subtitle-1 text-grey">
+              Commission tracking and cashout management
+            </p>
           </div>
           <v-btn
             color="primary"
@@ -24,36 +28,60 @@
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Earnings</div>
-            <div class="text-h5">{{ formatCurrency(earnings?.total_earnings || 0) }}</div>
-            <div class="text-caption text-success mt-1">All time</div>
+            <div class="text-caption text-grey">
+              Total Earnings
+            </div>
+            <div class="text-h5">
+              {{ formatCurrency(earnings?.total_earnings || 0) }}
+            </div>
+            <div class="text-caption text-success mt-1">
+              All time
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Collectible Earnings</div>
-            <div class="text-h5 text-success">{{ formatCurrency(earnings?.collectible_earnings || 0) }}</div>
-            <div class="text-caption mt-1">Available for cashout</div>
+            <div class="text-caption text-grey">
+              Collectible Earnings
+            </div>
+            <div class="text-h5 text-success">
+              {{ formatCurrency(earnings?.collectible_earnings || 0) }}
+            </div>
+            <div class="text-caption mt-1">
+              Available for cashout
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Cashed Out</div>
-            <div class="text-h5">{{ formatCurrency(earnings?.cashed_out || 0) }}</div>
-            <div class="text-caption text-info mt-1">Successfully withdrawn</div>
+            <div class="text-caption text-grey">
+              Cashed Out
+            </div>
+            <div class="text-h5">
+              {{ formatCurrency(earnings?.cashed_out || 0) }}
+            </div>
+            <div class="text-caption text-info mt-1">
+              Successfully withdrawn
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Commission Rate</div>
-            <div class="text-h5">{{ earnings?.commission_percentage || 0 }}%</div>
-            <div class="text-caption mt-1">On interest collected</div>
+            <div class="text-caption text-grey">
+              Commission Rate
+            </div>
+            <div class="text-h5">
+              {{ earnings?.commission_percentage || 0 }}%
+            </div>
+            <div class="text-caption mt-1">
+              On interest collected
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -63,7 +91,9 @@
     <v-row v-if="earningsStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading earnings...</p>
+        <p class="mt-4 text-grey">
+          Loading earnings...
+        </p>
       </v-col>
     </v-row>
 
@@ -107,9 +137,15 @@
               </v-list-item>
             </v-list>
             <v-card-text v-else class="text-center text-grey py-8">
-              <v-icon size="64" color="grey-lighten-2">mdi-cash-remove</v-icon>
-              <p class="mt-2">No commission earnings yet</p>
-              <p class="text-caption">Record payments to start earning commissions</p>
+              <v-icon size="64" color="grey-lighten-2">
+                mdi-cash-remove
+              </v-icon>
+              <p class="mt-2">
+                No commission earnings yet
+              </p>
+              <p class="text-caption">
+                Record payments to start earning commissions
+              </p>
             </v-card-text>
           </v-card>
         </v-col>
@@ -177,7 +213,9 @@
               <tbody>
                 <tr v-for="cashout in cashoutsStore.cashouts" :key="cashout.id">
                   <td>{{ formatDate(cashout.created_at) }}</td>
-                  <td class="font-weight-bold">{{ formatCurrency(cashout.amount) }}</td>
+                  <td class="font-weight-bold">
+                    {{ formatCurrency(cashout.amount) }}
+                  </td>
                   <td>
                     <v-chip
                       size="small"
@@ -243,12 +281,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="closeCashoutDialog">Cancel</v-btn>
+          <v-btn variant="text" @click="closeCashoutDialog">
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
-            @click="handleCashoutRequest"
             :loading="cashoutLoading"
             :disabled="!cashoutFormValid"
+            @click="handleCashoutRequest"
           >
             Submit Request
           </v-btn>
@@ -324,10 +364,10 @@ const closeCashoutDialog = () => {
 }
 
 const handleCashoutRequest = async () => {
-  if (!cashoutFormRef.value) return
+  if (!cashoutFormRef.value) { return }
 
   const { valid } = await cashoutFormRef.value.validate()
-  if (!valid) return
+  if (!valid) { return }
 
   cashoutLoading.value = true
   cashoutError.value = ''

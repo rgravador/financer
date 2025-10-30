@@ -4,7 +4,7 @@ import { daysBetween } from '~/utils/formatters'
 /**
  * Calculate penalties for overdue payments
  */
-export function usePenalties() {
+export function usePenalties () {
   /**
    * Calculate penalty for a single overdue payment
    * Formula: Penalty per day = (Due amount * 3%) / 30

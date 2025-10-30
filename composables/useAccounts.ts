@@ -2,7 +2,7 @@ import type { Account } from '~/types'
 
 export const useAccounts = () => {
   const supabase = useSupabaseClient()
-  const {user} = useAuth()
+  const { user } = useAuth()
 
   const accounts = ref<Account[]>([])
   const loading = ref(false)
@@ -49,7 +49,6 @@ export const useAccounts = () => {
 
   // Actions
   const fetchAccounts = async () => {
-
     if (!user?.value) {
       loading.value = false
       return
@@ -67,7 +66,7 @@ export const useAccounts = () => {
 
       const { data, error } = await query.order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) { throw error }
       accounts.value = data || []
     } catch (error: any) {
       console.error('Error fetching accounts:', error)
@@ -77,7 +76,7 @@ export const useAccounts = () => {
   }
 
   const createAccount = async (accountData: { name: string; contact_info: string; address: string; id_proof_file?: File | null }) => {
-    if (!user.value) return { success: false, error: 'User not authenticated' }
+    if (!user.value) { return { success: false, error: 'User not authenticated' } }
 
     try {
       let id_proof_url: string | null = null
@@ -114,15 +113,105 @@ export const useAccounts = () => {
           id_proof_url,
           assigned_agent_id: user.value.id,
           created_by: user.value.id,
-          status: 'active'
+          status: 'active' as const
         })
         .select()
         .single()
 
-      if (error) throw error
+      if (error) { throw error }
 
       accounts.value.unshift(data)
       return { success: true, data }
+    } catch (error: any) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  const createAccountMultiStep = async (stepData: {
+    name: string
+    date_of_birth?: string | null
+    ssn_tax_id?: string | null
+    government_id_type?: string | null
+    government_id_number?: string | null
+    secondary_id_type?: string | null
+    id_proof_file?: File | null
+  }) => {
+    if (!user.value) { return { success: false, error: 'User not authenticated' } }
+
+    try {
+      let id_proof_url: string | null = null
+
+      // Handle file upload if provided
+      if (stepData.id_proof_file) {
+        const file = stepData.id_proof_file
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${user.value.id}-${Date.now()}-id.${fileExt}`
+        const filePath = `account-documents/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(filePath, file)
+
+        if (uploadError) {
+          console.error('File upload error:', uploadError)
+          throw new Error('Failed to upload ID proof')
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('documents')
+          .getPublicUrl(filePath)
+
+        id_proof_url = urlData.publicUrl
+      }
+
+      const { data, error } = await supabase
+        .from('accounts')
+        .insert({
+          name: stepData.name,
+          date_of_birth: stepData.date_of_birth,
+          ssn_tax_id: stepData.ssn_tax_id,
+          government_id_type: stepData.government_id_type,
+          government_id_number: stepData.government_id_number,
+          secondary_id_type: stepData.secondary_id_type,
+          id_proof_url,
+          assigned_agent_id: user.value.id,
+          created_by: user.value.id,
+          status: 'active' as const
+        })
+        .select()
+        .single()
+
+      if (error) { throw error }
+
+      accounts.value.unshift(data)
+      return { success: true, data }
+    } catch (error: any) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  const uploadAccountDocument = async (accountId: string, file: File, documentType: string) => {
+    if (!user.value) { return { success: false, error: 'User not authenticated' } }
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${accountId}-${documentType}-${Date.now()}.${fileExt}`
+      const filePath = `account-documents/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('File upload error:', uploadError)
+        throw new Error(`Failed to upload ${documentType}`)
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('documents')
+        .getPublicUrl(filePath)
+
+      return { success: true, url: urlData.publicUrl }
     } catch (error: any) {
       return { success: false, error: error.message }
     }
@@ -132,18 +221,18 @@ export const useAccounts = () => {
     try {
       const { data, error } = await supabase
         .from('accounts')
-        .update(updates as any)
+        .update(updates)
         .eq('id', accountId)
         .select()
         .single()
 
-      if (error) throw error
-      
+      if (error) { throw error }
+
       const index = accounts.value.findIndex(a => a.id === accountId)
       if (index !== -1) {
         accounts.value[index] = data
       }
-      
+
       return { success: true, data }
     } catch (error: any) {
       return { success: false, error: error.message }
@@ -159,6 +248,8 @@ export const useAccounts = () => {
     // Actions
     fetchAccounts,
     createAccount,
+    createAccountMultiStep,
+    uploadAccountDocument,
     updateAccount,
     setFilters,
     clearFilters

@@ -1,7 +1,7 @@
 /**
  * Calculate agent commissions
  */
-export function useCommissions() {
+export function useCommissions () {
   /**
    * Calculate commission from a payment
    * Commission is earned only on the interest portion of the payment

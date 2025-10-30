@@ -1,9 +1,23 @@
 <template>
-  <v-layout class="rounded rounded-md border">
+  <v-layout class="rounded rounded-md border" style="height: 100vh;">
     <!-- Navigation Drawer -->
     <v-navigation-drawer
       :model="ui.sidebarOpen"
+      permanent
+      fixed
     >
+      <v-list>
+        <v-list-item>
+          <div class="d-flex flex-column justify-center align-center">
+            <img class="rounded-circle mt-4" :style="{height: '100px', width: '100px'}" src="https://uyxjwoujwpvzgrxyqzmc.supabase.co/storage/v1/object/public/avatars/profile.jpeg" alt="">
+            <div class="text-uppercase mt-4 font-weight-bold">
+              {{ user?.full_name || '-' }}
+            </div>
+          </div>
+        </v-list-item>
+      </v-list>
+
+      <v-divider />
       <v-list>
         <v-list-item
           prepend-icon="mdi-view-dashboard"
@@ -67,11 +81,23 @@
     </v-navigation-drawer>
 
     <!-- App Bar -->
-    <v-app-bar color="primary" elevate-on-scroll>
-      <v-app-barNavIcon @click="ui.toggleSidebar" class="hide-on-desktop" />
+    <v-app-bar color="primary" elevate-on-scroll fixed app>
+      <!-- Back button for specific pages (mobile only) -->
+      <v-btn
+        v-if="showBackButton"
+        icon
+        variant="text"
+        class="mr-2 hide-on-desktop"
+        @click="$router.back()"
+      >
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+
+      <!-- Menu button for mobile (when not showing back button) -->
+      <v-app-barNavIcon v-else class="hide-on-desktop" @click="ui.toggleSidebar" />
 
       <v-app-barTitle>
-        <span class="text-h6">Financer</span>
+        <span class="text-h6 pl-4">{{ pageTitle || 'Financer' }}</span>
       </v-app-barTitle>
 
       <v-spacer />
@@ -87,7 +113,9 @@
             >
               <v-icon>mdi-bell</v-icon>
             </v-badge>
-            <v-icon v-else>mdi-bell</v-icon>
+            <v-icon v-else>
+              mdi-bell
+            </v-icon>
           </v-btn>
         </template>
 
@@ -125,43 +153,17 @@
           <v-divider />
 
           <v-card-actions>
-            <v-btn block variant="text" to="/notifications">View All</v-btn>
+            <v-btn block variant="text" to="/notifications">
+              View All
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-menu>
 
-      <!-- User Menu -->
-      <v-menu>
-        <template #activator="{ props }">
-          <v-btn icon v-bind="props">
-            <v-avatar size="32" color="secondary">
-              <v-icon v-if="!auth.user?.avatar_url">mdi-account</v-icon>
-              <v-img v-else :src="auth.user.avatar_url" />
-            </v-avatar>
-          </v-btn>
-        </template>
-
-        <v-card min-width="200">
-          <v-card-text class="pb-0">
-            <div class="text-h6">{{ auth.user?.full_name }}</div>
-            <div class="text-caption text-grey">{{ auth.user?.email }}</div>
-            <v-chip size="small" :color="auth.isAdmin ? 'error' : 'primary'" class="mt-2">
-              {{ auth.user?.role }}
-            </v-chip>
-          </v-card-text>
-
-          <v-divider class="my-2" />
-
-          <v-list density="compact">
-            <v-list-item to="/profile" prepend-icon="mdi-account">
-              <v-list-item-title>Profile</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="auth.logout()" prepend-icon="mdi-logout">
-              <v-list-item-title>Logout</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
+      <v-btn variant="plain" @click="auth.logout()">
+        <v-icon>mdi-logout</v-icon>
+        Logout
+      </v-btn>
     </v-app-bar>
 
     <!-- Bottom Navigation (Mobile) -->
@@ -169,6 +171,8 @@
       v-model="bottomNav"
       grow
       class="hide-on-desktop"
+      fixed
+      app
     >
       <v-btn value="dashboard" to="/dashboard">
         <v-icon>mdi-view-dashboard</v-icon>
@@ -197,7 +201,7 @@
     </v-bottom-navigation>
 
     <!-- Main Content -->
-    <v-main>
+    <v-main style="overflow-y: auto; height: 100vh;">
       <slot />
     </v-main>
 
@@ -210,7 +214,9 @@
     >
       {{ ui.snackbar.message }}
       <template #actions>
-        <v-btn variant="text" @click="ui.hideSnackbar()">Close</v-btn>
+        <v-btn variant="text" @click="ui.hideSnackbar()">
+          Close
+        </v-btn>
       </template>
     </v-snackbar>
   </v-layout>
@@ -223,7 +229,37 @@ const auth = useAuth()
 const ui = useUI()
 const notifications = useNotifications()
 
+const { user } = auth
 const bottomNav = ref('dashboard')
+
+// Get page title - use a simple reactive approach
+const route = useRoute()
+const pageTitle = computed(() => {
+  // Map specific routes to titles
+  const routeTitles: Record<string, string> = {
+    'accounts-create': 'Create New Account',
+    accounts: 'Accounts',
+    loans: 'Loans',
+    payments: 'Payments',
+    earnings: 'Earnings',
+    cashouts: 'Cashouts',
+    dashboard: 'Dashboard',
+    'admin-dashboard': 'Admin Dashboard',
+    'admin-approvals': 'Loan Approvals',
+    'admin-cashouts': 'Cashout Management',
+    'admin-users': 'User Management'
+  }
+
+  const routeName = route.name as string
+  return routeTitles[routeName] || 'Financer'
+})
+
+// Show back button for specific pages
+const showBackButton = computed(() => {
+  const pagesWithBackButton = ['accounts-create', 'loans-create', 'accounts-edit']
+  const routeName = route.name as string
+  return pagesWithBackButton.includes(routeName)
+})
 
 // Fetch notifications on mount
 onMounted(async () => {

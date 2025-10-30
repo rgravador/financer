@@ -3,7 +3,7 @@ import type { Notification } from '~/types'
 export const useNotifications = () => {
   const supabase = useSupabaseClient()
   const { user } = useAuth()
-  
+
   const notifications = ref<Notification[]>([])
   const unreadCount = ref(0)
   const loading = ref(false)
@@ -15,8 +15,8 @@ export const useNotifications = () => {
 
   // Actions
   const fetchNotifications = async () => {
-    if (!user.value) return
-    
+    if (!user.value) { return }
+
     loading.value = true
     try {
       const { data, error } = await supabase
@@ -25,7 +25,7 @@ export const useNotifications = () => {
         .eq('user_id', user.value.id)
         .order('timestamp', { ascending: false })
 
-      if (error) throw error
+      if (error) { throw error }
 
       notifications.value = data || []
       unreadCount.value = notifications.value.filter(n => !n.is_read).length
@@ -43,7 +43,7 @@ export const useNotifications = () => {
         .update({ is_read: true } as any)
         .eq('id', notificationId)
 
-      if (error) throw error
+      if (error) { throw error }
 
       // Update local state
       const notification = notifications.value.find(n => n.id === notificationId)
@@ -57,8 +57,8 @@ export const useNotifications = () => {
   }
 
   const markAllAsRead = async () => {
-    if (!user.value) return
-    
+    if (!user.value) { return }
+
     try {
       const { error } = await supabase
         .from('notifications')
@@ -66,10 +66,10 @@ export const useNotifications = () => {
         .eq('user_id', user.value.id)
         .eq('is_read', false)
 
-      if (error) throw error
+      if (error) { throw error }
 
       // Update local state
-      notifications.value.forEach(n => {
+      notifications.value.forEach((n) => {
         n.is_read = true
       })
       unreadCount.value = 0
@@ -79,7 +79,7 @@ export const useNotifications = () => {
   }
 
   const subscribeToRealtime = () => {
-    if (!user.value) return
+    if (!user.value) { return }
 
     const { showInfo } = useUI()
 

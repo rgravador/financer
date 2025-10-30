@@ -4,8 +4,12 @@
       <v-col cols="12" sm="10" md="6" lg="5" class="pa-8">
         <!-- Header -->
         <div class="text-center mb-8">
-          <h1 class="text-h3 font-weight-bold text-white mb-3">Create Account</h1>
-          <p class="text-body-1 text-grey-lighten-1">Join LoanStar</p>
+          <h1 class="text-h3 font-weight-bold text-white mb-3">
+            Create Account
+          </h1>
+          <p class="text-body-1 text-grey-lighten-1">
+            Join LoanStar
+          </p>
         </div>
 
         <!-- Signup Form -->
@@ -139,10 +143,10 @@ const { signup } = useAuth()
 const router = useRouter()
 
 const handleSignup = async () => {
-  if (!formRef.value) return
+  if (!formRef.value) { return }
 
   const { valid } = await formRef.value.validate()
-  if (!valid) return
+  if (!valid) { return }
 
   loading.value = true
   error.value = ''

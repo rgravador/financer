@@ -10,8 +10,8 @@ export const MIN_CASHOUT_AMOUNT = 10
 // Payment frequencies
 export const PAYMENT_FREQUENCIES = {
   'bi-monthly': { days: 15, label: 'Bi-Monthly (Every 15 days)' },
-  'monthly': { days: 30, label: 'Monthly' },
-  'weekly': { days: 7, label: 'Weekly' }
+  monthly: { days: 30, label: 'Monthly' },
+  weekly: { days: 7, label: 'Weekly' }
 } as const
 
 // Status colors

@@ -4,7 +4,9 @@
     <v-row v-if="loading" class="mt-8">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading loan details...</p>
+        <p class="mt-4 text-grey">
+          Loading loan details...
+        </p>
       </v-col>
     </v-row>
 
@@ -17,8 +19,12 @@
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
             <div class="ml-4 flex-grow-1">
-              <h1 class="text-h4">{{ formatCurrency(loan.principal_amount) }} Loan</h1>
-              <p class="text-subtitle-1">{{ loan.account?.name }}</p>
+              <h1 class="text-h4">
+                {{ formatCurrency(loan.principal_amount) }} Loan
+              </h1>
+              <p class="text-subtitle-1">
+                {{ loan.account?.name }}
+              </p>
             </div>
             <v-chip :color="getLoanStatusColor(loan.status)" size="large">
               {{ loan.status.replace('_', ' ').toUpperCase() }}
@@ -35,42 +41,66 @@
             <v-divider />
             <v-card-text>
               <div class="mb-3">
-                <div class="text-caption text-grey">Principal Amount</div>
-                <div class="text-h6">{{ formatCurrency(loan.principal_amount) }}</div>
+                <div class="text-caption text-grey">
+                  Principal Amount
+                </div>
+                <div class="text-h6">
+                  {{ formatCurrency(loan.principal_amount) }}
+                </div>
               </div>
               <div class="mb-3">
-                <div class="text-caption text-grey">Current Balance</div>
+                <div class="text-caption text-grey">
+                  Current Balance
+                </div>
                 <div class="text-h6" :class="loan.current_balance > 0 ? 'text-warning' : 'text-success'">
                   {{ formatCurrency(loan.current_balance) }}
                 </div>
               </div>
               <div class="mb-3">
-                <div class="text-caption text-grey">Total Paid</div>
-                <div class="text-h6 text-success">{{ formatCurrency(loan.total_paid) }}</div>
+                <div class="text-caption text-grey">
+                  Total Paid
+                </div>
+                <div class="text-h6 text-success">
+                  {{ formatCurrency(loan.total_paid) }}
+                </div>
               </div>
               <div v-if="loan.total_penalties > 0" class="mb-3">
-                <div class="text-caption text-grey">Total Penalties</div>
-                <div class="text-h6 text-error">{{ formatCurrency(loan.total_penalties) }}</div>
+                <div class="text-caption text-grey">
+                  Total Penalties
+                </div>
+                <div class="text-h6 text-error">
+                  {{ formatCurrency(loan.total_penalties) }}
+                </div>
               </div>
               <v-divider class="my-3" />
               <div class="mb-2">
-                <v-icon size="small" class="mr-2">mdi-percent</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-percent
+                </v-icon>
                 <span>{{ loan.interest_rate }}% per month</span>
               </div>
               <div class="mb-2">
-                <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-calendar
+                </v-icon>
                 <span>{{ loan.tenure_months }} months</span>
               </div>
               <div class="mb-2">
-                <v-icon size="small" class="mr-2">mdi-calendar-clock</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-calendar-clock
+                </v-icon>
                 <span>{{ loan.payment_frequency }}</span>
               </div>
               <div class="mb-2">
-                <v-icon size="small" class="mr-2">mdi-calendar-start</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-calendar-start
+                </v-icon>
                 <span>{{ formatDate(loan.start_date) }}</span>
               </div>
               <div>
-                <v-icon size="small" class="mr-2">mdi-calendar-end</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-calendar-end
+                </v-icon>
                 <span>{{ formatDate(loan.end_date) }}</span>
               </div>
             </v-card-text>
@@ -146,7 +176,9 @@
                     <td>{{ formatDate(item.due_date) }}</td>
                     <td>{{ formatCurrency(item.principal_due) }}</td>
                     <td>{{ formatCurrency(item.interest_due) }}</td>
-                    <td class="font-weight-bold">{{ formatCurrency(item.total_due) }}</td>
+                    <td class="font-weight-bold">
+                      {{ formatCurrency(item.total_due) }}
+                    </td>
                     <td>{{ formatCurrency(item.remaining_balance) }}</td>
                     <td>
                       <v-chip size="x-small" :color="getPaymentStatusColor(item)">
@@ -192,8 +224,12 @@
     <!-- Error State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="error">mdi-alert-circle-outline</v-icon>
-        <h3 class="text-h6 mt-4">Loan not found</h3>
+        <v-icon size="120" color="error">
+          mdi-alert-circle-outline
+        </v-icon>
+        <h3 class="text-h6 mt-4">
+          Loan not found
+        </h3>
         <v-btn color="primary" class="mt-4" @click="$router.back()">
           Go Back
         </v-btn>
@@ -209,8 +245,12 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="approveLoanDialog = false">Cancel</v-btn>
-          <v-btn color="success" @click="handleApproveLoan" :loading="actionLoading">Approve</v-btn>
+          <v-btn variant="text" @click="approveLoanDialog = false">
+            Cancel
+          </v-btn>
+          <v-btn color="success" :loading="actionLoading" @click="handleApproveLoan">
+            Approve
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -229,12 +269,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="rejectLoanDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="rejectLoanDialog = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="error"
-            @click="handleRejectLoan"
             :loading="actionLoading"
             :disabled="!rejectionReason"
+            @click="handleRejectLoan"
           >
             Reject
           </v-btn>

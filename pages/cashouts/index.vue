@@ -4,8 +4,12 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
-            <h1 class="text-h4">Cashout Requests</h1>
-            <p class="text-subtitle-1 text-grey">Manage your cashout requests</p>
+            <h1 class="text-h4">
+              Cashout Requests
+            </h1>
+            <p class="text-subtitle-1 text-grey">
+              Manage your cashout requests
+            </p>
           </div>
           <v-btn
             color="primary"
@@ -24,32 +28,48 @@
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Requests</div>
-            <div class="text-h5">{{ cashoutsStore.cashouts.length }}</div>
+            <div class="text-caption text-grey">
+              Total Requests
+            </div>
+            <div class="text-h5">
+              {{ cashoutsStore.cashouts.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Pending</div>
-            <div class="text-h5 text-warning">{{ pendingCashouts.length }}</div>
+            <div class="text-caption text-grey">
+              Pending
+            </div>
+            <div class="text-h5 text-warning">
+              {{ pendingCashouts.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Approved</div>
-            <div class="text-h5 text-success">{{ approvedCashouts.length }}</div>
+            <div class="text-caption text-grey">
+              Approved
+            </div>
+            <div class="text-h5 text-success">
+              {{ approvedCashouts.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Available Balance</div>
-            <div class="text-h5 text-success">{{ formatCurrency(earningsStore.earnings?.collectible_earnings || 0) }}</div>
+            <div class="text-caption text-grey">
+              Available Balance
+            </div>
+            <div class="text-h5 text-success">
+              {{ formatCurrency(earningsStore.earnings?.collectible_earnings || 0) }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -59,7 +79,9 @@
     <v-row v-if="cashoutsStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading cashout requests...</p>
+        <p class="mt-4 text-grey">
+          Loading cashout requests...
+        </p>
       </v-col>
     </v-row>
 
@@ -87,7 +109,9 @@
               <tbody>
                 <tr v-for="cashout in cashoutsStore.cashouts" :key="cashout.id">
                   <td>{{ formatDate(cashout.created_at) }}</td>
-                  <td class="font-weight-bold">{{ formatCurrency(cashout.amount) }}</td>
+                  <td class="font-weight-bold">
+                    {{ formatCurrency(cashout.amount) }}
+                  </td>
                   <td>
                     <v-chip
                       size="small"
@@ -167,8 +191,12 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-cash-multiple</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No cashout requests yet</h3>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-cash-multiple
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No cashout requests yet
+        </h3>
         <p class="text-body-2 text-grey mb-4">
           Request your first cashout to withdraw your earnings
         </p>
@@ -228,12 +256,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="closeCashoutDialog">Cancel</v-btn>
+          <v-btn variant="text" @click="closeCashoutDialog">
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
-            @click="handleCashoutRequest"
             :loading="cashoutLoading"
             :disabled="!cashoutFormValid"
+            @click="handleCashoutRequest"
           >
             Submit Request
           </v-btn>
@@ -250,11 +280,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="cancelDialog = false">No</v-btn>
+          <v-btn variant="text" @click="cancelDialog = false">
+            No
+          </v-btn>
           <v-btn
             color="error"
-            @click="handleCancelRequest"
             :loading="cancelLoading"
+            @click="handleCancelRequest"
           >
             Yes, Cancel
           </v-btn>
@@ -330,10 +362,10 @@ const closeCashoutDialog = () => {
 }
 
 const handleCashoutRequest = async () => {
-  if (!cashoutFormRef.value) return
+  if (!cashoutFormRef.value) { return }
 
   const { valid } = await cashoutFormRef.value.validate()
-  if (!valid) return
+  if (!valid) { return }
 
   cashoutLoading.value = true
   cashoutError.value = ''
@@ -364,7 +396,7 @@ const openCancelDialog = (cashout: Cashout) => {
 }
 
 const handleCancelRequest = async () => {
-  if (!selectedCashout.value) return
+  if (!selectedCashout.value) { return }
 
   cancelLoading.value = true
 

@@ -32,7 +32,9 @@
                   <!-- Loan Summary -->
                   <v-card v-if="selectedLoan" variant="outlined" class="mb-4">
                     <v-card-text>
-                      <div class="text-caption text-grey mb-2">Loan Summary</div>
+                      <div class="text-caption text-grey mb-2">
+                        Loan Summary
+                      </div>
                       <div class="d-flex justify-space-between mb-1">
                         <span class="text-body-2">Principal:</span>
                         <span class="font-weight-bold">{{ formatCurrency(selectedLoan.principal_amount) }}</span>
@@ -85,11 +87,15 @@
                 </v-col>
 
                 <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-4">Payment Application Preview</h3>
+                  <h3 class="text-h6 mb-4">
+                    Payment Application Preview
+                  </h3>
 
                   <v-card variant="outlined" color="info" class="mb-4">
                     <v-card-text>
-                      <div class="text-caption text-grey mb-3">This payment will be applied as:</div>
+                      <div class="text-caption text-grey mb-3">
+                        This payment will be applied as:
+                      </div>
 
                       <div v-if="paymentBreakdown.penalty > 0" class="d-flex justify-space-between mb-2">
                         <span>To Penalties:</span>
@@ -123,7 +129,9 @@
 
                   <v-card variant="outlined" color="success" class="mb-4">
                     <v-card-text>
-                      <div class="text-caption text-grey mb-2">After Payment</div>
+                      <div class="text-caption text-grey mb-2">
+                        After Payment
+                      </div>
                       <div class="d-flex justify-space-between mb-1">
                         <span>New Balance:</span>
                         <span class="font-weight-bold">
@@ -168,8 +176,8 @@
                 <v-btn
                   variant="outlined"
                   size="large"
-                  @click="$router.back()"
                   :disabled="loading"
+                  @click="$router.back()"
                 >
                   Cancel
                 </v-btn>
@@ -294,10 +302,10 @@ const onLoanSelected = () => {
 }
 
 const handleSubmit = async () => {
-  if (!formRef.value) return
+  if (!formRef.value) { return }
 
   const { valid } = await formRef.value.validate()
-  if (!valid) return
+  if (!valid) { return }
 
   loading.value = true
   error.value = ''

@@ -4,8 +4,12 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
-            <h1 class="text-h4">Accounts</h1>
-            <p class="text-subtitle-1 text-grey">Manage borrower accounts</p>
+            <h1 class="text-h4">
+              Accounts
+            </h1>
+            <p class="text-subtitle-1 text-grey">
+              Manage borrower accounts
+            </p>
           </div>
           <v-btn color="primary" prepend-icon="mdi-plus" to="/accounts/create">
             Add Account
@@ -18,7 +22,9 @@
     <v-row v-if="loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading accounts... {{ loading }}</p>
+        <p class="mt-4 text-grey">
+          Loading accounts... {{ loading }}
+        </p>
       </v-col>
     </v-row>
 
@@ -117,15 +123,21 @@
 
             <v-card-text>
               <div class="mb-2">
-                <v-icon size="small" class="mr-2">mdi-phone</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-phone
+                </v-icon>
                 <span class="text-body-2">{{ account.contact_info }}</span>
               </div>
               <div class="mb-2">
-                <v-icon size="small" class="mr-2">mdi-map-marker</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-map-marker
+                </v-icon>
                 <span class="text-body-2 text-truncate">{{ account.address }}</span>
               </div>
               <div>
-                <v-icon size="small" class="mr-2">mdi-file-document</v-icon>
+                <v-icon size="small" class="mr-2">
+                  mdi-file-document
+                </v-icon>
                 <span class="text-body-2">{{ account.loans?.length || 0 }} loans</span>
               </div>
             </v-card-text>
@@ -169,7 +181,6 @@ const { loading, filteredAccounts, filters } = useAccounts()
 
 const uiStore = useUI()
 
-
 const statusOptions = [
   { title: 'Active', value: 'active' },
   { title: 'Inactive', value: 'inactive' },
@@ -184,7 +195,6 @@ const headers = [
   { title: 'Loans', value: 'loans', sortable: false },
   { title: 'Actions', value: 'actions', sortable: false, align: 'end' as const }
 ]
-
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {

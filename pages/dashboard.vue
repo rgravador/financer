@@ -4,8 +4,12 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
-            <h1 class="text-h4">Dashboard</h1>
-            <p class="text-subtitle-1 text-grey">Welcome back, {{ user?.full_name }}</p>
+            <h1 class="text-h4">
+              Dashboard
+            </h1>
+            <p class="text-subtitle-1 text-grey">
+              Welcome back, {{ user?.full_name }}
+            </p>
           </div>
           <v-btn color="primary" prepend-icon="mdi-plus" to="/accounts/create">
             Add Account
@@ -21,11 +25,17 @@
           <v-card-text>
             <div class="d-flex justify-space-between align-center">
               <div>
-                <p class="text-caption text-grey">Total Accounts</p>
-                <h2 class="text-h4">{{ accountsCount }}</h2>
+                <p class="text-caption text-grey">
+                  Total Accounts
+                </p>
+                <h2 class="text-h4">
+                  {{ accountsCount }}
+                </h2>
               </div>
               <v-avatar color="primary" size="48">
-                <v-icon size="28">mdi-account-multiple</v-icon>
+                <v-icon size="28">
+                  mdi-account-multiple
+                </v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -37,11 +47,17 @@
           <v-card-text>
             <div class="d-flex justify-space-between align-center">
               <div>
-                <p class="text-caption text-grey">Active Loans</p>
-                <h2 class="text-h4">{{ activeLoansCount }}</h2>
+                <p class="text-caption text-grey">
+                  Active Loans
+                </p>
+                <h2 class="text-h4">
+                  {{ activeLoansCount }}
+                </h2>
               </div>
               <v-avatar color="success" size="48">
-                <v-icon size="28">mdi-file-document</v-icon>
+                <v-icon size="28">
+                  mdi-file-document
+                </v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -53,11 +69,17 @@
           <v-card-text>
             <div class="d-flex justify-space-between align-center">
               <div>
-                <p class="text-caption text-grey">Collectible Earnings</p>
-                <h2 class="text-h5">{{ formatCurrency(availableEarnings) }}</h2>
+                <p class="text-caption text-grey">
+                  Collectible Earnings
+                </p>
+                <h2 class="text-h5">
+                  {{ formatCurrency(availableEarnings) }}
+                </h2>
               </div>
               <v-avatar color="warning" size="48">
-                <v-icon size="28">mdi-currency-usd</v-icon>
+                <v-icon size="28">
+                  mdi-currency-usd
+                </v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -69,11 +91,17 @@
           <v-card-text>
             <div class="d-flex justify-space-between align-center">
               <div>
-                <p class="text-caption text-grey">Overdue Loans</p>
-                <h2 class="text-h4">{{ overdueLoansCount }}</h2>
+                <p class="text-caption text-grey">
+                  Overdue Loans
+                </p>
+                <h2 class="text-h4">
+                  {{ overdueLoansCount }}
+                </h2>
               </div>
               <v-avatar color="error" size="48">
-                <v-icon size="28">mdi-alert-circle</v-icon>
+                <v-icon size="28">
+                  mdi-alert-circle
+                </v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -87,7 +115,9 @@
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
             <span>Recent Notifications</span>
-            <v-btn size="small" variant="text" to="/notifications">View All</v-btn>
+            <v-btn size="small" variant="text" to="/notifications">
+              View All
+            </v-btn>
           </v-card-title>
 
           <v-divider />
@@ -132,7 +162,9 @@
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
             <span>Recent Payments</span>
-            <v-btn size="small" variant="text" to="/payments">View All</v-btn>
+            <v-btn size="small" variant="text" to="/payments">
+              View All
+            </v-btn>
           </v-card-title>
 
           <v-divider />
@@ -201,7 +233,7 @@
 import { NOTIFICATION_COLORS, NOTIFICATION_ICONS } from '~/utils/constants'
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: 'auth'
 })
 
 const { user } = useAuth()

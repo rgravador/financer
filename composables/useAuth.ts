@@ -52,7 +52,7 @@ export const useAuth = () => {
         password
       })
 
-      if (error) throw error
+      if (error) { throw error }
 
       await fetchUserProfile(data.user.id)
 
@@ -64,12 +64,12 @@ export const useAuth = () => {
     }
   }
 
-  const signup = async (userData: { 
+  const signup = async (userData: {
     email: string
     password: string
     full_name: string
     display_name?: string
-    role: 'admin' | 'agent' 
+    role: 'admin' | 'agent'
   }) => {
     loading.value = true
     try {
@@ -85,19 +85,19 @@ export const useAuth = () => {
         }
       })
 
-      if (authError) throw authError
+      if (authError) { throw authError }
 
       // Create user profile
       const { error: profileError } = await (supabase
         .from('users_profile')
         .insert as any)({
-          id: authData.user?.id || '',
-          email: userData.email,
-          full_name: userData.full_name,
-          role: userData.role
-        })
+        id: authData.user?.id || '',
+        email: userData.email,
+        full_name: userData.full_name,
+        role: userData.role
+      })
 
-      if (profileError) throw profileError
+      if (profileError) { throw profileError }
 
       return { success: true }
     } catch (error: any) {
@@ -121,7 +121,7 @@ export const useAuth = () => {
       .eq('id', userId)
       .single()
 
-    if (error) throw error
+    if (error) { throw error }
 
     // Get display name from auth metadata
     const { data: { user: authUser } } = await supabase.auth.getUser()
@@ -150,7 +150,6 @@ export const useAuth = () => {
 
   // Listen to auth state changes
   supabase.auth.onAuthStateChange(async (event, session) => {
-
     if (event === 'SIGNED_IN' && session?.user) {
       // User signed in, fetch and save profile
       await fetchUserProfile(session.user.id)

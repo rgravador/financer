@@ -17,7 +17,9 @@
               <v-row>
                 <!-- Loan Details -->
                 <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-4">Loan Details</h3>
+                  <h3 class="text-h6 mb-4">
+                    Loan Details
+                  </h3>
 
                   <v-select
                     v-model="form.account_id"
@@ -106,7 +108,9 @@
 
                 <!-- Amortization Preview -->
                 <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-4">Amortization Preview</h3>
+                  <h3 class="text-h6 mb-4">
+                    Amortization Preview
+                  </h3>
 
                   <v-card variant="outlined" class="mb-4">
                     <v-card-text>
@@ -171,8 +175,8 @@
                 <v-btn
                   variant="outlined"
                   size="large"
-                  @click="$router.back()"
                   :disabled="loading"
+                  @click="$router.back()"
                 >
                   Cancel
                 </v-btn>
@@ -251,10 +255,10 @@ const canSubmit = computed(() => {
 })
 
 const handleSubmit = async () => {
-  if (!formRef.value) return
+  if (!formRef.value) { return }
 
   const { valid } = await formRef.value.validate()
-  if (!valid) return
+  if (!valid) { return }
 
   loading.value = true
   error.value = ''

@@ -3,8 +3,12 @@
     <v-row>
       <v-col cols="12">
         <div class="mb-4">
-          <h1 class="text-h4">Loan Approvals</h1>
-          <p class="text-subtitle-1 text-grey">Review and approve pending loan applications</p>
+          <h1 class="text-h4">
+            Loan Approvals
+          </h1>
+          <p class="text-subtitle-1 text-grey">
+            Review and approve pending loan applications
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -14,24 +18,36 @@
       <v-col cols="12" sm="4">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Pending Approvals</div>
-            <div class="text-h5 text-warning">{{ pendingLoans.length }}</div>
+            <div class="text-caption text-grey">
+              Pending Approvals
+            </div>
+            <div class="text-h5 text-warning">
+              {{ pendingLoans.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="4">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Amount Pending</div>
-            <div class="text-h5">{{ formatCurrency(totalPendingAmount) }}</div>
+            <div class="text-caption text-grey">
+              Total Amount Pending
+            </div>
+            <div class="text-h5">
+              {{ formatCurrency(totalPendingAmount) }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="4">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Approved Today</div>
-            <div class="text-h5 text-success">{{ approvedTodayCount }}</div>
+            <div class="text-caption text-grey">
+              Approved Today
+            </div>
+            <div class="text-h5 text-success">
+              {{ approvedTodayCount }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -41,7 +57,9 @@
     <v-row v-if="loansStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading pending loans...</p>
+        <p class="mt-4 text-grey">
+          Loading pending loans...
+        </p>
       </v-col>
     </v-row>
 
@@ -71,15 +89,23 @@
                 <tr v-for="loan in pendingLoans" :key="loan.id">
                   <td>
                     <div>
-                      <div class="font-weight-bold">{{ loan.account?.name }}</div>
-                      <div class="text-caption text-grey">{{ loan.account?.contact_number }}</div>
+                      <div class="font-weight-bold">
+                        {{ loan.account?.name }}
+                      </div>
+                      <div class="text-caption text-grey">
+                        {{ loan.account?.contact_number }}
+                      </div>
                     </div>
                   </td>
                   <td>{{ loan.agent?.full_name || 'N/A' }}</td>
-                  <td class="font-weight-bold">{{ formatCurrency(loan.principal_amount) }}</td>
+                  <td class="font-weight-bold">
+                    {{ formatCurrency(loan.principal_amount) }}
+                  </td>
                   <td>{{ loan.interest_rate }}%</td>
                   <td>{{ loan.tenure_months }} months</td>
-                  <td class="font-weight-bold">{{ formatCurrency(calculateTotalAmount(loan)) }}</td>
+                  <td class="font-weight-bold">
+                    {{ formatCurrency(calculateTotalAmount(loan)) }}
+                  </td>
                   <td>{{ formatDate(loan.created_at) }}</td>
                   <td>
                     <div class="d-flex gap-1">
@@ -124,13 +150,23 @@
             >
               <v-card-text>
                 <div class="mb-2">
-                  <div class="font-weight-bold">{{ loan.account?.name }}</div>
-                  <div class="text-caption text-grey">{{ loan.account?.contact_number }}</div>
+                  <div class="font-weight-bold">
+                    {{ loan.account?.name }}
+                  </div>
+                  <div class="text-caption text-grey">
+                    {{ loan.account?.contact_number }}
+                  </div>
                 </div>
                 <div class="mb-2">
-                  <v-chip size="small" class="mr-1">{{ formatCurrency(loan.principal_amount) }}</v-chip>
-                  <v-chip size="small" class="mr-1">{{ loan.interest_rate }}%</v-chip>
-                  <v-chip size="small">{{ loan.tenure_months }}mo</v-chip>
+                  <v-chip size="small" class="mr-1">
+                    {{ formatCurrency(loan.principal_amount) }}
+                  </v-chip>
+                  <v-chip size="small" class="mr-1">
+                    {{ loan.interest_rate }}%
+                  </v-chip>
+                  <v-chip size="small">
+                    {{ loan.tenure_months }}mo
+                  </v-chip>
                 </div>
                 <div class="text-caption text-grey mb-3">
                   Agent: {{ loan.agent?.full_name }} • {{ formatDate(loan.created_at) }}
@@ -172,9 +208,15 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-check-all</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No pending approvals</h3>
-        <p class="text-body-2 text-grey">All loan applications have been processed</p>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-check-all
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No pending approvals
+        </h3>
+        <p class="text-body-2 text-grey">
+          All loan applications have been processed
+        </p>
       </v-col>
     </v-row>
 
@@ -202,11 +244,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="approveDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="approveDialog = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="success"
-            @click="handleApproveLoan"
             :loading="actionLoading"
+            @click="handleApproveLoan"
           >
             Approve Loan
           </v-btn>
@@ -239,12 +283,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="rejectDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="rejectDialog = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="error"
-            @click="handleRejectLoan"
             :loading="actionLoading"
             :disabled="!rejectionReason"
+            @click="handleRejectLoan"
           >
             Reject Loan
           </v-btn>
@@ -265,7 +311,9 @@
         <v-card-text>
           <v-row>
             <v-col cols="12" md="6">
-              <h4 class="text-subtitle-1 mb-3">Borrower Information</h4>
+              <h4 class="text-subtitle-1 mb-3">
+                Borrower Information
+              </h4>
               <div class="mb-2">
                 <strong>Name:</strong> {{ selectedLoan.account?.name }}
               </div>
@@ -277,7 +325,9 @@
               </div>
             </v-col>
             <v-col cols="12" md="6">
-              <h4 class="text-subtitle-1 mb-3">Loan Details</h4>
+              <h4 class="text-subtitle-1 mb-3">
+                Loan Details
+              </h4>
               <div class="mb-2">
                 <strong>Principal:</strong> {{ formatCurrency(selectedLoan.principal_amount) }}
               </div>
@@ -298,7 +348,9 @@
 
           <v-divider class="my-4" />
 
-          <h4 class="text-subtitle-1 mb-3">Amortization Schedule Preview</h4>
+          <h4 class="text-subtitle-1 mb-3">
+            Amortization Schedule Preview
+          </h4>
           <div style="max-height: 300px; overflow-y: auto;">
             <v-table density="compact">
               <thead>
@@ -387,7 +439,7 @@ const openDetailsDialog = (loan: Loan) => {
 }
 
 const handleApproveLoan = async () => {
-  if (!selectedLoan.value) return
+  if (!selectedLoan.value) { return }
 
   actionLoading.value = true
   const result = await loansStore.approveLoan(selectedLoan.value.id)
@@ -405,7 +457,7 @@ const handleApproveLoan = async () => {
 }
 
 const handleRejectLoan = async () => {
-  if (!selectedLoan.value || !rejectionReason.value) return
+  if (!selectedLoan.value || !rejectionReason.value) { return }
 
   actionLoading.value = true
   const result = await loansStore.rejectLoan(selectedLoan.value.id, rejectionReason.value)

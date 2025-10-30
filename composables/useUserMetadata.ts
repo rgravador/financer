@@ -10,7 +10,7 @@ export const useUserMetadata = () => {
   const getDisplayName = async (userId: string): Promise<string | null> => {
     try {
       const { data: { user }, error } = await supabase.auth.admin.getUserById(userId)
-      if (error || !user) return null
+      if (error || !user) { return null }
 
       return user.user_metadata?.display_name || null
     } catch {

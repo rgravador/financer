@@ -3,8 +3,12 @@
     <v-row>
       <v-col cols="12">
         <div class="mb-4">
-          <h1 class="text-h4">Audit Log</h1>
-          <p class="text-subtitle-1 text-grey">System transaction history and activity log</p>
+          <h1 class="text-h4">
+            Audit Log
+          </h1>
+          <p class="text-subtitle-1 text-grey">
+            System transaction history and activity log
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -58,32 +62,48 @@
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Transactions</div>
-            <div class="text-h5">{{ filteredTransactions.length }}</div>
+            <div class="text-caption text-grey">
+              Total Transactions
+            </div>
+            <div class="text-h5">
+              {{ filteredTransactions.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Today's Transactions</div>
-            <div class="text-h5">{{ todayTransactions.length }}</div>
+            <div class="text-caption text-grey">
+              Today's Transactions
+            </div>
+            <div class="text-h5">
+              {{ todayTransactions.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Loan Transactions</div>
-            <div class="text-h5 text-info">{{ loanTransactions.length }}</div>
+            <div class="text-caption text-grey">
+              Loan Transactions
+            </div>
+            <div class="text-h5 text-info">
+              {{ loanTransactions.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Payment Transactions</div>
-            <div class="text-h5 text-success">{{ paymentTransactions.length }}</div>
+            <div class="text-caption text-grey">
+              Payment Transactions
+            </div>
+            <div class="text-h5 text-success">
+              {{ paymentTransactions.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -93,7 +113,9 @@
     <v-row v-if="adminStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading audit log...</p>
+        <p class="mt-4 text-grey">
+          Loading audit log...
+        </p>
       </v-col>
     </v-row>
 
@@ -130,8 +152,12 @@
               <tbody>
                 <tr v-for="transaction in paginatedTransactions" :key="transaction.id">
                   <td>
-                    <div class="text-body-2">{{ formatDate(transaction.created_at) }}</div>
-                    <div class="text-caption text-grey">{{ formatTime(transaction.created_at) }}</div>
+                    <div class="text-body-2">
+                      {{ formatDate(transaction.created_at) }}
+                    </div>
+                    <div class="text-caption text-grey">
+                      {{ formatTime(transaction.created_at) }}
+                    </div>
                   </td>
                   <td>
                     <v-chip
@@ -147,13 +173,19 @@
                   </td>
                   <td>
                     <div v-if="transaction.user">
-                      <div class="font-weight-bold text-body-2">{{ transaction.user.full_name }}</div>
-                      <div class="text-caption text-grey">{{ transaction.user.display_name || transaction.user.email }}</div>
+                      <div class="font-weight-bold text-body-2">
+                        {{ transaction.user.full_name }}
+                      </div>
+                      <div class="text-caption text-grey">
+                        {{ transaction.user.display_name || transaction.user.email }}
+                      </div>
                     </div>
                     <span v-else class="text-grey">-</span>
                   </td>
                   <td>
-                    <div class="text-caption">{{ transaction.details || '-' }}</div>
+                    <div class="text-caption">
+                      {{ transaction.details || '-' }}
+                    </div>
                   </td>
                   <td>
                     <span v-if="transaction.amount" class="font-weight-bold">
@@ -239,9 +271,15 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-clipboard-text</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No transactions found</h3>
-        <p class="text-body-2 text-grey">Try adjusting your filters</p>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-clipboard-text
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No transactions found
+        </h3>
+        <p class="text-body-2 text-grey">
+          Try adjusting your filters
+        </p>
       </v-col>
     </v-row>
   </v-container>
@@ -303,7 +341,7 @@ const filteredTransactions = computed(() => {
 
   // Filter by date range
   const now = new Date()
-  transactions = transactions.filter(t => {
+  transactions = transactions.filter((t) => {
     const transactionDate = new Date(t.created_at)
 
     switch (dateRange.value) {

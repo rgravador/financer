@@ -3,8 +3,12 @@
     <v-row>
       <v-col cols="12">
         <div class="mb-4">
-          <h1 class="text-h4">User Management</h1>
-          <p class="text-subtitle-1 text-grey">Manage system users and permissions</p>
+          <h1 class="text-h4">
+            User Management
+          </h1>
+          <p class="text-subtitle-1 text-grey">
+            Manage system users and permissions
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -14,32 +18,48 @@
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Users</div>
-            <div class="text-h5">{{ adminStore.users.length }}</div>
+            <div class="text-caption text-grey">
+              Total Users
+            </div>
+            <div class="text-h5">
+              {{ adminStore.users.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Agents</div>
-            <div class="text-h5 text-info">{{ agentUsers.length }}</div>
+            <div class="text-caption text-grey">
+              Agents
+            </div>
+            <div class="text-h5 text-info">
+              {{ agentUsers.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Admins</div>
-            <div class="text-h5 text-primary">{{ adminUsers.length }}</div>
+            <div class="text-caption text-grey">
+              Admins
+            </div>
+            <div class="text-h5 text-primary">
+              {{ adminUsers.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Active Users</div>
-            <div class="text-h5 text-success">{{ activeUsers.length }}</div>
+            <div class="text-caption text-grey">
+              Active Users
+            </div>
+            <div class="text-h5 text-success">
+              {{ activeUsers.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -49,7 +69,9 @@
     <v-row v-if="adminStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading users...</p>
+        <p class="mt-4 text-grey">
+          Loading users...
+        </p>
       </v-col>
     </v-row>
 
@@ -94,8 +116,12 @@
                         <span class="text-body-1">{{ getInitials(user.full_name) }}</span>
                       </v-avatar>
                       <div>
-                        <div class="font-weight-bold">{{ user.full_name }}</div>
-                        <div class="text-caption text-grey">{{ user.display_name || user.email }}</div>
+                        <div class="font-weight-bold">
+                          {{ user.full_name }}
+                        </div>
+                        <div class="text-caption text-grey">
+                          {{ user.display_name || user.email }}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -162,8 +188,12 @@
                     <span>{{ getInitials(user.full_name) }}</span>
                   </v-avatar>
                   <div class="flex-grow-1">
-                    <div class="font-weight-bold">{{ user.full_name }}</div>
-                    <div class="text-caption text-grey">{{ user.display_name || user.email }}</div>
+                    <div class="font-weight-bold">
+                      {{ user.full_name }}
+                    </div>
+                    <div class="text-caption text-grey">
+                      {{ user.display_name || user.email }}
+                    </div>
                   </div>
                   <v-chip
                     size="small"
@@ -214,8 +244,12 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-account-group</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No users found</h3>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-account-group
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No users found
+        </h3>
       </v-col>
     </v-row>
 
@@ -231,11 +265,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="deactivateDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="deactivateDialog = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="warning"
-            @click="handleDeactivateUser"
             :loading="actionLoading"
+            @click="handleDeactivateUser"
           >
             Deactivate
           </v-btn>
@@ -275,7 +311,7 @@ const activeUsers = computed(() => {
 })
 
 const filteredUsers = computed(() => {
-  if (!search.value) return adminStore.users
+  if (!search.value) { return adminStore.users }
 
   const searchLower = search.value.toLowerCase()
   return adminStore.users.filter(user =>
@@ -308,7 +344,7 @@ const openDeactivateDialog = (user: UserProfile) => {
 }
 
 const handleDeactivateUser = async () => {
-  if (!selectedUser.value) return
+  if (!selectedUser.value) { return }
 
   actionLoading.value = true
   const result = await adminStore.deactivateUser(selectedUser.value.id)

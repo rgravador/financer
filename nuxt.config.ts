@@ -40,7 +40,7 @@ export default defineNuxtConfig({
               error: '#FF5252',
               info: '#2196F3',
               success: '#4CAF50',
-              warning: '#FFC107',
+              warning: '#FFC107'
             }
           },
           dark: {
@@ -51,7 +51,7 @@ export default defineNuxtConfig({
               error: '#FF5252',
               info: '#2196F3',
               success: '#4CAF50',
-              warning: '#FFC107',
+              warning: '#FFC107'
             }
           }
         }
@@ -68,13 +68,12 @@ export default defineNuxtConfig({
     }
   },
 
-
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_KEY,
+      supabaseKey: process.env.SUPABASE_KEY
     },
-    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY
   },
 
   compatibilityDate: '2025-01-29'

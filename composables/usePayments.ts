@@ -3,14 +3,14 @@ import type { Payment } from '~/types'
 export const usePayments = () => {
   const supabase = useSupabaseClient()
   const { user } = useAuth()
-  
+
   const payments = ref<Payment[]>([])
   const loading = ref(false)
 
   // Actions
   const fetchPayments = async () => {
-    if (!user.value) return
-    
+    if (!user.value) { return }
+
     loading.value = true
     try {
       let query = supabase.from('payments').select(`
@@ -18,15 +18,15 @@ export const usePayments = () => {
         loan:loans(*),
         account:loans(account:accounts(*))
       `)
-      
+
       // If user is agent, only show payments for their assigned accounts
       if (user.value.role === 'agent') {
         query = query.eq('loans.accounts.assigned_agent_id', user.value.id)
       }
-      
+
       const { data, error } = await query.order('payment_date', { ascending: false })
 
-      if (error) throw error
+      if (error) { throw error }
       payments.value = data || []
     } catch (error: any) {
       console.error('Error fetching payments:', error)
@@ -36,8 +36,8 @@ export const usePayments = () => {
   }
 
   const createPayment = async (paymentData: Omit<Payment, 'id' | 'created_at' | 'received_by'>) => {
-    if (!user.value) return { success: false, error: 'User not authenticated' }
-    
+    if (!user.value) { return { success: false, error: 'User not authenticated' } }
+
     try {
       const { data, error } = await supabase
         .from('payments')
@@ -48,8 +48,8 @@ export const usePayments = () => {
         .select()
         .single()
 
-      if (error) throw error
-      
+      if (error) { throw error }
+
       payments.value.unshift(data)
       return { success: true, data }
     } catch (error: any) {
@@ -66,13 +66,13 @@ export const usePayments = () => {
         .select()
         .single()
 
-      if (error) throw error
-      
+      if (error) { throw error }
+
       const index = payments.value.findIndex(p => p.id === paymentId)
       if (index !== -1) {
         payments.value[index] = data
       }
-      
+
       return { success: true, data }
     } catch (error: any) {
       return { success: false, error: error.message }

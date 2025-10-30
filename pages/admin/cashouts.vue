@@ -3,8 +3,12 @@
     <v-row>
       <v-col cols="12">
         <div class="mb-4">
-          <h1 class="text-h4">Cashout Management</h1>
-          <p class="text-subtitle-1 text-grey">Review and process agent cashout requests</p>
+          <h1 class="text-h4">
+            Cashout Management
+          </h1>
+          <p class="text-subtitle-1 text-grey">
+            Review and process agent cashout requests
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -14,32 +18,48 @@
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Pending Requests</div>
-            <div class="text-h5 text-warning">{{ pendingCashouts.length }}</div>
+            <div class="text-caption text-grey">
+              Pending Requests
+            </div>
+            <div class="text-h5 text-warning">
+              {{ pendingCashouts.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Pending Amount</div>
-            <div class="text-h5">{{ formatCurrency(totalPendingAmount) }}</div>
+            <div class="text-caption text-grey">
+              Total Pending Amount
+            </div>
+            <div class="text-h5">
+              {{ formatCurrency(totalPendingAmount) }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Approved Today</div>
-            <div class="text-h5 text-success">{{ approvedTodayCount }}</div>
+            <div class="text-caption text-grey">
+              Approved Today
+            </div>
+            <div class="text-h5 text-success">
+              {{ approvedTodayCount }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Processed Today</div>
-            <div class="text-h5 text-success">{{ formatCurrency(approvedTodayAmount) }}</div>
+            <div class="text-caption text-grey">
+              Total Processed Today
+            </div>
+            <div class="text-h5 text-success">
+              {{ formatCurrency(approvedTodayAmount) }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -49,7 +69,9 @@
     <v-row v-if="cashoutsStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading cashout requests...</p>
+        <p class="mt-4 text-grey">
+          Loading cashout requests...
+        </p>
       </v-col>
     </v-row>
 
@@ -59,9 +81,15 @@
         <v-card>
           <v-card-title>
             <v-tabs v-model="tab">
-              <v-tab value="pending">Pending ({{ pendingCashouts.length }})</v-tab>
-              <v-tab value="approved">Approved</v-tab>
-              <v-tab value="rejected">Rejected</v-tab>
+              <v-tab value="pending">
+                Pending ({{ pendingCashouts.length }})
+              </v-tab>
+              <v-tab value="approved">
+                Approved
+              </v-tab>
+              <v-tab value="rejected">
+                Rejected
+              </v-tab>
             </v-tabs>
           </v-card-title>
           <v-divider />
@@ -83,12 +111,18 @@
                   <tr v-for="cashout in pendingCashouts" :key="cashout.id">
                     <td>
                       <div>
-                        <div class="font-weight-bold">{{ cashout.agent?.full_name }}</div>
-                        <div class="text-caption text-grey">{{ cashout.agent?.display_name || cashout.agent?.email }}</div>
+                        <div class="font-weight-bold">
+                          {{ cashout.agent?.full_name }}
+                        </div>
+                        <div class="text-caption text-grey">
+                          {{ cashout.agent?.display_name || cashout.agent?.email }}
+                        </div>
                       </div>
                     </td>
                     <td>{{ formatDate(cashout.created_at) }}</td>
-                    <td class="font-weight-bold">{{ formatCurrency(cashout.amount) }}</td>
+                    <td class="font-weight-bold">
+                      {{ formatCurrency(cashout.amount) }}
+                    </td>
                     <td>
                       <span v-if="cashout.notes" class="text-caption">{{ cashout.notes }}</span>
                       <span v-else class="text-grey text-caption">-</span>
@@ -137,7 +171,9 @@
                   <tr v-for="cashout in approvedCashouts" :key="cashout.id">
                     <td>{{ cashout.agent?.full_name }}</td>
                     <td>{{ formatDate(cashout.created_at) }}</td>
-                    <td class="font-weight-bold text-success">{{ formatCurrency(cashout.amount) }}</td>
+                    <td class="font-weight-bold text-success">
+                      {{ formatCurrency(cashout.amount) }}
+                    </td>
                     <td>{{ cashout.processed_at ? formatDate(cashout.processed_at) : '-' }}</td>
                     <td>{{ cashout.processed_by_user?.full_name || '-' }}</td>
                   </tr>
@@ -165,7 +201,9 @@
                   <tr v-for="cashout in rejectedCashouts" :key="cashout.id">
                     <td>{{ cashout.agent?.full_name }}</td>
                     <td>{{ formatDate(cashout.created_at) }}</td>
-                    <td class="font-weight-bold">{{ formatCurrency(cashout.amount) }}</td>
+                    <td class="font-weight-bold">
+                      {{ formatCurrency(cashout.amount) }}
+                    </td>
                     <td>{{ cashout.processed_at ? formatDate(cashout.processed_at) : '-' }}</td>
                     <td>
                       <span v-if="cashout.notes" class="text-caption text-error">{{ cashout.notes }}</span>
@@ -187,9 +225,15 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-cash-multiple</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No cashout requests</h3>
-        <p class="text-body-2 text-grey">Agent cashout requests will appear here</p>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-cash-multiple
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No cashout requests
+        </h3>
+        <p class="text-body-2 text-grey">
+          Agent cashout requests will appear here
+        </p>
       </v-col>
     </v-row>
 
@@ -217,11 +261,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="approveDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="approveDialog = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="success"
-            @click="handleApproveCashout"
             :loading="actionLoading"
+            @click="handleApproveCashout"
           >
             Approve
           </v-btn>
@@ -254,12 +300,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="rejectDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="rejectDialog = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="error"
-            @click="handleRejectCashout"
             :loading="actionLoading"
             :disabled="!rejectionReason"
+            @click="handleRejectCashout"
           >
             Reject
           </v-btn>
@@ -333,7 +381,7 @@ const openRejectDialog = (cashout: Cashout) => {
 }
 
 const handleApproveCashout = async () => {
-  if (!selectedCashout.value) return
+  if (!selectedCashout.value) { return }
 
   actionLoading.value = true
   const result = await cashoutsStore.approveCashout(selectedCashout.value.id)
@@ -351,7 +399,7 @@ const handleApproveCashout = async () => {
 }
 
 const handleRejectCashout = async () => {
-  if (!selectedCashout.value || !rejectionReason.value) return
+  if (!selectedCashout.value || !rejectionReason.value) { return }
 
   actionLoading.value = true
   const result = await cashoutsStore.rejectCashout(

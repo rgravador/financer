@@ -4,8 +4,12 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
-            <h1 class="text-h4">Payments</h1>
-            <p class="text-subtitle-1 text-grey">Payment history and records</p>
+            <h1 class="text-h4">
+              Payments
+            </h1>
+            <p class="text-subtitle-1 text-grey">
+              Payment history and records
+            </p>
           </div>
           <v-btn color="primary" prepend-icon="mdi-cash-plus" to="/payments/create">
             Record Payment
@@ -19,16 +23,24 @@
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Total Payments</div>
-            <div class="text-h5">{{ paymentsStore.payments.length }}</div>
+            <div class="text-caption text-grey">
+              Total Payments
+            </div>
+            <div class="text-h5">
+              {{ paymentsStore.payments.length }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-card>
           <v-card-text>
-            <div class="text-caption text-grey">Today's Collections</div>
-            <div class="text-h5">{{ formatCurrency(paymentsStore.totalPaymentsToday) }}</div>
+            <div class="text-caption text-grey">
+              Today's Collections
+            </div>
+            <div class="text-h5">
+              {{ formatCurrency(paymentsStore.totalPaymentsToday) }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -38,7 +50,9 @@
     <v-row v-if="paymentsStore.loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading payments...</p>
+        <p class="mt-4 text-grey">
+          Loading payments...
+        </p>
       </v-col>
     </v-row>
 
@@ -69,7 +83,9 @@
                   </NuxtLink>
                 </td>
                 <td>{{ payment.loan?.account?.name || 'N/A' }}</td>
-                <td class="font-weight-bold">{{ formatCurrency(payment.amount) }}</td>
+                <td class="font-weight-bold">
+                  {{ formatCurrency(payment.amount) }}
+                </td>
                 <td>
                   <div class="text-caption">
                     <div v-if="payment.applied_to_penalty > 0">
@@ -100,8 +116,12 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-cash-multiple</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No payments recorded</h3>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-cash-multiple
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No payments recorded
+        </h3>
         <p class="text-body-2 text-grey mb-4">
           Record your first payment to get started
         </p>

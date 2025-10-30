@@ -97,7 +97,7 @@ export const useUI = () => {
       if (savedTheme) {
         setTheme(savedTheme)
       }
-      
+
       const savedSidebarOpen = localStorage.getItem('sidebarOpen')
       if (savedSidebarOpen !== null) {
         sidebarOpen.value = savedSidebarOpen === 'true'

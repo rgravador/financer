@@ -4,8 +4,12 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center mb-4">
           <div>
-            <h1 class="text-h4">Loans</h1>
-            <p class="text-subtitle-1 text-grey">Manage all loans</p>
+            <h1 class="text-h4">
+              Loans
+            </h1>
+            <p class="text-subtitle-1 text-grey">
+              Manage all loans
+            </p>
           </div>
           <v-btn color="primary" prepend-icon="mdi-plus" to="/loans/create">
             Create Loan
@@ -18,10 +22,18 @@
     <v-row>
       <v-col cols="12">
         <v-tabs v-model="activeTab" color="primary">
-          <v-tab value="all">All ({{ loans.length }})</v-tab>
-          <v-tab value="pending">Pending Approval ({{ pendingApprovalLoans.length }})</v-tab>
-          <v-tab value="active">Active ({{ activeLoans.length }})</v-tab>
-          <v-tab value="overdue">Overdue ({{ overdueLoans.length }})</v-tab>
+          <v-tab value="all">
+            All ({{ loans.length }})
+          </v-tab>
+          <v-tab value="pending">
+            Pending Approval ({{ pendingApprovalLoans.length }})
+          </v-tab>
+          <v-tab value="active">
+            Active ({{ activeLoans.length }})
+          </v-tab>
+          <v-tab value="overdue">
+            Overdue ({{ overdueLoans.length }})
+          </v-tab>
         </v-tabs>
       </v-col>
     </v-row>
@@ -30,7 +42,9 @@
     <v-row v-if="loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
-        <p class="mt-4 text-grey">Loading loans...</p>
+        <p class="mt-4 text-grey">
+          Loading loans...
+        </p>
       </v-col>
     </v-row>
 
@@ -53,23 +67,33 @@
 
           <v-card-text>
             <div class="mb-2">
-              <v-icon size="small" class="mr-2">mdi-account</v-icon>
+              <v-icon size="small" class="mr-2">
+                mdi-account
+              </v-icon>
               <span class="text-body-2">{{ loan.account?.name || 'N/A' }}</span>
             </div>
             <div class="mb-2">
-              <v-icon size="small" class="mr-2">mdi-percent</v-icon>
+              <v-icon size="small" class="mr-2">
+                mdi-percent
+              </v-icon>
               <span class="text-body-2">{{ loan.interest_rate }}% monthly</span>
             </div>
             <div class="mb-2">
-              <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
+              <v-icon size="small" class="mr-2">
+                mdi-calendar
+              </v-icon>
               <span class="text-body-2">{{ loan.tenure_months }} months • {{ loan.payment_frequency }}</span>
             </div>
             <div class="mb-2">
-              <v-icon size="small" class="mr-2">mdi-cash</v-icon>
+              <v-icon size="small" class="mr-2">
+                mdi-cash
+              </v-icon>
               <span class="text-body-2">Balance: {{ formatCurrency(loan.current_balance) }}</span>
             </div>
             <div v-if="loan.total_penalties > 0" class="text-error">
-              <v-icon size="small" class="mr-2">mdi-alert-circle</v-icon>
+              <v-icon size="small" class="mr-2">
+                mdi-alert-circle
+              </v-icon>
               <span class="text-body-2">Penalties: {{ formatCurrency(loan.total_penalties) }}</span>
             </div>
           </v-card-text>
@@ -104,8 +128,12 @@
     <!-- Empty State -->
     <v-row v-else class="mt-8">
       <v-col cols="12" class="text-center">
-        <v-icon size="120" color="grey-lighten-2">mdi-file-document-outline</v-icon>
-        <h3 class="text-h6 mt-4 text-grey">No loans found</h3>
+        <v-icon size="120" color="grey-lighten-2">
+          mdi-file-document-outline
+        </v-icon>
+        <h3 class="text-h6 mt-4 text-grey">
+          No loans found
+        </h3>
         <p class="text-body-2 text-grey mb-4">
           Create your first loan to get started
         </p>

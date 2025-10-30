@@ -21,6 +21,10 @@ export type NotificationType =
 
 export type CashoutStatus = 'pending' | 'approved' | 'rejected'
 
+export type GovernmentIdType = 'drivers_license' | 'passport' | 'state_id' | 'military_id'
+
+export type SecondaryIdType = 'birth_certificate' | 'social_security_card' | 'utility_bill'
+
 // Alias for backward compatibility
 export type Cashout = CashoutRequest
 
@@ -56,13 +60,49 @@ export interface Account {
   id: string
   assigned_agent_id: string
   name: string
-  contact_info: string
-  address: string
+  contact_info: string | null
+  address: string | null
   id_proof_url: string | null
   status: AccountStatus
   created_at: string
   updated_at: string
   created_by: string
+
+  // Basic Identification
+  date_of_birth: string | null
+  ssn_tax_id: string | null
+  government_id_type: GovernmentIdType | null
+  government_id_number: string | null
+  secondary_id_type: SecondaryIdType | null
+
+  // Contact Information
+  phone_number: string | null
+  email: string | null
+  current_address: string | null
+  previous_address: string | null
+  proof_of_address_url: string | null
+
+  // Employment Details
+  employer_name: string | null
+  employer_phone: string | null
+  job_title: string | null
+  employment_length_months: number | null
+  employment_verification_url: string | null
+
+  // Income and Financial Information
+  annual_income: number | null
+  monthly_income: number | null
+  pay_stubs_url: string | null
+  tax_returns_url: string | null
+  bank_statements_url: string | null
+
+  // Debt and Expenses
+  monthly_expenses: number | null
+  monthly_debt_obligations: number | null
+  debt_to_income_ratio: number | null
+  existing_loans_details: string | null
+  credit_accounts_details: string | null
+
   // Alias for backward compatibility
   contact_number?: string
   // Optional relation

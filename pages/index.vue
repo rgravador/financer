@@ -4,8 +4,12 @@
       <v-col cols="12" sm="8" md="6" lg="4">
         <v-card class="elevation-12">
           <v-card-title class="bg-primary text-center py-6">
-            <div class="text-h4 text-white">LoanStar</div>
-            <div class="text-subtitle-2 text-white">Lending Management System</div>
+            <div class="text-h4 text-white">
+              LoanStar
+            </div>
+            <div class="text-subtitle-2 text-white">
+              Lending Management System
+            </div>
           </v-card-title>
 
           <v-card-text class="pt-6">
@@ -93,10 +97,10 @@ const { login } = useAuth()
 const router = useRouter()
 
 const handleLogin = async () => {
-  if (!formRef.value) return
+  if (!formRef.value) { return }
 
   const { valid } = await formRef.value.validate()
-  if (!valid) return
+  if (!valid) { return }
 
   loading.value = true
   error.value = ''
