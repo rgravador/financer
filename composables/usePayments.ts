@@ -44,7 +44,7 @@ export const usePayments = () => {
         .insert({
           ...paymentData,
           received_by: user.value.id
-        })
+        } as any)
         .select()
         .single()
 
@@ -61,7 +61,7 @@ export const usePayments = () => {
     try {
       const { data, error } = await supabase
         .from('payments')
-        .update(updates)
+        .update(updates as any)
         .eq('id', paymentId)
         .select()
         .single()

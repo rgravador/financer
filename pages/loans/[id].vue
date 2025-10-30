@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <!-- Loading State -->
-    <v-row v-if="loansStore.loading" class="mt-8">
+    <v-row v-if="loading" class="mt-8">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
         <p class="mt-4 text-grey">Loading loan details...</p>
@@ -256,6 +256,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuth()
 const loansStore = useLoans()
+const { loading } = loansStore
 const uiStore = useUI()
 
 const approveLoanDialog = ref(false)

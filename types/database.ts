@@ -65,6 +65,8 @@ export interface Account {
   created_by: string
   // Alias for backward compatibility
   contact_number?: string
+  // Optional relation
+  loans?: Loan[]
 }
 
 export interface AmortizationScheduleItem {

@@ -196,6 +196,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const accountsStore = useAccounts()
+const { accounts: accountsData } = accountsStore
 const loansStore = useLoans()
 const uiStore = useUI()
 
@@ -231,7 +232,7 @@ const rules = {
   interestRate: (v: number) => (v >= 3 && v <= 5) || 'Interest rate must be between 3% and 5%'
 }
 
-const accountOptions = computed(() => accountsStore.accounts)
+const accountOptions = computed(() => accountsData.value)
 
 const schedulePreview = computed(() => {
   return loansStore.generateSchedulePreview(form)

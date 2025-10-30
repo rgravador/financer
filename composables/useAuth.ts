@@ -1,14 +1,44 @@
 import type { UserProfileWithMeta } from '~/types'
 
+const PROFILE_STORAGE_KEY = 'user_profile'
+
 export const useAuth = () => {
   const supabase = useSupabaseClient()
   const user = useSupabaseUser()
-  
+
   const profile = ref<UserProfileWithMeta | null>(null)
   const loading = ref(false)
 
+  // Load profile from localStorage on initialization
+  const loadProfileFromStorage = () => {
+    if (process.client) {
+      const stored = localStorage.getItem(PROFILE_STORAGE_KEY)
+      if (stored) {
+        try {
+          profile.value = JSON.parse(stored)
+        } catch (error) {
+          localStorage.removeItem(PROFILE_STORAGE_KEY)
+        }
+      }
+    }
+  }
+
+  // Save profile to localStorage
+  const saveProfileToStorage = (profileData: UserProfileWithMeta) => {
+    if (process.client) {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profileData))
+    }
+  }
+
+  // Clear profile from localStorage
+  const clearProfileFromStorage = () => {
+    if (process.client) {
+      localStorage.removeItem(PROFILE_STORAGE_KEY)
+    }
+  }
+
   // Computed getters
-  const isAuthenticated = computed(() => !!user.value)
+  const isAuthenticated = computed(() => !!user.value && !!profile.value)
   const isAdmin = computed(() => profile.value?.role === 'admin')
   const isAgent = computed(() => profile.value?.role === 'agent')
   const userProfile = computed(() => profile.value)
@@ -80,6 +110,7 @@ export const useAuth = () => {
   const logout = async () => {
     await supabase.auth.signOut()
     profile.value = null
+    clearProfileFromStorage()
     await navigateTo('/auth/login')
   }
 
@@ -96,9 +127,12 @@ export const useAuth = () => {
     const { data: { user: authUser } } = await supabase.auth.getUser()
     const displayName = authUser?.user_metadata?.display_name || null
 
-    profile.value = Object.assign({}, data, {
+    const userProfile = Object.assign({}, data, {
       display_name: displayName
     }) as UserProfileWithMeta
+
+    profile.value = userProfile
+    saveProfileToStorage(userProfile)
   }
 
   const refreshSession = async () => {
@@ -109,12 +143,39 @@ export const useAuth = () => {
     }
   }
 
+  // Load profile from localStorage on initialization (client-side only)
+  if (process.client) {
+    loadProfileFromStorage()
+  }
+
+  // Listen to auth state changes
+  supabase.auth.onAuthStateChange(async (event, session) => {
+
+    if (event === 'SIGNED_IN' && session?.user) {
+      // User signed in, fetch and save profile
+      await fetchUserProfile(session.user.id)
+    } else if (event === 'SIGNED_OUT') {
+      // User signed out, clear profile
+      profile.value = null
+      clearProfileFromStorage()
+    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+      // Token refreshed, ensure profile is loaded
+      if (!profile.value) {
+        await fetchUserProfile(session.user.id)
+      }
+    } else if (event === 'USER_UPDATED' && session?.user) {
+      // User updated, refresh profile
+      await fetchUserProfile(session.user.id)
+    }
+  })
+
   // Initialize profile when user changes
   watch(user, async (newUser) => {
     if (newUser && !profile.value) {
       await fetchUserProfile(newUser.id)
     } else if (!newUser) {
       profile.value = null
+      clearProfileFromStorage()
     }
   }, { immediate: true })
 

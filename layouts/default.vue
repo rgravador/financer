@@ -1,11 +1,77 @@
 <template>
-  <v-app>
+  <v-layout class="rounded rounded-md border">
+    <!-- Navigation Drawer -->
+    <v-navigation-drawer
+      :model="ui.sidebarOpen"
+    >
+      <v-list>
+        <v-list-item
+          prepend-icon="mdi-view-dashboard"
+          title="Dashboard"
+          to="/dashboard"
+        />
+        <v-list-item
+          prepend-icon="mdi-account-multiple"
+          title="Accounts"
+          to="/accounts"
+        />
+        <v-list-item
+          prepend-icon="mdi-file-document"
+          title="Loans"
+          to="/loans"
+        />
+        <v-list-item
+          prepend-icon="mdi-cash"
+          title="Payments"
+          to="/payments"
+        />
+
+        <template v-if="auth.isAgent">
+          <v-list-item
+            prepend-icon="mdi-currency-usd"
+            title="Earnings"
+            to="/earnings"
+          />
+          <v-list-item
+            prepend-icon="mdi-cash-check"
+            title="Cashouts"
+            to="/cashouts"
+          />
+        </template>
+
+        <template v-if="auth.isAdmin">
+          <v-divider class="my-2" />
+          <v-listSubheader>Admin</v-listSubheader>
+          <v-list-item
+            prepend-icon="mdi-shield-account"
+            title="Admin Dashboard"
+            to="/admin/dashboard"
+          />
+          <v-list-item
+            prepend-icon="mdi-check-decagram"
+            title="Approvals"
+            to="/admin/approvals"
+          />
+          <v-list-item
+            prepend-icon="mdi-cash-multiple"
+            title="Cashouts"
+            to="/admin/cashouts"
+          />
+          <v-list-item
+            prepend-icon="mdi-account-group"
+            title="Users"
+            to="/admin/users"
+          />
+        </template>
+      </v-list>
+    </v-navigation-drawer>
+
     <!-- App Bar -->
-    <v-app-bar color="primary" density="comfortable" elevate-on-scroll>
+    <v-app-bar color="primary" elevate-on-scroll>
       <v-app-barNavIcon @click="ui.toggleSidebar" class="hide-on-desktop" />
 
       <v-app-barTitle>
-        <span class="text-h6">LoanStar</span>
+        <span class="text-h6">Financer</span>
       </v-app-barTitle>
 
       <v-spacer />
@@ -98,74 +164,6 @@
       </v-menu>
     </v-app-bar>
 
-    <!-- Navigation Drawer -->
-    <v-navigation-drawer
-      v-model="ui.sidebarOpen"
-      temporary
-      class="hide-on-desktop"
-    >
-      <v-list>
-        <v-list-item
-          prepend-icon="mdi-view-dashboard"
-          title="Dashboard"
-          to="/dashboard"
-        />
-        <v-list-item
-          prepend-icon="mdi-account-multiple"
-          title="Accounts"
-          to="/accounts"
-        />
-        <v-list-item
-          prepend-icon="mdi-file-document"
-          title="Loans"
-          to="/loans"
-        />
-        <v-list-item
-          prepend-icon="mdi-cash"
-          title="Payments"
-          to="/payments"
-        />
-
-        <template v-if="auth.isAgent">
-          <v-list-item
-            prepend-icon="mdi-currency-usd"
-            title="Earnings"
-            to="/earnings"
-          />
-          <v-list-item
-            prepend-icon="mdi-cash-check"
-            title="Cashouts"
-            to="/cashouts"
-          />
-        </template>
-
-        <template v-if="auth.isAdmin">
-          <v-divider class="my-2" />
-          <v-listSubheader>Admin</v-listSubheader>
-          <v-list-item
-            prepend-icon="mdi-shield-account"
-            title="Admin Dashboard"
-            to="/admin/dashboard"
-          />
-          <v-list-item
-            prepend-icon="mdi-check-decagram"
-            title="Approvals"
-            to="/admin/approvals"
-          />
-          <v-list-item
-            prepend-icon="mdi-cash-multiple"
-            title="Cashouts"
-            to="/admin/cashouts"
-          />
-          <v-list-item
-            prepend-icon="mdi-account-group"
-            title="Users"
-            to="/admin/users"
-          />
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-
     <!-- Bottom Navigation (Mobile) -->
     <v-bottom-navigation
       v-model="bottomNav"
@@ -215,7 +213,7 @@
         <v-btn variant="text" @click="ui.hideSnackbar()">Close</v-btn>
       </template>
     </v-snackbar>
-  </v-app>
+  </v-layout>
 </template>
 
 <script setup lang="ts">

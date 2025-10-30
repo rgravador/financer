@@ -18,16 +18,16 @@
     <v-row>
       <v-col cols="12">
         <v-tabs v-model="activeTab" color="primary">
-          <v-tab value="all">All ({{ loansStore.loans.length }})</v-tab>
-          <v-tab value="pending">Pending Approval ({{ loansStore.pendingApprovalLoans.length }})</v-tab>
-          <v-tab value="active">Active ({{ loansStore.activeLoans.length }})</v-tab>
-          <v-tab value="overdue">Overdue ({{ loansStore.overdueLoans.length }})</v-tab>
+          <v-tab value="all">All ({{ loans.length }})</v-tab>
+          <v-tab value="pending">Pending Approval ({{ pendingApprovalLoans.length }})</v-tab>
+          <v-tab value="active">Active ({{ activeLoans.length }})</v-tab>
+          <v-tab value="overdue">Overdue ({{ overdueLoans.length }})</v-tab>
         </v-tabs>
       </v-col>
     </v-row>
 
     <!-- Loading State -->
-    <v-row v-if="loansStore.loading" class="mt-4">
+    <v-row v-if="loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
         <p class="mt-4 text-grey">Loading loans...</p>
@@ -125,6 +125,7 @@ definePageMeta({
 })
 
 const loansStore = useLoans()
+const { loans, loading, pendingApprovalLoans, activeLoans, overdueLoans } = loansStore
 const uiStore = useUI()
 
 const activeTab = ref('all')
@@ -132,13 +133,13 @@ const activeTab = ref('all')
 const filteredLoans = computed(() => {
   switch (activeTab.value) {
     case 'pending':
-      return loansStore.pendingApprovalLoans
+      return pendingApprovalLoans.value
     case 'active':
-      return loansStore.activeLoans
+      return activeLoans.value
     case 'overdue':
-      return loansStore.overdueLoans
+      return overdueLoans.value
     default:
-      return loansStore.loans
+      return loans.value
   }
 })
 

@@ -68,7 +68,7 @@ export const useEarnings = () => {
           agent_id: user.value.id,
           amount,
           status: 'pending'
-        })
+        } as any)
         .select()
         .single()
 
