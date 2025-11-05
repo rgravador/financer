@@ -122,17 +122,16 @@ definePageMeta({
 })
 
 const router = useRouter()
+const route = useRoute()
 const creationStore = useAccountCreation()
 const accountsStore = useAccounts()
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { formData, saveBasicInfo } = creationStore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { loading } = accountsStore
+const { loading, updateAccount } = accountsStore
 
-void formData
-void saveBasicInfo
-void loading
+// Determine if we're in edit mode
+const accountId = computed(() => route.query.id as string | undefined)
+const isEditMode = computed(() => !!accountId.value)
 
 const formRef = ref()
 const formValid = ref(false)
@@ -155,7 +154,11 @@ const rules = {
 }
 
 const goBack = () => {
-  router.push('/accounts/create')
+  if (isEditMode.value) {
+    router.push(`/accounts/${accountId.value}`)
+  } else {
+    router.push('/accounts/create')
+  }
 }
 
 const handleSave = async () => {
@@ -166,9 +169,47 @@ const handleSave = async () => {
     }
   }
 
-  const result = await saveBasicInfo()
-  if (result.success) {
-    router.push('/accounts/create')
+  if (isEditMode.value && accountId.value) {
+    // Update existing account
+    const result = await updateAccount(accountId.value, {
+      name: formData.value.name,
+      date_of_birth: formData.value.date_of_birth,
+      ssn_tax_id: formData.value.ssn_tax_id,
+      government_id_type: formData.value.government_id_type,
+      government_id_number: formData.value.government_id_number,
+      secondary_id_type: formData.value.secondary_id_type
+    })
+
+    if (result.success) {
+      router.push(`/accounts/create?id=${accountId.value}`)
+    }
+  } else {
+    // Create new account
+    const result = await saveBasicInfo()
+    if (result.success) {
+      router.push('/accounts/create')
+    }
   }
 }
+
+// Load existing account data if in edit mode
+onMounted(async () => {
+  if (isEditMode.value && accountId.value) {
+    const supabase = useSupabaseClient()
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('*')
+      .eq('id', accountId.value)
+      .single()
+
+    if (!error && data) {
+      formData.value.name = data.name || ''
+      formData.value.date_of_birth = data.date_of_birth || null
+      formData.value.ssn_tax_id = data.ssn_tax_id || null
+      formData.value.government_id_type = data.government_id_type || null
+      formData.value.government_id_number = data.government_id_number || null
+      formData.value.secondary_id_type = data.secondary_id_type || null
+    }
+  }
+})
 </script>

@@ -235,6 +235,7 @@ const ui = useUI()
 const notifications = useNotifications()
 
 const { user, logout } = auth
+
 const bottomNav = ref('dashboard')
 
 // Get page title - use a simple reactive approach

@@ -87,17 +87,33 @@ CREATE INDEX IF NOT EXISTS idx_accounts_ssn_tax_id ON accounts(ssn_tax_id);
 CREATE INDEX IF NOT EXISTS idx_accounts_annual_income ON accounts(annual_income);
 
 -- Step 8: Add check constraints for data validation
-ALTER TABLE accounts ADD CONSTRAINT IF NOT EXISTS chk_debt_to_income_ratio 
-  CHECK (debt_to_income_ratio IS NULL OR (debt_to_income_ratio >= 0 AND debt_to_income_ratio <= 100));
+DO $$ BEGIN
+    ALTER TABLE accounts ADD CONSTRAINT chk_debt_to_income_ratio
+      CHECK (debt_to_income_ratio IS NULL OR (debt_to_income_ratio >= 0 AND debt_to_income_ratio <= 100));
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
-ALTER TABLE accounts ADD CONSTRAINT IF NOT EXISTS chk_employment_length 
-  CHECK (employment_length_months IS NULL OR employment_length_months >= 0);
+DO $$ BEGIN
+    ALTER TABLE accounts ADD CONSTRAINT chk_employment_length
+      CHECK (employment_length_months IS NULL OR employment_length_months >= 0);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
-ALTER TABLE accounts ADD CONSTRAINT IF NOT EXISTS chk_income_positive 
-  CHECK (annual_income IS NULL OR annual_income > 0);
+DO $$ BEGIN
+    ALTER TABLE accounts ADD CONSTRAINT chk_income_positive
+      CHECK (annual_income IS NULL OR annual_income > 0);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
-ALTER TABLE accounts ADD CONSTRAINT IF NOT EXISTS chk_monthly_income_positive 
-  CHECK (monthly_income IS NULL OR monthly_income > 0);
+DO $$ BEGIN
+    ALTER TABLE accounts ADD CONSTRAINT chk_monthly_income_positive
+      CHECK (monthly_income IS NULL OR monthly_income > 0);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Step 9: Update RLS policies if needed (accounts table should already have proper RLS)
 -- The existing RLS policies should cover the new columns automatically

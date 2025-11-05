@@ -164,7 +164,12 @@ const getStepColor = (stepKey: typeof steps[number]['key']) => {
 }
 
 const navigateToStep = (route: string) => {
-  router.push(route)
+  if (accountId.value) {
+    // If account is already created, add the account ID to the route
+    router.push(`${route}?id=${accountId.value}`)
+  } else {
+    router.push(route)
+  }
 }
 
 const handleCancel = () => {

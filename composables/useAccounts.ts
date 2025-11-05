@@ -1,10 +1,11 @@
-import type { Account } from '~/types'
+import type { Account, AccountWithRelations } from '~/types'
 
 export const useAccounts = () => {
   const supabase = useSupabaseClient()
   const { user } = useAuth()
 
   const accounts = ref<Account[]>([])
+  const selectedAccount = ref<AccountWithRelations | null>(null)
   const loading = ref(false)
 
   // Filters
@@ -136,6 +137,7 @@ export const useAccounts = () => {
     secondary_id_type?: string | null
     id_proof_file?: File | null
   }) => {
+    console.log('🚀 ~ createAccountMultiStep ~ user:', user.value)
     if (!user.value) { return { success: false, error: 'User not authenticated' } }
 
     try {
@@ -164,20 +166,24 @@ export const useAccounts = () => {
         id_proof_url = urlData.publicUrl
       }
 
+      const insertData = {
+        name: stepData.name,
+        date_of_birth: stepData.date_of_birth,
+        ssn_tax_id: stepData.ssn_tax_id,
+        government_id_type: stepData.government_id_type,
+        government_id_number: stepData.government_id_number,
+        secondary_id_type: stepData.secondary_id_type,
+        id_proof_url,
+        contact_info: null,
+        address: null,
+        assigned_agent_id: user.value.id,
+        created_by: user.value.id,
+        status: 'active' as const
+      }
+      console.log('🚀 ~ createAccountMultiStep ~ insertData:', insertData)
       const { data, error } = await supabase
         .from('accounts')
-        .insert({
-          name: stepData.name,
-          date_of_birth: stepData.date_of_birth,
-          ssn_tax_id: stepData.ssn_tax_id,
-          government_id_type: stepData.government_id_type,
-          government_id_number: stepData.government_id_number,
-          secondary_id_type: stepData.secondary_id_type,
-          id_proof_url,
-          assigned_agent_id: user.value.id,
-          created_by: user.value.id,
-          status: 'active' as const
-        })
+        .insert(insertData)
         .select()
         .single()
 
@@ -239,14 +245,40 @@ export const useAccounts = () => {
     }
   }
 
+  const fetchAccountById = async (accountId: string) => {
+    loading.value = true
+
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .select(`
+          *,
+          assigned_agent:assigned_agent_id(id, full_name, email),
+          loans(*)
+        `)
+        .eq('id', accountId)
+        .single()
+
+      if (error) { throw error }
+      selectedAccount.value = data as AccountWithRelations
+    } catch (error: any) {
+      console.error('Error fetching account:', error)
+      selectedAccount.value = null
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // State
     accounts,
+    selectedAccount,
     loading,
     filters,
     filteredAccounts,
     // Actions
     fetchAccounts,
+    fetchAccountById,
     createAccount,
     createAccountMultiStep,
     uploadAccountDocument,

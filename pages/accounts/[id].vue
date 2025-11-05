@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <!-- Loading State -->
-    <v-row v-if="accountsStore.loading" class="mt-8">
+    <v-row v-if="loading" class="mt-8">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
         <p class="mt-4 text-grey">
@@ -45,7 +45,13 @@
                   <v-icon size="small" class="mr-2">
                     mdi-phone
                   </v-icon>
-                  <span>{{ account.contact_info }}</span>
+                  <span>{{ account.contact_info || account.phone_number || 'Not provided' }}</span>
+                </div>
+                <div v-if="account.email" class="d-flex align-center mt-2">
+                  <v-icon size="small" class="mr-2">
+                    mdi-email
+                  </v-icon>
+                  <span>{{ account.email }}</span>
                 </div>
               </div>
 
@@ -57,7 +63,7 @@
                   <v-icon size="small" class="mr-2 mt-1">
                     mdi-map-marker
                   </v-icon>
-                  <span>{{ account.address }}</span>
+                  <span>{{ account.address || account.current_address || 'Not provided' }}</span>
                 </div>
               </div>
 
@@ -96,7 +102,7 @@
                 View ID Proof
               </v-btn>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="flex-column gap-2">
               <v-btn
                 block
                 color="primary"
@@ -104,6 +110,14 @@
                 :to="`/loans/create?account_id=${account.id}`"
               >
                 Create Loan
+              </v-btn>
+              <v-btn
+                block
+                variant="outlined"
+                prepend-icon="mdi-pencil"
+                :to="`/accounts/create/basic?id=${account.id}`"
+              >
+                Edit Account
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -206,7 +220,9 @@ const route = useRoute()
 const accountsStore = useAccounts()
 const uiStore = useUI()
 
-const account = computed(() => accountsStore.selectedAccount)
+const { selectedAccount, fetchAccountById, loading } = accountsStore
+
+const account = computed(() => selectedAccount.value)
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
@@ -231,7 +247,7 @@ const getLoanStatusColor = (status: string) => {
 // Fetch account details on mount
 onMounted(async () => {
   try {
-    await accountsStore.fetchAccountById(route.params.id as string)
+    await fetchAccountById(route.params.id as string)
   } catch (error: any) {
     uiStore.showError('Failed to load account details')
   }

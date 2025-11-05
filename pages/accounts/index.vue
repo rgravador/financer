@@ -126,13 +126,13 @@
                 <v-icon size="small" class="mr-2">
                   mdi-phone
                 </v-icon>
-                <span class="text-body-2">{{ account.contact_info }}</span>
+                <span class="text-body-2">{{ account.contact_info || account.phone_number || 'Not provided' }}</span>
               </div>
               <div class="mb-2">
                 <v-icon size="small" class="mr-2">
                   mdi-map-marker
                 </v-icon>
-                <span class="text-body-2 text-truncate">{{ account.address }}</span>
+                <span class="text-body-2 text-truncate">{{ account.address || account.current_address || 'Not provided' }}</span>
               </div>
               <div>
                 <v-icon size="small" class="mr-2">
@@ -177,7 +177,14 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { loading, filteredAccounts, filters } = useAccounts()
+const accountsStore = useAccounts()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { loading, filteredAccounts, filters, fetchAccounts } = accountsStore
+
+void loading
+void filteredAccounts
+void filters
+void fetchAccounts
 
 const uiStore = useUI()
 
@@ -212,7 +219,7 @@ const handleRowClick = (_event: any, { item }: any) => {
 // Fetch accounts on mount
 onMounted(async () => {
   try {
-    await accountsStore.fetchAccounts()
+    await fetchAccounts()
   } catch (error: any) {
     uiStore.showError('Failed to load accounts')
   }

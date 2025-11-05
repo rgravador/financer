@@ -4,10 +4,10 @@
       <v-col cols="12" sm="8" md="5" lg="4" class="pa-8">
         <!-- Header -->
         <div class="text-center mb-10">
-          <h1 class="text-h3 font-weight-bold text-white mb-3">
-            LoanStar
+          <h1 class="text-h3 font-weight-bold mb-3">
+            Financer
           </h1>
-          <p class="text-body-1 text-grey-lighten-1">
+          <p class="text-body-1 text-grey">
             Lending Management System
           </p>
         </div>
@@ -22,12 +22,9 @@
             :rules="[rules.required, rules.email]"
             variant="outlined"
             flat
-            bg-color="rgba(255, 255, 255, 0.15)"
-            color="white"
-            class="mb-4 white-input"
+            class="mb-4"
             hide-details="auto"
             density="comfortable"
-            autocomplete="username"
           />
 
           <v-text-field
@@ -39,12 +36,9 @@
             :rules="[rules.required]"
             variant="outlined"
             flat
-            bg-color="rgba(255, 255, 255, 0.15)"
-            color="white"
-            class="mb-4 white-input"
+            class="mb-4"
             hide-details="auto"
             density="comfortable"
-            autocomplete="current-password"
             @click:append-inner="showPassword = !showPassword"
           />
 
@@ -54,7 +48,7 @@
 
           <v-btn
             type="submit"
-            color="white"
+            color="primary"
             size="x-large"
             block
             flat
@@ -132,7 +126,6 @@ const handleLogin = async () => {
 
 <style scoped>
 .flat-auth-container {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   min-height: 100vh;
 }
 
@@ -140,58 +133,6 @@ const handleLogin = async () => {
   background: transparent;
   border-radius: 0;
   max-width: 450px;
-}
-
-/* White input styling */
-:deep(.white-input .v-field) {
-  background-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-:deep(.white-input .v-field__input) {
-  color: white !important;
-  opacity: 1;
-}
-
-:deep(.white-input .v-field__input::placeholder) {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-:deep(.white-input .v-label) {
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-:deep(.white-input .v-field--focused .v-label) {
-  color: white !important;
-}
-
-:deep(.white-input .v-field__prepend-inner),
-:deep(.white-input .v-field__append-inner) {
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-:deep(.white-input .v-messages__message) {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* Login button */
-.login-btn {
-  background: white !important;
-  color: #1a1a2e !important;
-  letter-spacing: 0.5px;
-}
-
-.login-btn:hover {
-  background: rgba(255, 255, 255, 0.9) !important;
-}
-
-/* Error alert */
-:deep(.error-alert) {
-  background-color: rgba(244, 67, 54, 0.2) !important;
-  color: white !important;
-}
-
-:deep(.error-alert .v-alert__content) {
-  color: white !important;
 }
 
 @media (max-width: 600px) {

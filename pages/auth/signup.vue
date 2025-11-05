@@ -112,8 +112,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'auth',
-  middleware: 'guest'
+  middleware: 'admin'
 })
 
 const formRef = ref()
