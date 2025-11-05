@@ -209,69 +209,61 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAccountsStore } from '~/stores/accounts'
+import { useUIStore } from '~/stores/ui'
+import { useRoute } from 'vue-router'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 
-export default defineComponent({
-  name: 'AccountDetails',
+// Initialize stores and route
+const accountsStore = useAccountsStore()
+const uiStore = useUIStore()
+const route = useRoute()
 
-  computed: {
-    accountsStore () {
-      return useAccountsStore()
-    },
+// Extract reactive state/getters using storeToRefs
+const { loading, selectedAccount } = storeToRefs(accountsStore)
 
-    uiStore () {
-      return useUIStore()
-    },
+// Extract actions directly from store
+const { fetchAccountById } = accountsStore
+const { showError } = uiStore
 
-    selectedAccount () {
-      return this.accountsStore.selectedAccount
-    },
+// Computed properties
+const account = computed(() => selectedAccount.value)
 
-    loading () {
-      return this.accountsStore.loading
-    },
+// Methods
+const getStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    active: 'success',
+    inactive: 'grey',
+    suspended: 'error'
+  }
+  return colors[status] || 'grey'
+}
 
-    account () {
-      return this.selectedAccount
-    }
-  },
+const getLoanStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    pending_approval: 'warning',
+    approved: 'info',
+    active: 'success',
+    closed: 'grey',
+    rejected: 'error'
+  }
+  return colors[status] || 'grey'
+}
 
-  async mounted () {
-    try {
-      await this.accountsStore.fetchAccountById(this.$route.params.id as string)
-    } catch (error: any) {
-      this.uiStore.showError('Failed to load account details')
-    }
-  },
-
-  methods: {
-    formatCurrency,
-    formatDate,
-
-    getStatusColor (status: string) {
-      const colors: Record<string, string> = {
-        active: 'success',
-        inactive: 'grey',
-        suspended: 'error'
-      }
-      return colors[status] || 'grey'
-    },
-
-    getLoanStatusColor (status: string) {
-      const colors: Record<string, string> = {
-        pending_approval: 'warning',
-        approved: 'info',
-        active: 'success',
-        closed: 'grey',
-        rejected: 'error'
-      }
-      return colors[status] || 'grey'
-    }
+// Lifecycle
+onMounted(async () => {
+  try {
+    await fetchAccountById(route.params.id as string)
+  } catch (error: any) {
+    showError('Failed to load account details')
   }
 })
+</script>
 
+<script lang="ts">
 definePageMeta({
   middleware: 'auth'
 })

@@ -27,7 +27,7 @@
               Total Payments
             </div>
             <div class="text-h5">
-              {{ paymentsStore.payments.length }}
+              {{ payments.length }}
             </div>
           </v-card-text>
         </v-card>
@@ -39,7 +39,7 @@
               Today's Collections
             </div>
             <div class="text-h5">
-              {{ formatCurrency(paymentsStore.totalPaymentsToday) }}
+              {{ formatCurrency(totalPaymentsToday) }}
             </div>
           </v-card-text>
         </v-card>
@@ -47,7 +47,7 @@
     </v-row>
 
     <!-- Loading State -->
-    <v-row v-if="paymentsStore.loading" class="mt-4">
+    <v-row v-if="loading" class="mt-4">
       <v-col cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="64" />
         <p class="mt-4 text-grey">
@@ -57,7 +57,7 @@
     </v-row>
 
     <!-- Payments List -->
-    <v-row v-else-if="paymentsStore.payments.length > 0" class="mt-4">
+    <v-row v-else-if="payments.length > 0" class="mt-4">
       <v-col cols="12">
         <v-card>
           <v-card-title>Payment History</v-card-title>
@@ -75,7 +75,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="payment in paymentsStore.payments" :key="payment.id">
+              <tr v-for="payment in payments" :key="payment.id">
                 <td>{{ formatDate(payment.payment_date) }}</td>
                 <td>
                   <NuxtLink :to="`/loans/${payment.loan_id}`" class="text-primary">
@@ -135,30 +135,28 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { mapState, mapActions } from 'pinia'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 
 export default defineComponent({
   name: 'PaymentsIndex',
 
   computed: {
-    paymentsStore () {
-      return usePaymentsStore()
-    },
-
-    uiStore () {
-      return useUIStore()
-    }
+    ...mapState(usePaymentsStore, ['payments', 'loading', 'totalPaymentsToday'])
   },
 
   async mounted () {
     try {
-      await this.paymentsStore.fetchPayments()
+      await this.fetchPayments()
     } catch (error: any) {
-      this.uiStore.showError('Failed to load payments')
+      this.showError('Failed to load payments')
     }
   },
 
   methods: {
+    ...mapActions(usePaymentsStore, ['fetchPayments']),
+    ...mapActions(useUIStore, ['showError']),
+
     formatCurrency,
     formatDate
   }

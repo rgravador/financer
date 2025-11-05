@@ -228,113 +228,80 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '~/stores/auth'
+import { useAccountsStore } from '~/stores/accounts'
+import { useLoansStore } from '~/stores/loans'
+import { usePaymentsStore } from '~/stores/payments'
+import { useEarningsStore } from '~/stores/earnings'
+import { useNotificationsStore } from '~/stores/notifications'
 import { formatCurrency, formatDate, formatRelativeTime } from '~/utils/formatters'
 import { NOTIFICATION_COLORS, NOTIFICATION_ICONS } from '~/utils/constants'
 
-export default defineComponent({
-  name: 'DashboardPage',
+// Initialize stores
+const authStore = useAuthStore()
+const accountsStore = useAccountsStore()
+const loansStore = useLoansStore()
+const paymentsStore = usePaymentsStore()
+const earningsStore = useEarningsStore()
+const notificationsStore = useNotificationsStore()
 
-  computed: {
-    authStore () {
-      return useAuthStore()
-    },
+// Extract reactive state/getters using storeToRefs
+const { user } = storeToRefs(authStore)
+const { accounts } = storeToRefs(accountsStore)
+const { loans } = storeToRefs(loansStore)
+const { payments } = storeToRefs(paymentsStore)
+const { availableEarnings } = storeToRefs(earningsStore)
+const { notifications, recentNotifications } = storeToRefs(notificationsStore)
 
-    accountsStore () {
-      return useAccountsStore()
-    },
+// Extract actions directly from store
+const { fetchAccounts } = accountsStore
+const { fetchLoans } = loansStore
+const { fetchPayments } = paymentsStore
+const { fetchEarnings } = earningsStore
+const { fetchNotifications, markAsRead } = notificationsStore
 
-    loansStore () {
-      return useLoansStore()
-    },
+// Computed properties
+const activeLoansCount = computed(() =>
+  loans.value.filter((l: any) => l.status === 'active').length
+)
 
-    paymentsStore () {
-      return usePaymentsStore()
-    },
+const overdueLoansCount = computed(() =>
+  loans.value.filter((l: any) => l.status === 'active' && new Date(l.end_date) < new Date()).length
+)
 
-    earningsStore () {
-      return useEarningsStore()
-    },
+const accountsCount = computed(() =>
+  accounts.value.length
+)
 
-    notificationsStore () {
-      return useNotificationsStore()
-    },
+const recentPayments = computed(() =>
+  payments.value.slice(0, 5)
+)
 
-    user () {
-      return this.authStore.user
-    },
+// Methods
+const getNotificationColor = (type: string) => {
+  return NOTIFICATION_COLORS[type as keyof typeof NOTIFICATION_COLORS] || 'grey'
+}
 
-    accounts () {
-      return this.accountsStore.accounts
-    },
+const getNotificationIcon = (type: string) => {
+  return NOTIFICATION_ICONS[type as keyof typeof NOTIFICATION_ICONS] || 'mdi-bell'
+}
 
-    loans () {
-      return this.loansStore.loans
-    },
-
-    payments () {
-      return this.paymentsStore.payments
-    },
-
-    availableEarnings () {
-      return this.earningsStore.availableEarnings
-    },
-
-    notifications () {
-      return this.notificationsStore.notifications
-    },
-
-    recentNotifications () {
-      return this.notificationsStore.recentNotifications
-    },
-
-    activeLoansCount (): number {
-      return this.loans.filter((l: any) => l.status === 'active').length
-    },
-
-    overdueLoansCount (): number {
-      return this.loans.filter((l: any) => l.status === 'active' && new Date(l.end_date) < new Date()).length
-    },
-
-    accountsCount (): number {
-      return this.accounts.length
-    },
-
-    recentPayments () {
-      return this.payments.slice(0, 5)
-    }
-  },
-
-  async mounted () {
-    await Promise.all([
-      this.accountsStore.fetchAccounts(),
-      this.loansStore.fetchLoans(),
-      this.paymentsStore.fetchPayments(),
-      this.earningsStore.fetchEarnings(),
-      this.notificationsStore.fetchNotifications()
-    ])
-  },
-
-  methods: {
-    formatCurrency,
-    formatDate,
-    formatRelativeTime,
-
-    markAsRead (id: string) {
-      this.notificationsStore.markAsRead(id)
-    },
-
-    getNotificationColor (type: string) {
-      return NOTIFICATION_COLORS[type as keyof typeof NOTIFICATION_COLORS] || 'grey'
-    },
-
-    getNotificationIcon (type: string) {
-      return NOTIFICATION_ICONS[type as keyof typeof NOTIFICATION_ICONS] || 'mdi-bell'
-    }
-  }
+// Lifecycle
+onMounted(async () => {
+  await Promise.all([
+    fetchAccounts(),
+    fetchLoans(),
+    fetchPayments(),
+    fetchEarnings(),
+    fetchNotifications()
+  ])
 })
+</script>
 
+<script lang="ts">
 definePageMeta({
   middleware: 'auth'
 })

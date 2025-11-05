@@ -73,3 +73,5 @@ export const usePenaltiesStore = defineStore('penalties', {
     }
   }
 })
+
+export type PenaltiesStore = ReturnType<typeof usePenaltiesStore>

@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'agent'
+export type UserRole = 'admin' | 'agent' | 'internal_admin'
 
 export type AccountStatus = 'active' | 'inactive' | 'suspended'
 
@@ -20,6 +20,8 @@ export type NotificationType =
   | 'payment_received'
 
 export type CashoutStatus = 'pending' | 'approved' | 'rejected'
+
+export type CompanyStatus = 'active' | 'inactive' | 'archived'
 
 export type GovernmentIdType = 'drivers_license' | 'passport' | 'state_id' | 'military_id'
 
@@ -51,6 +53,26 @@ export interface UserProfile {
 // Extended user profile with auth metadata (for client-side use)
 export interface UserProfileWithMeta extends UserProfile {
   display_name?: string | null
+}
+
+export interface Company {
+  id: string
+  name: string
+  description: string | null
+  address: string | null
+  contact_email: string | null
+  contact_phone: string | null
+  registration_number: string | null
+  tax_id: string | null
+  logo_url: string | null
+  status: CompanyStatus
+  created_by: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CompanyWithRelations extends Company {
+  creator?: UserProfileWithMeta
 }
 
 export interface Account {

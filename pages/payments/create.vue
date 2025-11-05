@@ -54,26 +54,34 @@
                     </v-card-text>
                   </v-card>
 
+                  <label for="payment-amount" class="font-weight-medium">Payment Amount *</label>
                   <v-text-field
+                    id="payment-amount"
                     v-model.number="form.amount"
-                    label="Payment Amount *"
                     type="number"
                     prepend-inner-icon="mdi-cash"
                     :rules="[rules.required, rules.positive]"
-                    variant="outlined"
+                    variant="solo"
+                    flat
                     class="mb-4"
+                    hide-details="auto"
+                    density="comfortable"
                     autocomplete="off"
                   />
 
+                  <label for="payment-date" class="font-weight-medium">Payment Date *</label>
                   <v-text-field
+                    id="payment-date"
                     v-model="form.payment_date"
-                    label="Payment Date *"
                     type="date"
                     prepend-inner-icon="mdi-calendar"
                     :rules="[rules.required]"
-                    variant="outlined"
+                    variant="solo"
+                    flat
                     :max="today"
                     class="mb-4"
+                    hide-details="auto"
+                    density="comfortable"
                     autocomplete="off"
                   />
 

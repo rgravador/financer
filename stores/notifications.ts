@@ -128,3 +128,5 @@ export const useNotificationsStore = defineStore('notifications', {
     }
   }
 })
+
+export type NotificationsStore = ReturnType<typeof useNotificationsStore>

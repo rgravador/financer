@@ -107,3 +107,5 @@ export const useEarningsStore = defineStore('earnings', {
     }
   }
 })
+
+export type EarningsStore = ReturnType<typeof useEarningsStore>

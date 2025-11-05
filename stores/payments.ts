@@ -90,3 +90,5 @@ export const usePaymentsStore = defineStore('payments', {
     }
   }
 })
+
+export type PaymentsStore = ReturnType<typeof usePaymentsStore>

@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: state => !!state.profile,
     isAdmin: state => state.profile?.role === 'admin',
     isAgent: state => state.profile?.role === 'agent',
+    isInternalAdmin: state => state.profile?.role === 'internal_admin',
     userProfile: state => state.profile
   },
 
@@ -69,7 +70,7 @@ export const useAuthStore = defineStore('auth', {
       password: string
       full_name: string
       display_name?: string
-      role: 'admin' | 'agent'
+      role: 'admin' | 'agent' | 'internal_admin'
     }) {
       this.loading = true
       try {
@@ -113,7 +114,7 @@ export const useAuthStore = defineStore('auth', {
       await supabase.auth.signOut()
       this.profile = null
       this.clearProfileFromStorage()
-      await navigateTo('/auth/login')
+      await navigateTo('/')
     },
 
     async fetchUserProfile (userId: string) {
@@ -184,3 +185,5 @@ export const useAuthStore = defineStore('auth', {
     }
   }
 })
+
+export type AuthStore = ReturnType<typeof useAuthStore>

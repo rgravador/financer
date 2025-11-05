@@ -18,24 +18,32 @@
         <v-form ref="formRef" v-model="formValid">
           <v-row>
             <v-col cols="12" md="6">
+              <label for="contact-phone" class="font-weight-medium">Phone Number *</label>
               <v-text-field
+                id="contact-phone"
                 v-model="formData.phone_number"
-                label="Phone Number *"
                 prepend-inner-icon="mdi-phone"
                 :rules="[rules.required]"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="contact-email" class="font-weight-medium">Email Address *</label>
               <v-text-field
+                id="contact-email"
                 v-model="formData.email"
-                label="Email Address *"
                 prepend-inner-icon="mdi-email"
                 :rules="[rules.required, rules.email]"
                 type="email"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12">

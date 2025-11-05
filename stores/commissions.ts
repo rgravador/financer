@@ -44,3 +44,5 @@ export const useCommissionsStore = defineStore('commissions', {
     }
   }
 })
+
+export type CommissionsStore = ReturnType<typeof useCommissionsStore>

@@ -18,40 +18,56 @@
         <v-form ref="formRef" v-model="formValid">
           <v-row>
             <v-col cols="12" md="6">
+              <label for="employment-employer-name" class="font-weight-medium">Employer Name</label>
               <v-text-field
+                id="employment-employer-name"
                 v-model="formData.employer_name"
-                label="Employer Name"
                 prepend-inner-icon="mdi-office-building"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="employment-employer-phone" class="font-weight-medium">Employer Phone</label>
               <v-text-field
+                id="employment-employer-phone"
                 v-model="formData.employer_phone"
-                label="Employer Phone"
                 prepend-inner-icon="mdi-phone-outline"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="employment-job-title" class="font-weight-medium">Job Title</label>
               <v-text-field
+                id="employment-job-title"
                 v-model="formData.job_title"
-                label="Job Title"
                 prepend-inner-icon="mdi-briefcase"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="employment-length" class="font-weight-medium">Employment Length (months)</label>
               <v-text-field
+                id="employment-length"
                 v-model="formData.employment_length_months"
-                label="Employment Length (months)"
                 prepend-inner-icon="mdi-calendar-clock"
                 type="number"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12">

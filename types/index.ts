@@ -12,7 +12,7 @@ export interface SignupForm {
   password: string
   full_name: string
   display_name?: string
-  role: 'admin' | 'agent'
+  role: 'admin' | 'agent' | 'internal_admin'
 }
 
 export interface AccountForm {
@@ -40,6 +40,17 @@ export interface PaymentForm {
 
 export interface CashoutRequestForm {
   amount: number
+}
+
+export interface CompanyForm {
+  name: string
+  description?: string
+  address?: string
+  contact_email?: string
+  contact_phone?: string
+  registration_number?: string
+  tax_id?: string
+  logo_file?: File | null
 }
 
 // Dashboard stats

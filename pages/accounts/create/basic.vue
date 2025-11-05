@@ -18,32 +18,44 @@
         <v-form ref="formRef" v-model="formValid">
           <v-row>
             <v-col cols="12" md="6">
+              <label for="account-full-name" class="font-weight-medium">Full Name *</label>
               <v-text-field
+                id="account-full-name"
                 v-model="formData.name"
-                label="Full Name *"
                 prepend-inner-icon="mdi-account"
                 :rules="[rules.required]"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="account-dob" class="font-weight-medium">Date of Birth</label>
               <v-text-field
+                id="account-dob"
                 v-model="formData.date_of_birth"
-                label="Date of Birth"
                 prepend-inner-icon="mdi-calendar"
                 type="date"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="account-ssn" class="font-weight-medium">SSN / Tax ID</label>
               <v-text-field
+                id="account-ssn"
                 v-model="formData.ssn_tax_id"
-                label="SSN / Tax ID"
                 prepend-inner-icon="mdi-card-account-details"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
@@ -57,12 +69,16 @@
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="account-gov-id-number" class="font-weight-medium">Government ID Number</label>
               <v-text-field
+                id="account-gov-id-number"
                 v-model="formData.government_id_number"
-                label="Government ID Number"
                 prepend-inner-icon="mdi-numeric"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">

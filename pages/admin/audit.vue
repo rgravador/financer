@@ -34,10 +34,12 @@
                 <v-text-field
                   v-model="filterUser"
                   label="Search by user"
-                  variant="outlined"
-                  density="compact"
+                  variant="solo"
+                  flat
+                  density="comfortable"
                   clearable
                   prepend-inner-icon="mdi-magnify"
+                  hide-details="auto"
                   autocomplete="off"
                 />
               </v-col>

@@ -118,3 +118,5 @@ export const useAmortizationStore = defineStore('amortization', {
     }
   }
 })
+
+export type AmortizationStore = ReturnType<typeof useAmortizationStore>

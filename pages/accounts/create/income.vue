@@ -18,23 +18,31 @@
         <v-form ref="formRef" v-model="formValid">
           <v-row>
             <v-col cols="12" md="6">
+              <label for="income-annual" class="font-weight-medium">Annual Income</label>
               <v-text-field
+                id="income-annual"
                 v-model="formData.annual_income"
-                label="Annual Income"
                 prepend-inner-icon="mdi-currency-usd"
                 type="number"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="income-monthly" class="font-weight-medium">Monthly Income</label>
               <v-text-field
+                id="income-monthly"
                 v-model="formData.monthly_income"
-                label="Monthly Income"
                 prepend-inner-icon="mdi-currency-usd"
                 type="number"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="4">

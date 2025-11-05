@@ -14,12 +14,13 @@
 
         <!-- Signup Form -->
         <v-form ref="formRef" v-model="formValid" @submit.prevent="handleSignup">
+          <label for="signup-full-name" class="font-weight-medium">Full Name</label>
           <v-text-field
+            id="signup-full-name"
             v-model="form.full_name"
-            label="Full Name"
             prepend-inner-icon="mdi-account"
             :rules="[rules.required]"
-            variant="outlined"
+            variant="solo"
             flat
             color="white"
             class="mb-4 white-input"
@@ -28,13 +29,14 @@
             autocomplete="off"
           />
 
+          <label for="signup-email" class="font-weight-medium">Email</label>
           <v-text-field
+            id="signup-email"
             v-model="form.email"
-            label="Email"
             type="email"
             prepend-inner-icon="mdi-email"
             :rules="[rules.required, rules.email]"
-            variant="outlined"
+            variant="solo"
             flat
             color="white"
             class="mb-4 white-input"
@@ -43,14 +45,15 @@
             autocomplete="username"
           />
 
+          <label for="signup-password" class="font-weight-medium">Password</label>
           <v-text-field
+            id="signup-password"
             v-model="form.password"
-            label="Password"
             :type="showPassword ? 'text' : 'password'"
             prepend-inner-icon="mdi-lock"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :rules="[rules.required, rules.password]"
-            variant="outlined"
+            variant="solo"
             flat
             color="white"
             class="mb-4 white-input"
@@ -60,14 +63,15 @@
             @click:append-inner="showPassword = !showPassword"
           />
 
+          <label for="signup-confirm-password" class="font-weight-medium">Confirm Password</label>
           <v-text-field
+            id="signup-confirm-password"
             v-model="form.confirmPassword"
-            label="Confirm Password"
             :type="showConfirmPassword ? 'text' : 'password'"
             prepend-inner-icon="mdi-lock-check"
             :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :rules="[rules.required, rules.passwordMatch]"
-            variant="outlined"
+            variant="solo"
             flat
             color="white"
             class="mb-4 white-input"
@@ -100,7 +104,7 @@
 
           <div class="text-center">
             <span class="text-body-2 text-grey-lighten-1">Already have an account?</span>
-            <v-btn variant="text" size="small" to="/auth/login" class="text-none text-white ml-1">
+            <v-btn variant="text" size="small" to="/" class="text-none text-white ml-1">
               Login
             </v-btn>
           </div>
@@ -110,78 +114,76 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, computed } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  name: 'SignupPage',
+// Initialize stores and router
+const authStore = useAuthStore()
+const router = useRouter()
 
-  data () {
-    return {
-      formValid: false,
-      showPassword: false,
-      showConfirmPassword: false,
-      loading: false,
-      error: '',
-      success: false,
-      form: {
-        full_name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'agent' as 'admin' | 'agent'
-      }
-    }
-  },
+// Extract actions directly from store
+const { signup } = authStore
 
-  computed: {
-    authStore () {
-      return useAuthStore()
-    },
+// Component state
+const formRef = ref<any>(null)
+const formValid = ref(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+const loading = ref(false)
+const error = ref('')
+const success = ref(false)
 
-    rules () {
-      return {
-        required: (v: string) => !!v || 'Field is required',
-        email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-        password: (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
-        passwordMatch: (v: string) => v === this.form.password || 'Passwords must match'
-      }
-    }
-  },
-
-  methods: {
-    async handleSignup () {
-      const formRef = this.$refs.formRef as any
-      if (!formRef) { return }
-
-      const { valid } = await formRef.validate()
-      if (!valid) { return }
-
-      this.loading = true
-      this.error = ''
-      this.success = false
-
-      const result = await this.authStore.signup({
-        email: this.form.email,
-        password: this.form.password,
-        full_name: this.form.full_name,
-        role: this.form.role
-      })
-
-      if (result.success) {
-        this.success = true
-        setTimeout(() => {
-          this.$router.push('/auth/login')
-        }, 2000)
-      } else {
-        this.error = result.error || 'Signup failed'
-      }
-
-      this.loading = false
-    }
-  }
+// Form data
+const form = reactive({
+  full_name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  role: 'agent' as 'admin' | 'agent'
 })
 
+// Validation rules
+const rules = computed(() => ({
+  required: (v: string) => !!v || 'Field is required',
+  email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+  password: (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+  passwordMatch: (v: string) => v === form.password || 'Passwords must match'
+}))
+
+// Methods
+const handleSignup = async () => {
+  if (!formRef.value) { return }
+
+  const { valid } = await formRef.value.validate()
+  if (!valid) { return }
+
+  loading.value = true
+  error.value = ''
+  success.value = false
+
+  const result = await signup({
+    email: form.email,
+    password: form.password,
+    full_name: form.full_name,
+    role: form.role
+  })
+
+  if (result.success) {
+    success.value = true
+    setTimeout(() => {
+      router.push('/')
+    }, 2000)
+  } else {
+    error.value = result.error || 'Signup failed'
+  }
+
+  loading.value = false
+}
+</script>
+
+<script lang="ts">
 definePageMeta({
   middleware: 'admin'
 })

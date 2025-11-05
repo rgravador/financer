@@ -250,9 +250,10 @@
           </v-alert>
 
           <v-form ref="cashoutFormRef" v-model="cashoutFormValid">
+            <label for="cashout-amount" class="font-weight-medium">Amount to Cashout *</label>
             <v-text-field
+              id="cashout-amount"
               v-model.number="cashoutForm.amount"
-              label="Amount to Cashout *"
               type="number"
               prepend-inner-icon="mdi-cash"
               :rules="[
@@ -260,8 +261,11 @@
                 rules.positive,
                 rules.maxAmount
               ]"
-              variant="outlined"
+              variant="solo"
+              flat
               class="mb-4"
+              hide-details="auto"
+              density="comfortable"
               autocomplete="off"
             />
 

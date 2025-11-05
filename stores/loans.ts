@@ -154,3 +154,5 @@ export const useLoansStore = defineStore('loans', {
     }
   }
 })
+
+export type LoansStore = ReturnType<typeof useLoansStore>

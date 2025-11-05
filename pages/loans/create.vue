@@ -31,17 +31,21 @@
                     :rules="[rules.required]"
                     variant="outlined"
                     class="mb-4"
-                    :loading="accountsStore.loading"
+                    :loading="accountsLoading"
                   />
 
+                  <label for="loan-principal-amount" class="font-weight-medium">Principal Amount *</label>
                   <v-text-field
+                    id="loan-principal-amount"
                     v-model.number="form.principal_amount"
-                    label="Principal Amount *"
                     type="number"
                     prepend-inner-icon="mdi-cash"
                     :rules="[rules.required, rules.positive]"
-                    variant="outlined"
+                    variant="solo"
+                    flat
                     class="mb-4"
+                    hide-details="auto"
+                    density="comfortable"
                     autocomplete="off"
                   />
 
@@ -61,14 +65,18 @@
                         <span class="text-body-2">5%</span>
                       </template>
                     </v-slider>
+                    <label for="loan-interest-rate" class="font-weight-medium">Interest Rate (% per month) *</label>
                     <v-text-field
+                      id="loan-interest-rate"
                       v-model.number="form.interest_rate"
-                      label="Interest Rate (% per month) *"
                       type="number"
                       prepend-inner-icon="mdi-percent"
                       :rules="[rules.required, rules.interestRate]"
-                      variant="outlined"
+                      variant="solo"
+                      flat
                       suffix="%"
+                      hide-details="auto"
+                      density="comfortable"
                       autocomplete="off"
                     />
                   </div>
@@ -191,6 +199,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { mapState, mapActions } from 'pinia'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { PaymentFrequency } from '~/types'
 
@@ -230,24 +239,13 @@ export default defineComponent({
   },
 
   computed: {
-    accountsStore () {
-      return useAccountsStore()
-    },
-
-    loansStore () {
-      return useLoansStore()
-    },
-
-    uiStore () {
-      return useUIStore()
-    },
-
-    accountOptions () {
-      return this.accountsStore.accounts
-    },
+    ...mapState(useAccountsStore, {
+      accountOptions: 'accounts',
+      accountsLoading: 'loading'
+    }),
 
     schedulePreview () {
-      return this.loansStore.generateSchedulePreview(this.form)
+      return this.generateSchedulePreview(this.form)
     },
 
     totalInterest () {
@@ -265,13 +263,17 @@ export default defineComponent({
 
   async mounted () {
     try {
-      await this.accountsStore.fetchAccounts()
+      await this.fetchAccounts()
     } catch (error: any) {
-      this.uiStore.showError('Failed to load accounts')
+      this.showError('Failed to load accounts')
     }
   },
 
   methods: {
+    ...mapActions(useAccountsStore, ['fetchAccounts']),
+    ...mapActions(useLoansStore, ['createLoan', 'generateSchedulePreview']),
+    ...mapActions(useUIStore, ['showError', 'showSuccess']),
+
     formatCurrency,
     formatDate,
 
@@ -285,17 +287,17 @@ export default defineComponent({
       this.error = ''
       this.success = false
 
-      const result = await this.loansStore.createLoan(this.form)
+      const result = await this.createLoan(this.form)
 
       if (result.success) {
         this.success = true
-        this.uiStore.showSuccess('Loan created and pending approval')
+        this.showSuccess('Loan created and pending approval')
         setTimeout(() => {
           this.$router.push('/loans')
         }, 2000)
       } else {
         this.error = result.error || 'Failed to create loan'
-        this.uiStore.showError(this.error)
+        this.showError(this.error)
       }
 
       this.loading = false

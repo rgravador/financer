@@ -338,3 +338,19 @@ SUPABASE_SERVICE_KEY=your_supabase_service_role_key
 - Pagination recommended for large datasets (already implemented in data tables)
 - Add to memory, always add eslint disable next line to composable desctruct
 - Add to memory, always use vuex instead of composables
+- add to memory, always use pinia instead of composables
+- Add to memory, always add Full store instance type. example export type UserStore = ReturnType<typeof useUserStore>
+- Add to memory, always use mapState, mapActions, mapGetters and others when communicating to pinia from vue files
+- Add to memory, when create or edit text fields use the format <label for="login-email" class="font-weight-medium">Email</label>
+          <v-text-field
+            id="login-email"
+            v-model="form.email"
+            type="email"
+            prepend-inner-icon="mdi-email"
+            :rules="[rules.required, rules.email]"
+            variant="solo"
+            flat
+            class="mb-4"
+            hide-details="auto"
+            density="comfortable"
+          />, main points label tag above, no label attribute in the text field tag, variant is solo

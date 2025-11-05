@@ -145,86 +145,64 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useLoansStore } from '~/stores/loans'
+import { useUIStore } from '~/stores/ui'
 import { formatCurrency } from '~/utils/formatters'
 
-export default defineComponent({
-  name: 'LoansIndex',
+// Initialize stores
+const loansStore = useLoansStore()
+const uiStore = useUIStore()
 
-  data () {
-    return {
-      activeTab: 'all'
-    }
-  },
+// Extract reactive state/getters using storeToRefs
+const { loans, loading, pendingApprovalLoans, activeLoans, overdueLoans } = storeToRefs(loansStore)
 
-  computed: {
-    loansStore () {
-      return useLoansStore()
-    },
+// Extract actions directly from store
+const { fetchLoans } = loansStore
+const { showError } = uiStore
 
-    uiStore () {
-      return useUIStore()
-    },
+// Component state
+const activeTab = ref('all')
 
-    loans () {
-      return this.loansStore.loans
-    },
-
-    loading () {
-      return this.loansStore.loading
-    },
-
-    pendingApprovalLoans () {
-      return this.loansStore.pendingApprovalLoans
-    },
-
-    activeLoans () {
-      return this.loansStore.activeLoans
-    },
-
-    overdueLoans () {
-      return this.loansStore.overdueLoans
-    },
-
-    filteredLoans () {
-      switch (this.activeTab) {
-        case 'pending':
-          return this.pendingApprovalLoans
-        case 'active':
-          return this.activeLoans
-        case 'overdue':
-          return this.overdueLoans
-        default:
-          return this.loans
-      }
-    }
-  },
-
-  async mounted () {
-    try {
-      await this.loansStore.fetchLoans()
-    } catch (error: any) {
-      this.uiStore.showError('Failed to load loans')
-    }
-  },
-
-  methods: {
-    formatCurrency,
-
-    getLoanStatusColor (status: string) {
-      const colors: Record<string, string> = {
-        pending_approval: 'warning',
-        approved: 'info',
-        active: 'success',
-        closed: 'grey',
-        rejected: 'error'
-      }
-      return colors[status] || 'grey'
-    }
+// Computed properties
+const filteredLoans = computed(() => {
+  switch (activeTab.value) {
+    case 'pending':
+      return pendingApprovalLoans.value
+    case 'active':
+      return activeLoans.value
+    case 'overdue':
+      return overdueLoans.value
+    default:
+      return loans.value
   }
 })
 
+// Methods
+const getLoanStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    pending_approval: 'warning',
+    approved: 'info',
+    active: 'success',
+    closed: 'grey',
+    rejected: 'error'
+  }
+  return colors[status] || 'grey'
+}
+
+// Lifecycle
+onMounted(async () => {
+  try {
+    await fetchLoans()
+  } catch (error: any) {
+    showError('Failed to load loans')
+  }
+})
+</script>
+
+<script lang="ts">
 definePageMeta({
   middleware: 'auth'
 })

@@ -41,6 +41,7 @@ export const useAuth = () => {
   const isAuthenticated = computed(() => !!user.value && !!profile.value)
   const isAdmin = computed(() => profile.value?.role === 'admin')
   const isAgent = computed(() => profile.value?.role === 'agent')
+  const isInternalAdmin = computed(() => profile.value?.role === 'internal_admin')
   const userProfile = computed(() => profile.value)
 
   // Actions
@@ -69,7 +70,7 @@ export const useAuth = () => {
     password: string
     full_name: string
     display_name?: string
-    role: 'admin' | 'agent'
+    role: 'admin' | 'agent' | 'internal_admin'
   }) => {
     loading.value = true
     try {
@@ -111,7 +112,7 @@ export const useAuth = () => {
     await supabase.auth.signOut()
     profile.value = null
     clearProfileFromStorage()
-    await navigateTo('/auth/login')
+    await navigateTo('/')
   }
 
   const fetchUserProfile = async (userId: string) => {
@@ -186,6 +187,7 @@ export const useAuth = () => {
     isAuthenticated,
     isAdmin,
     isAgent,
+    isInternalAdmin,
     userProfile,
     // Actions
     login,

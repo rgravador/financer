@@ -112,3 +112,5 @@ export const useUIStore = defineStore('ui', {
     }
   }
 })
+
+export type UIStore = ReturnType<typeof useUIStore>

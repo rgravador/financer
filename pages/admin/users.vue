@@ -85,9 +85,10 @@
               v-model="search"
               prepend-inner-icon="mdi-magnify"
               label="Search users"
-              variant="outlined"
-              density="compact"
-              hide-details
+              variant="solo"
+              flat
+              density="comfortable"
+              hide-details="auto"
               clearable
               autocomplete="off"
               style="max-width: 300px;"

@@ -298,3 +298,5 @@ export const useAccountsStore = defineStore('accounts', {
     }
   }
 })
+
+export type AccountsStore = ReturnType<typeof useAccountsStore>

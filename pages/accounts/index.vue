@@ -50,9 +50,10 @@
               v-model="filters.search"
               prepend-inner-icon="mdi-magnify"
               label="Search table"
-              variant="outlined"
-              density="compact"
-              hide-details
+              variant="solo"
+              flat
+              density="comfortable"
+              hide-details="auto"
               clearable
               class="search-field"
               style="max-width: 300px"
@@ -171,76 +172,66 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAccountsStore } from '~/stores/accounts'
+import { useUIStore } from '~/stores/ui'
+import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  name: 'AccountsPage',
+// Initialize stores and router
+const accountsStore = useAccountsStore()
+const uiStore = useUIStore()
+const router = useRouter()
 
-  data () {
-    return {
-      statusOptions: [
-        { title: 'Active', value: 'active' },
-        { title: 'Inactive', value: 'inactive' },
-        { title: 'Suspended', value: 'suspended' }
-      ],
-      headers: [
-        { title: 'Name', value: 'name', sortable: true },
-        { title: 'Contact', value: 'contact_info', sortable: false },
-        { title: 'Address', value: 'address', sortable: false },
-        { title: 'Status', value: 'status', sortable: true },
-        { title: 'Loans', value: 'loans', sortable: false },
-        { title: 'Actions', value: 'actions', sortable: false, align: 'end' as const }
-      ]
-    }
-  },
+// Extract reactive state/getters using storeToRefs
+const { loading, filteredAccounts, filters } = storeToRefs(accountsStore)
 
-  computed: {
-    accountsStore () {
-      return useAccountsStore()
-    },
+// Extract actions directly from store
+const { fetchAccounts } = accountsStore
+const { showError } = uiStore
 
-    uiStore () {
-      return useUIStore()
-    },
+// Component data
+const statusOptions = ref([
+  { title: 'Active', value: 'active' },
+  { title: 'Inactive', value: 'inactive' },
+  { title: 'Suspended', value: 'suspended' }
+])
 
-    loading () {
-      return this.accountsStore.loading
-    },
+const headers = ref([
+  { title: 'Name', value: 'name', sortable: true },
+  { title: 'Contact', value: 'contact_info', sortable: false },
+  { title: 'Address', value: 'address', sortable: false },
+  { title: 'Status', value: 'status', sortable: true },
+  { title: 'Loans', value: 'loans', sortable: false },
+  { title: 'Actions', value: 'actions', sortable: false, align: 'end' as const }
+])
 
-    filteredAccounts () {
-      return this.accountsStore.filteredAccounts
-    },
+// Methods
+const getStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    active: 'success',
+    inactive: 'grey',
+    suspended: 'error'
+  }
+  return colors[status] || 'grey'
+}
 
-    filters () {
-      return this.accountsStore.filters
-    }
-  },
+const handleRowClick = (_event: any, { item }: any) => {
+  router.push(`/accounts/${item.id}`)
+}
 
-  async mounted () {
-    try {
-      await this.accountsStore.fetchAccounts()
-    } catch (error: any) {
-      this.uiStore.showError('Failed to load accounts')
-    }
-  },
-
-  methods: {
-    getStatusColor (status: string) {
-      const colors: Record<string, string> = {
-        active: 'success',
-        inactive: 'grey',
-        suspended: 'error'
-      }
-      return colors[status] || 'grey'
-    },
-
-    handleRowClick (_event: any, { item }: any) {
-      this.$router.push(`/accounts/${item.id}`)
-    }
+// Lifecycle
+onMounted(async () => {
+  try {
+    await fetchAccounts()
+  } catch (error: any) {
+    showError('Failed to load accounts')
   }
 })
+</script>
 
+<script lang="ts">
 definePageMeta({
   middleware: 'auth'
 })

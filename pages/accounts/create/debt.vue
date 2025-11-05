@@ -18,23 +18,31 @@
         <v-form ref="formRef" v-model="formValid">
           <v-row>
             <v-col cols="12" md="6">
+              <label for="debt-monthly-expenses" class="font-weight-medium">Monthly Expenses</label>
               <v-text-field
+                id="debt-monthly-expenses"
                 v-model="formData.monthly_expenses"
-                label="Monthly Expenses"
                 prepend-inner-icon="mdi-calculator"
                 type="number"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12" md="6">
+              <label for="debt-monthly-payments" class="font-weight-medium">Monthly Debt Payments</label>
               <v-text-field
+                id="debt-monthly-payments"
                 v-model="formData.monthly_debt_obligations"
-                label="Monthly Debt Payments"
                 prepend-inner-icon="mdi-credit-card"
                 type="number"
-                variant="outlined"
+                variant="solo"
+                flat
                 class="mb-4"
+                hide-details="auto"
+                density="comfortable"
               />
             </v-col>
             <v-col cols="12">
