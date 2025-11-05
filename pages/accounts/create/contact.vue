@@ -100,58 +100,76 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AccountsCreateContact',
+
+  data () {
+    return {
+      formRef: null as any,
+      formValid: false,
+      rules: {
+        required: (v: string) => !!v || 'This field is required',
+        email: (v: string) => {
+          const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          return !v || pattern.test(v) || 'Invalid email format'
+        }
+      }
+    }
+  },
+
+  computed: {
+    creationStore () {
+      return useAccountCreation()
+    },
+
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    formData () {
+      return this.creationStore.formData
+    },
+
+    loading () {
+      return this.accountsStore.loading
+    },
+
+    accountId () {
+      return this.creationStore.accountId
+    }
+  },
+
+  methods: {
+    goBack () {
+      this.$router.push('/accounts/create')
+    },
+
+    async handleSave () {
+      if (this.formRef) {
+        const { valid } = await this.formRef.validate()
+        if (!valid) {
+          return
+        }
+      }
+
+      if (!this.accountId) {
+        alert('Please complete Basic Identification first')
+        this.$router.push('/accounts/create/basic')
+        return
+      }
+
+      const result = await this.creationStore.saveContactInfo()
+      if (result.success) {
+        this.$router.push('/accounts/create')
+      }
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'auth'
 })
-
-const router = useRouter()
-const creationStore = useAccountCreation()
-const accountsStore = useAccounts()
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { formData, saveContactInfo, accountId } = creationStore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { loading } = accountsStore
-
-void formData
-void saveContactInfo
-void accountId
-void loading
-
-const formRef = ref()
-const formValid = ref(false)
-
-const rules = {
-  required: (v: string) => !!v || 'This field is required',
-  email: (v: string) => {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return !v || pattern.test(v) || 'Invalid email format'
-  }
-}
-
-const goBack = () => {
-  router.push('/accounts/create')
-}
-
-const handleSave = async () => {
-  if (formRef.value) {
-    const { valid } = await formRef.value.validate()
-    if (!valid) {
-      return
-    }
-  }
-
-  // Check if basic info is completed first
-  if (!accountId) {
-    alert('Please complete Basic Identification first')
-    router.push('/accounts/create/basic')
-    return
-  }
-
-  const result = await saveContactInfo()
-  if (result.success) {
-    router.push('/accounts/create')
-  }
-}
 </script>

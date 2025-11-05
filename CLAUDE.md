@@ -337,3 +337,4 @@ SUPABASE_SERVICE_KEY=your_supabase_service_role_key
 - Real-time subscriptions only for notifications (not all tables)
 - Pagination recommended for large datasets (already implemented in data tables)
 - Add to memory, always add eslint disable next line to composable desctruct
+- Add to memory, always use vuex instead of composables

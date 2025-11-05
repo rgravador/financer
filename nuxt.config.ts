@@ -6,7 +6,8 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/supabase',
-    'vuetify-nuxt-module'
+    'vuetify-nuxt-module',
+    '@pinia/nuxt'
   ],
 
   typescript: {

@@ -101,93 +101,120 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AccountCreation',
+
+  data () {
+    return {
+      steps: [
+        {
+          key: 'basic' as const,
+          title: 'Basic Identification',
+          description: 'Enter your name, date of birth, and ID information',
+          route: '/accounts/create/basic'
+        },
+        {
+          key: 'contact' as const,
+          title: 'Contact Information',
+          description: 'Provide your phone, email, and address details',
+          route: '/accounts/create/contact'
+        },
+        {
+          key: 'employment' as const,
+          title: 'Employment Details',
+          description: 'Share information about your current employer',
+          route: '/accounts/create/employment'
+        },
+        {
+          key: 'income' as const,
+          title: 'Income & Financial Information',
+          description: 'Enter your income and upload financial documents',
+          route: '/accounts/create/income'
+        },
+        {
+          key: 'debt' as const,
+          title: 'Debt & Expenses',
+          description: 'Provide details about your monthly expenses and debts',
+          route: '/accounts/create/debt'
+        }
+      ]
+    }
+  },
+
+  computed: {
+    creationStore () {
+      return useAccountCreation()
+    },
+
+    completionPercentage () {
+      return this.creationStore.completionPercentage
+    },
+
+    accountId () {
+      return this.creationStore.accountId
+    },
+
+    getCompletedFieldsCount () {
+      return this.creationStore.getCompletedFieldsCount
+    },
+
+    getTotalFieldsCount () {
+      return this.creationStore.getTotalFieldsCount
+    },
+
+    isSectionComplete () {
+      return this.creationStore.isSectionComplete
+    },
+
+    isAllRequiredComplete () {
+      return this.isSectionComplete('basic') && this.isSectionComplete('contact')
+    }
+  },
+
+  mounted () {
+    // If there's a draft in progress, we can load it here
+    // For now, we just ensure the form is ready
+  },
+
+  methods: {
+    getStepColor (stepKey: typeof this.steps[number]['key']) {
+      if (this.isSectionComplete(stepKey)) {
+        return 'success-lighten-5'
+      }
+      if (this.getCompletedFieldsCount(stepKey) > 0) {
+        return 'warning-lighten-5'
+      }
+      return 'surface'
+    },
+
+    navigateToStep (route: string) {
+      if (this.accountId) {
+        // If account is already created, add the account ID to the route
+        this.$router.push(`${route}?id=${this.accountId}`)
+      } else {
+        this.$router.push(route)
+      }
+    },
+
+    handleCancel () {
+      if (confirm('Are you sure you want to cancel? All unsaved data will be lost.')) {
+        this.creationStore.resetForm()
+        this.$router.push('/accounts')
+      }
+    },
+
+    handleComplete () {
+      if (this.accountId) {
+        this.$router.push(`/accounts/${this.accountId}`)
+      }
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'auth'
-})
-
-const router = useRouter()
-const creationStore = useAccountCreation()
-
-const { completionPercentage, accountId, getCompletedFieldsCount, getTotalFieldsCount, isSectionComplete } = creationStore
-void completionPercentage
-void accountId
-void getCompletedFieldsCount
-void getTotalFieldsCount
-void isSectionComplete
-
-const steps = [
-  {
-    key: 'basic' as const,
-    title: 'Basic Identification',
-    description: 'Enter your name, date of birth, and ID information',
-    route: '/accounts/create/basic'
-  },
-  {
-    key: 'contact' as const,
-    title: 'Contact Information',
-    description: 'Provide your phone, email, and address details',
-    route: '/accounts/create/contact'
-  },
-  {
-    key: 'employment' as const,
-    title: 'Employment Details',
-    description: 'Share information about your current employer',
-    route: '/accounts/create/employment'
-  },
-  {
-    key: 'income' as const,
-    title: 'Income & Financial Information',
-    description: 'Enter your income and upload financial documents',
-    route: '/accounts/create/income'
-  },
-  {
-    key: 'debt' as const,
-    title: 'Debt & Expenses',
-    description: 'Provide details about your monthly expenses and debts',
-    route: '/accounts/create/debt'
-  }
-]
-
-const isAllRequiredComplete = computed(() => {
-  return isSectionComplete('basic') && isSectionComplete('contact')
-})
-
-const getStepColor = (stepKey: typeof steps[number]['key']) => {
-  if (isSectionComplete(stepKey)) {
-    return 'success-lighten-5'
-  }
-  if (getCompletedFieldsCount(stepKey) > 0) {
-    return 'warning-lighten-5'
-  }
-  return 'surface'
-}
-
-const navigateToStep = (route: string) => {
-  if (accountId.value) {
-    // If account is already created, add the account ID to the route
-    router.push(`${route}?id=${accountId.value}`)
-  } else {
-    router.push(route)
-  }
-}
-
-const handleCancel = () => {
-  if (confirm('Are you sure you want to cancel? All unsaved data will be lost.')) {
-    creationStore.resetForm()
-    router.push('/accounts')
-  }
-}
-
-const handleComplete = () => {
-  if (accountId) {
-    router.push(`/accounts/${accountId}`)
-  }
-}
-
-// Initialize or load existing draft
-onMounted(() => {
-  // If there's a draft in progress, we can load it here
-  // For now, we just ensure the form is ready
 })
 </script>

@@ -133,22 +133,38 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
+
+export default defineComponent({
+  name: 'PaymentsIndex',
+
+  computed: {
+    paymentsStore () {
+      return usePaymentsStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.paymentsStore.fetchPayments()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load payments')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate
+  }
+})
 
 definePageMeta({
   middleware: 'auth'
-})
-
-const paymentsStore = usePayments()
-const uiStore = useUI()
-
-// Fetch payments on mount
-onMounted(async () => {
-  try {
-    await paymentsStore.fetchPayments()
-  } catch (error: any) {
-    uiStore.showError('Failed to load payments')
-  }
 })
 </script>

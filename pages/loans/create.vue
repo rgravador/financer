@@ -189,103 +189,121 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { PaymentFrequency } from '~/types'
 
+export default defineComponent({
+  name: 'LoansCreate',
+
+  data () {
+    return {
+      formRef: null as any,
+      formValid: false,
+      loading: false,
+      error: '',
+      success: false,
+      form: {
+        account_id: (this.$route.query.account_id as string) || '',
+        principal_amount: 0,
+        interest_rate: 3.5,
+        tenure_months: 6,
+        payment_frequency: 'monthly' as PaymentFrequency,
+        start_date: ''
+      },
+      tenureOptions: Array.from({ length: 11 }, (_, i) => ({
+        title: `${i + 2} months`,
+        value: i + 2
+      })),
+      frequencyOptions: [
+        { label: 'Bi-Monthly (Every 15 days)', value: 'bi-monthly' },
+        { label: 'Monthly', value: 'monthly' },
+        { label: 'Weekly', value: 'weekly' }
+      ],
+      rules: {
+        required: (v: any) => !!v || 'This field is required',
+        positive: (v: number) => v > 0 || 'Must be greater than 0',
+        interestRate: (v: number) => (v >= 3 && v <= 5) || 'Interest rate must be between 3% and 5%'
+      }
+    }
+  },
+
+  computed: {
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    loansStore () {
+      return useLoansStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    accountOptions () {
+      return this.accountsStore.accounts
+    },
+
+    schedulePreview () {
+      return this.loansStore.generateSchedulePreview(this.form)
+    },
+
+    totalInterest () {
+      return this.schedulePreview.reduce((sum, item) => sum + item.interest_due, 0)
+    },
+
+    totalAmount () {
+      return this.form.principal_amount + this.totalInterest
+    },
+
+    canSubmit () {
+      return this.form.account_id && this.form.principal_amount > 0
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.accountsStore.fetchAccounts()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load accounts')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    async handleSubmit () {
+      if (!this.formRef) { return }
+
+      const { valid } = await this.formRef.validate()
+      if (!valid) { return }
+
+      this.loading = true
+      this.error = ''
+      this.success = false
+
+      const result = await this.loansStore.createLoan(this.form)
+
+      if (result.success) {
+        this.success = true
+        this.uiStore.showSuccess('Loan created and pending approval')
+        setTimeout(() => {
+          this.$router.push('/loans')
+        }, 2000)
+      } else {
+        this.error = result.error || 'Failed to create loan'
+        this.uiStore.showError(this.error)
+      }
+
+      this.loading = false
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'auth'
-})
-
-const route = useRoute()
-const router = useRouter()
-const accountsStore = useAccounts()
-const { accounts: accountsData } = accountsStore
-const loansStore = useLoans()
-const uiStore = useUI()
-
-const formRef = ref()
-const formValid = ref(false)
-const loading = ref(false)
-const error = ref('')
-const success = ref(false)
-
-const form = reactive({
-  account_id: (route.query.account_id as string) || '',
-  principal_amount: 0,
-  interest_rate: 3.5,
-  tenure_months: 6,
-  payment_frequency: 'monthly' as PaymentFrequency,
-  start_date: ''
-})
-
-const tenureOptions = Array.from({ length: 11 }, (_, i) => ({
-  title: `${i + 2} months`,
-  value: i + 2
-}))
-
-const frequencyOptions = [
-  { label: 'Bi-Monthly (Every 15 days)', value: 'bi-monthly' },
-  { label: 'Monthly', value: 'monthly' },
-  { label: 'Weekly', value: 'weekly' }
-]
-
-const rules = {
-  required: (v: any) => !!v || 'This field is required',
-  positive: (v: number) => v > 0 || 'Must be greater than 0',
-  interestRate: (v: number) => (v >= 3 && v <= 5) || 'Interest rate must be between 3% and 5%'
-}
-
-const accountOptions = computed(() => accountsData.value)
-
-const schedulePreview = computed(() => {
-  return loansStore.generateSchedulePreview(form)
-})
-
-const totalInterest = computed(() => {
-  return schedulePreview.value.reduce((sum, item) => sum + item.interest_due, 0)
-})
-
-const totalAmount = computed(() => {
-  return form.principal_amount + totalInterest.value
-})
-
-const canSubmit = computed(() => {
-  return form.account_id && form.principal_amount > 0
-})
-
-const handleSubmit = async () => {
-  if (!formRef.value) { return }
-
-  const { valid } = await formRef.value.validate()
-  if (!valid) { return }
-
-  loading.value = true
-  error.value = ''
-  success.value = false
-
-  const result = await loansStore.createLoan(form)
-
-  if (result.success) {
-    success.value = true
-    uiStore.showSuccess('Loan created and pending approval')
-    setTimeout(() => {
-      router.push('/loans')
-    }, 2000)
-  } else {
-    error.value = result.error || 'Failed to create loan'
-    uiStore.showError(error.value)
-  }
-
-  loading.value = false
-}
-
-// Fetch accounts on mount
-onMounted(async () => {
-  try {
-    await accountsStore.fetchAccounts()
-  } catch (error: any) {
-    uiStore.showError('Failed to load accounts')
-  }
 })
 </script>

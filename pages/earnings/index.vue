@@ -298,107 +298,135 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { Payment } from '~/types'
 
+export default defineComponent({
+  name: 'EarningsIndex',
+
+  data () {
+    return {
+      cashoutDialog: false,
+      cashoutFormValid: false,
+      cashoutLoading: false,
+      cashoutError: '',
+      cashoutForm: {
+        amount: 0,
+        notes: ''
+      }
+    }
+  },
+
+  computed: {
+    earningsStore () {
+      return useEarningsStore()
+    },
+
+    cashoutsStore () {
+      return useCashouts()
+    },
+
+    paymentsStore () {
+      return usePaymentsStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    earnings () {
+      return this.earningsStore.earnings
+    },
+
+    canRequestCashout () {
+      return this.earnings && this.earnings.collectible_earnings > 0
+    },
+
+    paymentsWithCommission () {
+      return this.paymentsStore.payments.filter((p: Payment) => p.applied_to_interest > 0)
+    },
+
+    rules () {
+      return {
+        required: (v: any) => !!v || 'This field is required',
+        positive: (v: number) => v > 0 || 'Amount must be greater than 0',
+        maxAmount: (v: number) => {
+          const max = this.earnings?.collectible_earnings || 0
+          return v <= max || `Amount cannot exceed ${formatCurrency(max)}`
+        }
+      }
+    }
+  },
+
+  async mounted () {
+    try {
+      await Promise.all([
+        this.earningsStore.fetchEarnings(),
+        this.cashoutsStore.fetchCashouts(),
+        this.paymentsStore.fetchPayments()
+      ])
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load earnings data')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    calculateCommissionAmount (payment: Payment) {
+      const commissionRate = this.earnings?.commission_percentage || 0
+      return payment.applied_to_interest * (commissionRate / 100)
+    },
+
+    getCashoutStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        pending: 'warning',
+        approved: 'success',
+        rejected: 'error'
+      }
+      return colors[status] || 'grey'
+    },
+
+    closeCashoutDialog () {
+      this.cashoutDialog = false
+      this.cashoutForm.amount = 0
+      this.cashoutForm.notes = ''
+      this.cashoutError = ''
+    },
+
+    async handleCashoutRequest () {
+      const formRef = this.$refs.cashoutFormRef as any
+      if (!formRef) { return }
+
+      const { valid } = await formRef.validate()
+      if (!valid) { return }
+
+      this.cashoutLoading = true
+      this.cashoutError = ''
+
+      const result = await this.cashoutsStore.requestCashout({
+        amount: this.cashoutForm.amount,
+        notes: this.cashoutForm.notes
+      })
+
+      if (result.success) {
+        this.uiStore.showSuccess('Cashout request submitted successfully')
+        this.closeCashoutDialog()
+        // Refresh data
+        await this.earningsStore.fetchEarnings()
+      } else {
+        this.cashoutError = result.error || 'Failed to submit cashout request'
+      }
+
+      this.cashoutLoading = false
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'auth'
-})
-
-const earningsStore = useEarnings()
-const cashoutsStore = useCashouts()
-const paymentsStore = usePayments()
-const uiStore = useUI()
-
-const cashoutDialog = ref(false)
-const cashoutFormRef = ref()
-const cashoutFormValid = ref(false)
-const cashoutLoading = ref(false)
-const cashoutError = ref('')
-
-const cashoutForm = reactive({
-  amount: 0,
-  notes: ''
-})
-
-const earnings = computed(() => earningsStore.earnings)
-
-const canRequestCashout = computed(() => {
-  return earnings.value && earnings.value.collectible_earnings > 0
-})
-
-const rules = {
-  required: (v: any) => !!v || 'This field is required',
-  positive: (v: number) => v > 0 || 'Amount must be greater than 0',
-  maxAmount: (v: number) => {
-    const max = earnings.value?.collectible_earnings || 0
-    return v <= max || `Amount cannot exceed ${formatCurrency(max)}`
-  }
-}
-
-// Get payments with commission (where agent earned)
-const paymentsWithCommission = computed(() => {
-  return paymentsStore.payments.filter(p => p.applied_to_interest > 0)
-})
-
-const calculateCommissionAmount = (payment: Payment) => {
-  const commissionRate = earnings.value?.commission_percentage || 0
-  return payment.applied_to_interest * (commissionRate / 100)
-}
-
-const getCashoutStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending: 'warning',
-    approved: 'success',
-    rejected: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-const closeCashoutDialog = () => {
-  cashoutDialog.value = false
-  cashoutForm.amount = 0
-  cashoutForm.notes = ''
-  cashoutError.value = ''
-}
-
-const handleCashoutRequest = async () => {
-  if (!cashoutFormRef.value) { return }
-
-  const { valid } = await cashoutFormRef.value.validate()
-  if (!valid) { return }
-
-  cashoutLoading.value = true
-  cashoutError.value = ''
-
-  const result = await cashoutsStore.requestCashout({
-    amount: cashoutForm.amount,
-    notes: cashoutForm.notes
-  })
-
-  if (result.success) {
-    uiStore.showSuccess('Cashout request submitted successfully')
-    closeCashoutDialog()
-    // Refresh data
-    await earningsStore.fetchEarnings()
-  } else {
-    cashoutError.value = result.error || 'Failed to submit cashout request'
-  }
-
-  cashoutLoading.value = false
-}
-
-// Fetch data on mount
-onMounted(async () => {
-  try {
-    await Promise.all([
-      earningsStore.fetchEarnings(),
-      cashoutsStore.fetchCashouts(),
-      paymentsStore.fetchPayments()
-    ])
-  } catch (error: any) {
-    uiStore.showError('Failed to load earnings data')
-  }
 })
 </script>

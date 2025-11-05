@@ -6,8 +6,12 @@
   </v-app>
 </template>
 
-<script setup lang="ts">
-// Simple layout for auth pages
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AuthLayout'
+})
 </script>
 
 <style scoped>

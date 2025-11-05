@@ -379,108 +379,130 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { Loan } from '~/types'
 
+export default defineComponent({
+  name: 'AdminApprovals',
+
+  data () {
+    return {
+      approveDialog: false,
+      rejectDialog: false,
+      detailsDialog: false,
+      selectedLoan: null as Loan | null,
+      rejectionReason: '',
+      actionLoading: false
+    }
+  },
+
+  computed: {
+    loansStore () {
+      return useLoansStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    pendingLoans () {
+      return this.loansStore.loans.filter((loan: Loan) => loan.status === 'pending_approval')
+    },
+
+    totalPendingAmount () {
+      return this.pendingLoans.reduce((sum: number, loan: Loan) => sum + loan.principal_amount, 0)
+    },
+
+    approvedTodayCount () {
+      const today = new Date().toDateString()
+      return this.loansStore.loans.filter(
+        (loan: Loan) => loan.status === 'approved' &&
+        loan.approved_at &&
+        new Date(loan.approved_at).toDateString() === today
+      ).length
+    },
+
+    rules () {
+      return {
+        required: (v: any) => !!v || 'This field is required'
+      }
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.loansStore.fetchLoans()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load loans')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    calculateTotalAmount (loan: Loan) {
+      return loan.amortization_schedule.reduce((sum: number, item: any) => sum + item.total_due, 0)
+    },
+
+    openApproveDialog (loan: Loan) {
+      this.selectedLoan = loan
+      this.approveDialog = true
+    },
+
+    openRejectDialog (loan: Loan) {
+      this.selectedLoan = loan
+      this.rejectionReason = ''
+      this.rejectDialog = true
+    },
+
+    openDetailsDialog (loan: Loan) {
+      this.selectedLoan = loan
+      this.detailsDialog = true
+    },
+
+    async handleApproveLoan () {
+      if (!this.selectedLoan) { return }
+
+      this.actionLoading = true
+      const result = await this.loansStore.approveLoan(this.selectedLoan.id)
+
+      if (result.success) {
+        this.uiStore.showSuccess('Loan approved successfully')
+        this.approveDialog = false
+        this.selectedLoan = null
+        await this.loansStore.fetchLoans()
+      } else {
+        this.uiStore.showError(result.error || 'Failed to approve loan')
+      }
+
+      this.actionLoading = false
+    },
+
+    async handleRejectLoan () {
+      if (!this.selectedLoan || !this.rejectionReason) { return }
+
+      this.actionLoading = true
+      const result = await this.loansStore.rejectLoan(this.selectedLoan.id, this.rejectionReason)
+
+      if (result.success) {
+        this.uiStore.showSuccess('Loan rejected')
+        this.rejectDialog = false
+        this.selectedLoan = null
+        this.rejectionReason = ''
+        await this.loansStore.fetchLoans()
+      } else {
+        this.uiStore.showError(result.error || 'Failed to reject loan')
+      }
+
+      this.actionLoading = false
+    }
+  }
+})
+
 definePageMeta({
   middleware: ['auth', 'admin']
-})
-
-const loansStore = useLoans()
-const uiStore = useUI()
-
-const approveDialog = ref(false)
-const rejectDialog = ref(false)
-const detailsDialog = ref(false)
-const selectedLoan = ref<Loan | null>(null)
-const rejectionReason = ref('')
-const actionLoading = ref(false)
-
-const rules = {
-  required: (v: any) => !!v || 'This field is required'
-}
-
-const pendingLoans = computed(() => {
-  return loansStore.loans.filter(loan => loan.status === 'pending_approval')
-})
-
-const totalPendingAmount = computed(() => {
-  return pendingLoans.value.reduce((sum, loan) => sum + loan.principal_amount, 0)
-})
-
-const approvedTodayCount = computed(() => {
-  const today = new Date().toDateString()
-  return loansStore.loans.filter(
-    loan => loan.status === 'approved' &&
-    loan.approved_at &&
-    new Date(loan.approved_at).toDateString() === today
-  ).length
-})
-
-const calculateTotalAmount = (loan: Loan) => {
-  return loan.amortization_schedule.reduce((sum, item) => sum + item.total_due, 0)
-}
-
-const openApproveDialog = (loan: Loan) => {
-  selectedLoan.value = loan
-  approveDialog.value = true
-}
-
-const openRejectDialog = (loan: Loan) => {
-  selectedLoan.value = loan
-  rejectionReason.value = ''
-  rejectDialog.value = true
-}
-
-const openDetailsDialog = (loan: Loan) => {
-  selectedLoan.value = loan
-  detailsDialog.value = true
-}
-
-const handleApproveLoan = async () => {
-  if (!selectedLoan.value) { return }
-
-  actionLoading.value = true
-  const result = await loansStore.approveLoan(selectedLoan.value.id)
-
-  if (result.success) {
-    uiStore.showSuccess('Loan approved successfully')
-    approveDialog.value = false
-    selectedLoan.value = null
-    await loansStore.fetchLoans()
-  } else {
-    uiStore.showError(result.error || 'Failed to approve loan')
-  }
-
-  actionLoading.value = false
-}
-
-const handleRejectLoan = async () => {
-  if (!selectedLoan.value || !rejectionReason.value) { return }
-
-  actionLoading.value = true
-  const result = await loansStore.rejectLoan(selectedLoan.value.id, rejectionReason.value)
-
-  if (result.success) {
-    uiStore.showSuccess('Loan rejected')
-    rejectDialog.value = false
-    selectedLoan.value = null
-    rejectionReason.value = ''
-    await loansStore.fetchLoans()
-  } else {
-    uiStore.showError(result.error || 'Failed to reject loan')
-  }
-
-  actionLoading.value = false
-}
-
-// Fetch loans on mount
-onMounted(async () => {
-  try {
-    await loansStore.fetchLoans()
-  } catch (error: any) {
-    uiStore.showError('Failed to load loans')
-  }
 })
 </script>

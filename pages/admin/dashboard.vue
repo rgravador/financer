@@ -382,73 +382,98 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
+
+export default defineComponent({
+  name: 'AdminDashboard',
+
+  data () {
+    return {}
+  },
+
+  computed: {
+    adminStore () {
+      return useAdmin()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    stats () {
+      return this.adminStore.dashboardStats
+    },
+
+    agentPerformance () {
+      return this.adminStore.agentPerformance
+    }
+  },
+
+  async mounted () {
+    try {
+      await Promise.all([
+        this.adminStore.fetchDashboardStats(),
+        this.adminStore.fetchAgentPerformance(),
+        this.adminStore.fetchRecentTransactions()
+      ])
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load dashboard data')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    getInitials (name: string) {
+      return name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    },
+
+    getPerformanceColor (performance: string) {
+      const colors: Record<string, string> = {
+        excellent: 'success',
+        good: 'info',
+        average: 'warning',
+        poor: 'error'
+      }
+      return colors[performance.toLowerCase()] || 'grey'
+    },
+
+    getTransactionColor (type: string) {
+      const colors: Record<string, string> = {
+        loan_created: 'info',
+        loan_approved: 'success',
+        loan_rejected: 'error',
+        payment_recorded: 'success',
+        cashout_approved: 'success',
+        cashout_rejected: 'error'
+      }
+      return colors[type] || 'grey'
+    },
+
+    getTransactionIcon (type: string) {
+      const icons: Record<string, string> = {
+        loan_created: 'mdi-file-document-plus',
+        loan_approved: 'mdi-check-circle',
+        loan_rejected: 'mdi-close-circle',
+        payment_recorded: 'mdi-cash-plus',
+        cashout_approved: 'mdi-cash-check',
+        cashout_rejected: 'mdi-cash-remove'
+      }
+      return icons[type] || 'mdi-information'
+    }
+  }
+})
 
 definePageMeta({
   middleware: ['auth', 'admin']
-})
-
-const adminStore = useAdmin()
-const uiStore = useUI()
-
-const stats = computed(() => adminStore.dashboardStats)
-const agentPerformance = computed(() => adminStore.agentPerformance)
-
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-}
-
-const getPerformanceColor = (performance: string) => {
-  const colors: Record<string, string> = {
-    excellent: 'success',
-    good: 'info',
-    average: 'warning',
-    poor: 'error'
-  }
-  return colors[performance.toLowerCase()] || 'grey'
-}
-
-const getTransactionColor = (type: string) => {
-  const colors: Record<string, string> = {
-    loan_created: 'info',
-    loan_approved: 'success',
-    loan_rejected: 'error',
-    payment_recorded: 'success',
-    cashout_approved: 'success',
-    cashout_rejected: 'error'
-  }
-  return colors[type] || 'grey'
-}
-
-const getTransactionIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    loan_created: 'mdi-file-document-plus',
-    loan_approved: 'mdi-check-circle',
-    loan_rejected: 'mdi-close-circle',
-    payment_recorded: 'mdi-cash-plus',
-    cashout_approved: 'mdi-cash-check',
-    cashout_rejected: 'mdi-cash-remove'
-  }
-  return icons[type] || 'mdi-information'
-}
-
-// Fetch dashboard data on mount
-onMounted(async () => {
-  try {
-    await Promise.all([
-      adminStore.fetchDashboardStats(),
-      adminStore.fetchAgentPerformance(),
-      adminStore.fetchRecentTransactions()
-    ])
-  } catch (error: any) {
-    uiStore.showError('Failed to load dashboard data')
-  }
 })
 </script>
 

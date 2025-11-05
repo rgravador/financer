@@ -96,7 +96,7 @@
 
           <v-window v-model="tab">
             <!-- Pending Tab -->
-            <v-windowItem value="pending">
+            <v-window-item value="pending">
               <v-table v-if="pendingCashouts.length > 0">
                 <thead>
                   <tr>
@@ -153,10 +153,10 @@
               <v-card-text v-else class="text-center text-grey py-8">
                 No pending cashout requests
               </v-card-text>
-            </v-windowItem>
+            </v-window-item>
 
             <!-- Approved Tab -->
-            <v-windowItem value="approved">
+            <v-window-item value="approved">
               <v-table v-if="approvedCashouts.length > 0">
                 <thead>
                   <tr>
@@ -182,10 +182,10 @@
               <v-card-text v-else class="text-center text-grey py-8">
                 No approved cashouts yet
               </v-card-text>
-            </v-windowItem>
+            </v-window-item>
 
             <!-- Rejected Tab -->
-            <v-windowItem value="rejected">
+            <v-window-item value="rejected">
               <v-table v-if="rejectedCashouts.length > 0">
                 <thead>
                   <tr>
@@ -216,7 +216,7 @@
               <v-card-text v-else class="text-center text-grey py-8">
                 No rejected cashouts
               </v-card-text>
-            </v-windowItem>
+            </v-window-item>
           </v-window>
         </v-card>
       </v-col>
@@ -317,115 +317,137 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { Cashout } from '~/types'
 
+export default defineComponent({
+  name: 'AdminCashouts',
+
+  data () {
+    return {
+      tab: 'pending',
+      approveDialog: false,
+      rejectDialog: false,
+      selectedCashout: null as Cashout | null,
+      rejectionReason: '',
+      actionLoading: false
+    }
+  },
+
+  computed: {
+    cashoutsStore () {
+      return useCashouts()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    pendingCashouts () {
+      return this.cashoutsStore.cashouts.filter((c: Cashout) => c.status === 'pending')
+    },
+
+    approvedCashouts () {
+      return this.cashoutsStore.cashouts.filter((c: Cashout) => c.status === 'approved')
+    },
+
+    rejectedCashouts () {
+      return this.cashoutsStore.cashouts.filter((c: Cashout) => c.status === 'rejected')
+    },
+
+    totalPendingAmount () {
+      return this.pendingCashouts.reduce((sum: number, c: Cashout) => sum + c.amount, 0)
+    },
+
+    approvedTodayCount () {
+      const today = new Date().toDateString()
+      return this.approvedCashouts.filter(
+        (c: Cashout) => c.processed_at && new Date(c.processed_at).toDateString() === today
+      ).length
+    },
+
+    approvedTodayAmount () {
+      const today = new Date().toDateString()
+      return this.approvedCashouts
+        .filter((c: Cashout) => c.processed_at && new Date(c.processed_at).toDateString() === today)
+        .reduce((sum: number, c: Cashout) => sum + c.amount, 0)
+    },
+
+    rules () {
+      return {
+        required: (v: any) => !!v || 'This field is required'
+      }
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.cashoutsStore.fetchCashouts()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load cashout requests')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    openApproveDialog (cashout: Cashout) {
+      this.selectedCashout = cashout
+      this.approveDialog = true
+    },
+
+    openRejectDialog (cashout: Cashout) {
+      this.selectedCashout = cashout
+      this.rejectionReason = ''
+      this.rejectDialog = true
+    },
+
+    async handleApproveCashout () {
+      if (!this.selectedCashout) { return }
+
+      this.actionLoading = true
+      const result = await this.cashoutsStore.approveCashout(this.selectedCashout.id)
+
+      if (result.success) {
+        this.uiStore.showSuccess('Cashout approved successfully')
+        this.approveDialog = false
+        this.selectedCashout = null
+        await this.cashoutsStore.fetchCashouts()
+      } else {
+        this.uiStore.showError(result.error || 'Failed to approve cashout')
+      }
+
+      this.actionLoading = false
+    },
+
+    async handleRejectCashout () {
+      if (!this.selectedCashout || !this.rejectionReason) { return }
+
+      this.actionLoading = true
+      const result = await this.cashoutsStore.rejectCashout(
+        this.selectedCashout.id,
+        this.rejectionReason
+      )
+
+      if (result.success) {
+        this.uiStore.showSuccess('Cashout rejected')
+        this.rejectDialog = false
+        this.selectedCashout = null
+        this.rejectionReason = ''
+        await this.cashoutsStore.fetchCashouts()
+      } else {
+        this.uiStore.showError(result.error || 'Failed to reject cashout')
+      }
+
+      this.actionLoading = false
+    }
+  }
+})
+
 definePageMeta({
   middleware: ['auth', 'admin']
-})
-
-const cashoutsStore = useCashouts()
-const uiStore = useUI()
-
-const tab = ref('pending')
-const approveDialog = ref(false)
-const rejectDialog = ref(false)
-const selectedCashout = ref<Cashout | null>(null)
-const rejectionReason = ref('')
-const actionLoading = ref(false)
-
-const rules = {
-  required: (v: any) => !!v || 'This field is required'
-}
-
-const pendingCashouts = computed(() => {
-  return cashoutsStore.cashouts.filter(c => c.status === 'pending')
-})
-
-const approvedCashouts = computed(() => {
-  return cashoutsStore.cashouts.filter(c => c.status === 'approved')
-})
-
-const rejectedCashouts = computed(() => {
-  return cashoutsStore.cashouts.filter(c => c.status === 'rejected')
-})
-
-const totalPendingAmount = computed(() => {
-  return pendingCashouts.value.reduce((sum, c) => sum + c.amount, 0)
-})
-
-const approvedTodayCount = computed(() => {
-  const today = new Date().toDateString()
-  return approvedCashouts.value.filter(
-    c => c.processed_at && new Date(c.processed_at).toDateString() === today
-  ).length
-})
-
-const approvedTodayAmount = computed(() => {
-  const today = new Date().toDateString()
-  return approvedCashouts.value
-    .filter(c => c.processed_at && new Date(c.processed_at).toDateString() === today)
-    .reduce((sum, c) => sum + c.amount, 0)
-})
-
-const openApproveDialog = (cashout: Cashout) => {
-  selectedCashout.value = cashout
-  approveDialog.value = true
-}
-
-const openRejectDialog = (cashout: Cashout) => {
-  selectedCashout.value = cashout
-  rejectionReason.value = ''
-  rejectDialog.value = true
-}
-
-const handleApproveCashout = async () => {
-  if (!selectedCashout.value) { return }
-
-  actionLoading.value = true
-  const result = await cashoutsStore.approveCashout(selectedCashout.value.id)
-
-  if (result.success) {
-    uiStore.showSuccess('Cashout approved successfully')
-    approveDialog.value = false
-    selectedCashout.value = null
-    await cashoutsStore.fetchCashouts()
-  } else {
-    uiStore.showError(result.error || 'Failed to approve cashout')
-  }
-
-  actionLoading.value = false
-}
-
-const handleRejectCashout = async () => {
-  if (!selectedCashout.value || !rejectionReason.value) { return }
-
-  actionLoading.value = true
-  const result = await cashoutsStore.rejectCashout(
-    selectedCashout.value.id,
-    rejectionReason.value
-  )
-
-  if (result.success) {
-    uiStore.showSuccess('Cashout rejected')
-    rejectDialog.value = false
-    selectedCashout.value = null
-    rejectionReason.value = ''
-    await cashoutsStore.fetchCashouts()
-  } else {
-    uiStore.showError(result.error || 'Failed to reject cashout')
-  }
-
-  actionLoading.value = false
-}
-
-// Fetch cashouts on mount
-onMounted(async () => {
-  try {
-    await cashoutsStore.fetchCashouts()
-  } catch (error: any) {
-    uiStore.showError('Failed to load cashout requests')
-  }
 })
 </script>

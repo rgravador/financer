@@ -110,65 +110,81 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'SignupPage',
+
+  data () {
+    return {
+      formValid: false,
+      showPassword: false,
+      showConfirmPassword: false,
+      loading: false,
+      error: '',
+      success: false,
+      form: {
+        full_name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'agent' as 'admin' | 'agent'
+      }
+    }
+  },
+
+  computed: {
+    authStore () {
+      return useAuthStore()
+    },
+
+    rules () {
+      return {
+        required: (v: string) => !!v || 'Field is required',
+        email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        password: (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+        passwordMatch: (v: string) => v === this.form.password || 'Passwords must match'
+      }
+    }
+  },
+
+  methods: {
+    async handleSignup () {
+      const formRef = this.$refs.formRef as any
+      if (!formRef) { return }
+
+      const { valid } = await formRef.validate()
+      if (!valid) { return }
+
+      this.loading = true
+      this.error = ''
+      this.success = false
+
+      const result = await this.authStore.signup({
+        email: this.form.email,
+        password: this.form.password,
+        full_name: this.form.full_name,
+        role: this.form.role
+      })
+
+      if (result.success) {
+        this.success = true
+        setTimeout(() => {
+          this.$router.push('/auth/login')
+        }, 2000)
+      } else {
+        this.error = result.error || 'Signup failed'
+      }
+
+      this.loading = false
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'admin'
 })
-
-const formRef = ref()
-const formValid = ref(false)
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
-const loading = ref(false)
-const error = ref('')
-const success = ref(false)
-
-const form = reactive({
-  full_name: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-  role: 'agent' as 'admin' | 'agent'
-})
-
-const rules = {
-  required: (v: string) => !!v || 'Field is required',
-  email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-  password: (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
-  passwordMatch: (v: string) => v === form.password || 'Passwords must match'
-}
-
-const { signup } = useAuth()
-const router = useRouter()
-
-const handleSignup = async () => {
-  if (!formRef.value) { return }
-
-  const { valid } = await formRef.value.validate()
-  if (!valid) { return }
-
-  loading.value = true
-  error.value = ''
-  success.value = false
-
-  const result = await signup({
-    email: form.email,
-    password: form.password,
-    full_name: form.full_name,
-    role: form.role
-  })
-
-  if (result.success) {
-    success.value = true
-    setTimeout(() => {
-      router.push('/auth/login')
-    }, 2000)
-  } else {
-    error.value = result.error || 'Signup failed'
-  }
-
-  loading.value = false
-}
 </script>
 
 <style scoped>

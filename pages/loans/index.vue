@@ -145,50 +145,88 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency } from '~/utils/formatters'
+
+export default defineComponent({
+  name: 'LoansIndex',
+
+  data () {
+    return {
+      activeTab: 'all'
+    }
+  },
+
+  computed: {
+    loansStore () {
+      return useLoansStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    loans () {
+      return this.loansStore.loans
+    },
+
+    loading () {
+      return this.loansStore.loading
+    },
+
+    pendingApprovalLoans () {
+      return this.loansStore.pendingApprovalLoans
+    },
+
+    activeLoans () {
+      return this.loansStore.activeLoans
+    },
+
+    overdueLoans () {
+      return this.loansStore.overdueLoans
+    },
+
+    filteredLoans () {
+      switch (this.activeTab) {
+        case 'pending':
+          return this.pendingApprovalLoans
+        case 'active':
+          return this.activeLoans
+        case 'overdue':
+          return this.overdueLoans
+        default:
+          return this.loans
+      }
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.loansStore.fetchLoans()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load loans')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+
+    getLoanStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        pending_approval: 'warning',
+        approved: 'info',
+        active: 'success',
+        closed: 'grey',
+        rejected: 'error'
+      }
+      return colors[status] || 'grey'
+    }
+  }
+})
 
 definePageMeta({
   middleware: 'auth'
-})
-
-const loansStore = useLoans()
-const { loans, loading, pendingApprovalLoans, activeLoans, overdueLoans } = loansStore
-const uiStore = useUI()
-
-const activeTab = ref('all')
-
-const filteredLoans = computed(() => {
-  switch (activeTab.value) {
-    case 'pending':
-      return pendingApprovalLoans.value
-    case 'active':
-      return activeLoans.value
-    case 'overdue':
-      return overdueLoans.value
-    default:
-      return loans.value
-  }
-})
-
-const getLoanStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending_approval: 'warning',
-    approved: 'info',
-    active: 'success',
-    closed: 'grey',
-    rejected: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-// Fetch loans on mount
-onMounted(async () => {
-  try {
-    await loansStore.fetchLoans()
-  } catch (error: any) {
-    uiStore.showError('Failed to load loans')
-  }
 })
 </script>
 

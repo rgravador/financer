@@ -71,49 +71,62 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'IndexPage',
+
+  data () {
+    return {
+      formValid: false,
+      showPassword: false,
+      loading: false,
+      error: '',
+      form: {
+        email: '',
+        password: ''
+      },
+      rules: {
+        required: (v: string) => !!v || 'Field is required',
+        email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+      }
+    }
+  },
+
+  computed: {
+    authStore () {
+      return useAuthStore()
+    }
+  },
+
+  methods: {
+    async handleLogin () {
+      const formRef = this.$refs.formRef as any
+      if (!formRef) { return }
+
+      const { valid } = await formRef.validate()
+      if (!valid) { return }
+
+      this.loading = true
+      this.error = ''
+
+      const result = await this.authStore.login(this.form.email, this.form.password)
+
+      if (result.success) {
+        // Redirect to dashboard
+        this.$router.push('/dashboard')
+      } else {
+        this.error = result.error || 'Login failed'
+      }
+
+      this.loading = false
+    }
+  }
+})
+
 definePageMeta({
   layout: 'auth',
   middleware: 'guest'
 })
-
-const formRef = ref()
-const formValid = ref(false)
-const showPassword = ref(false)
-const loading = ref(false)
-const error = ref('')
-
-const form = reactive({
-  email: '',
-  password: ''
-})
-
-const rules = {
-  required: (v: string) => !!v || 'Field is required',
-  email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
-}
-
-const { login } = useAuth()
-const router = useRouter()
-
-const handleLogin = async () => {
-  if (!formRef.value) { return }
-
-  const { valid } = await formRef.value.validate()
-  if (!valid) { return }
-
-  loading.value = true
-  error.value = ''
-
-  const result = await login(form.email, form.password)
-
-  if (result.success) {
-    // Redirect to dashboard
-    router.push('/dashboard')
-  } else {
-    error.value = result.error || 'Login failed'
-  }
-
-  loading.value = false
-}
 </script>

@@ -281,106 +281,129 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { UserProfile } from '~/types'
 
+export default defineComponent({
+  name: 'AdminUsers',
+
+  data () {
+    return {
+      search: '',
+      deactivateDialog: false,
+      selectedUser: null as UserProfile | null,
+      actionLoading: false
+    }
+  },
+
+  computed: {
+    adminStore () {
+      return useAdmin()
+    },
+
+    loansStore () {
+      return useLoansStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    agentUsers () {
+      return this.adminStore.users.filter((u: UserProfile) => u.role === 'agent')
+    },
+
+    adminUsers () {
+      return this.adminStore.users.filter((u: UserProfile) => u.role === 'admin')
+    },
+
+    activeUsers () {
+      return this.adminStore.users.filter((u: UserProfile) => u.is_active)
+    },
+
+    filteredUsers () {
+      if (!this.search) { return this.adminStore.users }
+
+      const searchLower = this.search.toLowerCase()
+      return this.adminStore.users.filter((user: UserProfile) =>
+        user.full_name.toLowerCase().includes(searchLower) ||
+        (user.display_name?.toLowerCase().includes(searchLower)) ||
+        user.email.toLowerCase().includes(searchLower)
+      )
+    }
+  },
+
+  async mounted () {
+    try {
+      await Promise.all([
+        this.adminStore.fetchUsers(),
+        this.loansStore.fetchLoans()
+      ])
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load users')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    getInitials (name: string) {
+      return name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    },
+
+    getUserStats (userId: string) {
+      const userLoans = this.loansStore.loans.filter((l: any) => l.agent_id === userId)
+      const loans = userLoans.length
+      const collected = userLoans.reduce((sum: number, l: any) => sum + l.total_paid, 0)
+
+      return { loans, collected }
+    },
+
+    openDeactivateDialog (user: UserProfile) {
+      this.selectedUser = user
+      this.deactivateDialog = true
+    },
+
+    async handleDeactivateUser () {
+      if (!this.selectedUser) { return }
+
+      this.actionLoading = true
+      const result = await this.adminStore.deactivateUser(this.selectedUser.id)
+
+      if (result.success) {
+        this.uiStore.showSuccess('User deactivated successfully')
+        this.deactivateDialog = false
+        this.selectedUser = null
+        await this.adminStore.fetchUsers()
+      } else {
+        this.uiStore.showError(result.error || 'Failed to deactivate user')
+      }
+
+      this.actionLoading = false
+    },
+
+    async handleActivateUser (user: UserProfile) {
+      const result = await this.adminStore.activateUser(user.id)
+
+      if (result.success) {
+        this.uiStore.showSuccess('User activated successfully')
+        await this.adminStore.fetchUsers()
+      } else {
+        this.uiStore.showError(result.error || 'Failed to activate user')
+      }
+    }
+  }
+})
+
 definePageMeta({
   middleware: ['auth', 'admin']
-})
-
-const adminStore = useAdmin()
-const loansStore = useLoans()
-const uiStore = useUI()
-
-const search = ref('')
-const deactivateDialog = ref(false)
-const selectedUser = ref<UserProfile | null>(null)
-const actionLoading = ref(false)
-
-const agentUsers = computed(() => {
-  return adminStore.users.filter(u => u.role === 'agent')
-})
-
-const adminUsers = computed(() => {
-  return adminStore.users.filter(u => u.role === 'admin')
-})
-
-const activeUsers = computed(() => {
-  return adminStore.users.filter(u => u.is_active)
-})
-
-const filteredUsers = computed(() => {
-  if (!search.value) { return adminStore.users }
-
-  const searchLower = search.value.toLowerCase()
-  return adminStore.users.filter(user =>
-    user.full_name.toLowerCase().includes(searchLower) ||
-    (user.display_name?.toLowerCase().includes(searchLower)) ||
-    user.email.toLowerCase().includes(searchLower)
-  )
-})
-
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-}
-
-const getUserStats = (userId: string) => {
-  const userLoans = loansStore.loans.filter(l => l.agent_id === userId)
-  const loans = userLoans.length
-  const collected = userLoans.reduce((sum, l) => sum + l.total_paid, 0)
-
-  return { loans, collected }
-}
-
-const openDeactivateDialog = (user: UserProfile) => {
-  selectedUser.value = user
-  deactivateDialog.value = true
-}
-
-const handleDeactivateUser = async () => {
-  if (!selectedUser.value) { return }
-
-  actionLoading.value = true
-  const result = await adminStore.deactivateUser(selectedUser.value.id)
-
-  if (result.success) {
-    uiStore.showSuccess('User deactivated successfully')
-    deactivateDialog.value = false
-    selectedUser.value = null
-    await adminStore.fetchUsers()
-  } else {
-    uiStore.showError(result.error || 'Failed to deactivate user')
-  }
-
-  actionLoading.value = false
-}
-
-const handleActivateUser = async (user: UserProfile) => {
-  const result = await adminStore.activateUser(user.id)
-
-  if (result.success) {
-    uiStore.showSuccess('User activated successfully')
-    await adminStore.fetchUsers()
-  } else {
-    uiStore.showError(result.error || 'Failed to activate user')
-  }
-}
-
-// Fetch data on mount
-onMounted(async () => {
-  try {
-    await Promise.all([
-      adminStore.fetchUsers(),
-      loansStore.fetchLoans()
-    ])
-  } catch (error: any) {
-    uiStore.showError('Failed to load users')
-  }
 })
 </script>

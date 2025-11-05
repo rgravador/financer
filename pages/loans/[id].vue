@@ -286,112 +286,138 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate, isPastDue } from '~/utils/formatters'
 import type { AmortizationScheduleItem } from '~/types'
 
-definePageMeta({
-  middleware: 'auth'
+export default defineComponent({
+  name: 'LoansDetail',
+
+  data () {
+    return {
+      approveLoanDialog: false,
+      rejectLoanDialog: false,
+      rejectionReason: '',
+      actionLoading: false
+    }
+  },
+
+  computed: {
+    authStore () {
+      return useAuthStore()
+    },
+
+    loansStore () {
+      return useLoansStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    loading () {
+      return this.loansStore.loading
+    },
+
+    loan () {
+      return this.loansStore.selectedLoan
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.loansStore.fetchLoanById(this.$route.params.id as string)
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load loan details')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    getLoanStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        pending_approval: 'warning',
+        approved: 'info',
+        active: 'success',
+        closed: 'grey',
+        rejected: 'error'
+      }
+      return colors[status] || 'grey'
+    },
+
+    getScheduleRowClass (item: AmortizationScheduleItem) {
+      if (this.loan) {
+        const totalDue = this.loan.amortization_schedule
+          .slice(0, item.payment_number)
+          .reduce((sum, i) => sum + i.total_due, 0)
+
+        if (this.loan.total_paid >= totalDue) {
+          return 'bg-success-lighten-5'
+        } else if (isPastDue(item.due_date)) {
+          return 'bg-error-lighten-5'
+        }
+      }
+      return ''
+    },
+
+    getPaymentStatus (item: AmortizationScheduleItem) {
+      if (this.loan) {
+        const totalDue = this.loan.amortization_schedule
+          .slice(0, item.payment_number)
+          .reduce((sum, i) => sum + i.total_due, 0)
+
+        if (this.loan.total_paid >= totalDue) {
+          return 'Paid'
+        } else if (isPastDue(item.due_date)) {
+          return 'Overdue'
+        } else {
+          return 'Pending'
+        }
+      }
+      return 'Pending'
+    },
+
+    getPaymentStatusColor (item: AmortizationScheduleItem) {
+      const status = this.getPaymentStatus(item)
+      return status === 'Paid' ? 'success' : status === 'Overdue' ? 'error' : 'grey'
+    },
+
+    async handleApproveLoan () {
+      this.actionLoading = true
+      const result = await this.loansStore.approveLoan(this.loan!.id)
+
+      if (result.success) {
+        this.uiStore.showSuccess('Loan approved successfully')
+        this.approveLoanDialog = false
+        await this.loansStore.fetchLoanById(this.$route.params.id as string)
+      } else {
+        this.uiStore.showError(result.error || 'Failed to approve loan')
+      }
+
+      this.actionLoading = false
+    },
+
+    async handleRejectLoan () {
+      this.actionLoading = true
+      const result = await this.loansStore.rejectLoan(this.loan!.id, this.rejectionReason)
+
+      if (result.success) {
+        this.uiStore.showSuccess('Loan rejected')
+        this.rejectLoanDialog = false
+        this.$router.push('/loans')
+      } else {
+        this.uiStore.showError(result.error || 'Failed to reject loan')
+      }
+
+      this.actionLoading = false
+    }
+  }
 })
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuth()
-const loansStore = useLoans()
-const { loading } = loansStore
-const uiStore = useUI()
-
-const approveLoanDialog = ref(false)
-const rejectLoanDialog = ref(false)
-const rejectionReason = ref('')
-const actionLoading = ref(false)
-
-const loan = computed(() => loansStore.selectedLoan)
-
-const getLoanStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending_approval: 'warning',
-    approved: 'info',
-    active: 'success',
-    closed: 'grey',
-    rejected: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-const getScheduleRowClass = (item: AmortizationScheduleItem) => {
-  if (loan.value) {
-    const totalDue = loan.value.amortization_schedule
-      .slice(0, item.payment_number)
-      .reduce((sum, i) => sum + i.total_due, 0)
-
-    if (loan.value.total_paid >= totalDue) {
-      return 'bg-success-lighten-5'
-    } else if (isPastDue(item.due_date)) {
-      return 'bg-error-lighten-5'
-    }
-  }
-  return ''
-}
-
-const getPaymentStatus = (item: AmortizationScheduleItem) => {
-  if (loan.value) {
-    const totalDue = loan.value.amortization_schedule
-      .slice(0, item.payment_number)
-      .reduce((sum, i) => sum + i.total_due, 0)
-
-    if (loan.value.total_paid >= totalDue) {
-      return 'Paid'
-    } else if (isPastDue(item.due_date)) {
-      return 'Overdue'
-    } else {
-      return 'Pending'
-    }
-  }
-  return 'Pending'
-}
-
-const getPaymentStatusColor = (item: AmortizationScheduleItem) => {
-  const status = getPaymentStatus(item)
-  return status === 'Paid' ? 'success' : status === 'Overdue' ? 'error' : 'grey'
-}
-
-const handleApproveLoan = async () => {
-  actionLoading.value = true
-  const result = await loansStore.approveLoan(loan.value!.id)
-
-  if (result.success) {
-    uiStore.showSuccess('Loan approved successfully')
-    approveLoanDialog.value = false
-    await loansStore.fetchLoanById(route.params.id as string)
-  } else {
-    uiStore.showError(result.error || 'Failed to approve loan')
-  }
-
-  actionLoading.value = false
-}
-
-const handleRejectLoan = async () => {
-  actionLoading.value = true
-  const result = await loansStore.rejectLoan(loan.value!.id, rejectionReason.value)
-
-  if (result.success) {
-    uiStore.showSuccess('Loan rejected')
-    rejectLoanDialog.value = false
-    router.push('/loans')
-  } else {
-    uiStore.showError(result.error || 'Failed to reject loan')
-  }
-
-  actionLoading.value = false
-}
-
-// Fetch loan details on mount
-onMounted(async () => {
-  try {
-    await loansStore.fetchLoanById(route.params.id as string)
-  } catch (error: any) {
-    uiStore.showError('Failed to load loan details')
-  }
+definePageMeta({
+  middleware: 'auth'
 })
 </script>

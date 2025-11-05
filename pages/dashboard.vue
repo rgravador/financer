@@ -228,58 +228,114 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
-// import { formatCurrency, formatDate, formatRelativeTime } from '~/utils/formatters'
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { formatCurrency, formatDate, formatRelativeTime } from '~/utils/formatters'
 import { NOTIFICATION_COLORS, NOTIFICATION_ICONS } from '~/utils/constants'
+
+export default defineComponent({
+  name: 'DashboardPage',
+
+  computed: {
+    authStore () {
+      return useAuthStore()
+    },
+
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    loansStore () {
+      return useLoansStore()
+    },
+
+    paymentsStore () {
+      return usePaymentsStore()
+    },
+
+    earningsStore () {
+      return useEarningsStore()
+    },
+
+    notificationsStore () {
+      return useNotificationsStore()
+    },
+
+    user () {
+      return this.authStore.user
+    },
+
+    accounts () {
+      return this.accountsStore.accounts
+    },
+
+    loans () {
+      return this.loansStore.loans
+    },
+
+    payments () {
+      return this.paymentsStore.payments
+    },
+
+    availableEarnings () {
+      return this.earningsStore.availableEarnings
+    },
+
+    notifications () {
+      return this.notificationsStore.notifications
+    },
+
+    recentNotifications () {
+      return this.notificationsStore.recentNotifications
+    },
+
+    activeLoansCount (): number {
+      return this.loans.filter((l: any) => l.status === 'active').length
+    },
+
+    overdueLoansCount (): number {
+      return this.loans.filter((l: any) => l.status === 'active' && new Date(l.end_date) < new Date()).length
+    },
+
+    accountsCount (): number {
+      return this.accounts.length
+    },
+
+    recentPayments () {
+      return this.payments.slice(0, 5)
+    }
+  },
+
+  async mounted () {
+    await Promise.all([
+      this.accountsStore.fetchAccounts(),
+      this.loansStore.fetchLoans(),
+      this.paymentsStore.fetchPayments(),
+      this.earningsStore.fetchEarnings(),
+      this.notificationsStore.fetchNotifications()
+    ])
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+    formatRelativeTime,
+
+    markAsRead (id: string) {
+      this.notificationsStore.markAsRead(id)
+    },
+
+    getNotificationColor (type: string) {
+      return NOTIFICATION_COLORS[type as keyof typeof NOTIFICATION_COLORS] || 'grey'
+    },
+
+    getNotificationIcon (type: string) {
+      return NOTIFICATION_ICONS[type as keyof typeof NOTIFICATION_ICONS] || 'mdi-bell'
+    }
+  }
+})
 
 definePageMeta({
   middleware: 'auth'
 })
-
-const { user } = useAuth()
-const accountsStore = useAccounts()
-const { accounts, fetchAccounts: fetchAccountsData } = accountsStore
-const loansStore = useLoans()
-const { loans, fetchLoans: fetchLoansData } = loansStore
-const paymentsStore = usePayments()
-const { payments, fetchPayments: fetchPaymentsData } = paymentsStore
-const earningsStore = useEarnings()
-const { availableEarnings, fetchEarnings: fetchEarningsData } = earningsStore
-const notificationsStore = useNotifications()
-const { notifications, recentNotifications, fetchNotifications: fetchNotificationsData, markAsRead } = notificationsStore
-
-// Vetur workaround - these are used in template
-void user
-void accounts
-void loans
-void payments
-void availableEarnings
-void notifications
-void recentNotifications
-void markAsRead
-
-// Computed properties for template
-const activeLoansCount = computed(() => loans.value.filter((l: any) => l.status === 'active').length)
-const overdueLoansCount = computed(() => loans.value.filter((l: any) => l.status === 'active' && new Date(l.end_date) < new Date()).length)
-const accountsCount = computed(() => accounts.value.length)
-const recentPayments = computed(() => payments.value.slice(0, 5))
-
-// Fetch data on mount
-onMounted(async () => {
-  await Promise.all([
-    fetchAccountsData(),
-    fetchLoansData(),
-    fetchPaymentsData(),
-    fetchEarningsData(),
-    fetchNotificationsData()
-  ])
-})
-
-const getNotificationColor = (type: string) => {
-  return NOTIFICATION_COLORS[type as keyof typeof NOTIFICATION_COLORS] || 'grey'
-}
-
-const getNotificationIcon = (type: string) => {
-  return NOTIFICATION_ICONS[type as keyof typeof NOTIFICATION_ICONS] || 'mdi-bell'
-}
 </script>

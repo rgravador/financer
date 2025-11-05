@@ -25,9 +25,6 @@ export type GovernmentIdType = 'drivers_license' | 'passport' | 'state_id' | 'mi
 
 export type SecondaryIdType = 'birth_certificate' | 'social_security_card' | 'utility_bill'
 
-// Alias for backward compatibility
-export type Cashout = CashoutRequest
-
 export type TransactionType =
   | 'create_account'
   | 'update_account'
@@ -199,6 +196,8 @@ export interface CashoutRequest {
   processed_by_user?: UserProfileWithMeta
 }
 
+// Alias for backward compatibility
+export type Cashout = CashoutRequest
 export interface Transaction {
   id: string
   type: TransactionType

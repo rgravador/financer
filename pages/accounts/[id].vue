@@ -209,47 +209,70 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
+
+export default defineComponent({
+  name: 'AccountDetails',
+
+  computed: {
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    selectedAccount () {
+      return this.accountsStore.selectedAccount
+    },
+
+    loading () {
+      return this.accountsStore.loading
+    },
+
+    account () {
+      return this.selectedAccount
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.accountsStore.fetchAccountById(this.$route.params.id as string)
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load account details')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    getStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        active: 'success',
+        inactive: 'grey',
+        suspended: 'error'
+      }
+      return colors[status] || 'grey'
+    },
+
+    getLoanStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        pending_approval: 'warning',
+        approved: 'info',
+        active: 'success',
+        closed: 'grey',
+        rejected: 'error'
+      }
+      return colors[status] || 'grey'
+    }
+  }
+})
 
 definePageMeta({
   middleware: 'auth'
-})
-
-const route = useRoute()
-const accountsStore = useAccounts()
-const uiStore = useUI()
-
-const { selectedAccount, fetchAccountById, loading } = accountsStore
-
-const account = computed(() => selectedAccount.value)
-
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    active: 'success',
-    inactive: 'grey',
-    suspended: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-const getLoanStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending_approval: 'warning',
-    approved: 'info',
-    active: 'success',
-    closed: 'grey',
-    rejected: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-// Fetch account details on mount
-onMounted(async () => {
-  try {
-    await fetchAccountById(route.params.id as string)
-  } catch (error: any) {
-    uiStore.showError('Failed to load account details')
-  }
 })
 </script>

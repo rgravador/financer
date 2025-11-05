@@ -6,6 +6,10 @@
   </VApp>
 </template>
 
-<script setup lang="ts">
-// Global app configuration
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'App'
+})
 </script>

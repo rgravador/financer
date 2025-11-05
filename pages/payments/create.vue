@@ -190,154 +190,171 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency } from '~/utils/formatters'
+
+export default defineComponent({
+  name: 'PaymentsCreate',
+
+  data () {
+    const today = new Date().toISOString().split('T')[0]
+
+    return {
+      formRef: null as any,
+      formValid: false,
+      loading: false,
+      error: '',
+      success: false,
+      today,
+      form: {
+        loan_id: (this.$route.query.loan_id as string) || '',
+        amount: 0,
+        payment_date: today,
+        notes: ''
+      },
+      rules: {
+        required: (v: any) => !!v || 'This field is required',
+        positive: (v: number) => v > 0 || 'Amount must be greater than 0'
+      }
+    }
+  },
+
+  computed: {
+    loansStore () {
+      return useLoansStore()
+    },
+
+    paymentsStore () {
+      return usePaymentsStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    activeLoanOptions () {
+      return this.loansStore.activeLoans.map(loan => ({
+        id: loan.id,
+        label: `${loan.account?.name} - ${formatCurrency(loan.principal_amount)} (Balance: ${formatCurrency(loan.current_balance)})`
+      }))
+    },
+
+    selectedLoan () {
+      return this.loansStore.loans.find(l => l.id === this.form.loan_id)
+    },
+
+    paymentBreakdown () {
+      if (!this.selectedLoan || this.form.amount <= 0) {
+        return { penalty: 0, interest: 0, principal: 0 }
+      }
+
+      let remaining = this.form.amount
+      let penalty = 0
+      let interest = 0
+      let principal = 0
+
+      if (this.selectedLoan.total_penalties > 0) {
+        penalty = Math.min(remaining, this.selectedLoan.total_penalties)
+        remaining -= penalty
+      }
+
+      if (remaining > 0) {
+        const schedule = this.selectedLoan.amortization_schedule
+        const totalPaid = this.selectedLoan.total_paid
+
+        let accumulated = 0
+        for (const item of schedule) {
+          accumulated += item.total_due
+          if (accumulated > totalPaid) {
+            const dueForPayment = accumulated - totalPaid
+            const portionToApply = Math.min(remaining, dueForPayment)
+            const interestPortion = item.interest_due / item.total_due
+
+            interest = portionToApply * interestPortion
+            principal = portionToApply * (1 - interestPortion)
+            remaining -= portionToApply
+            break
+          }
+        }
+
+        if (remaining > 0) {
+          principal += remaining
+        }
+      }
+
+      return {
+        penalty: Math.round(penalty * 100) / 100,
+        interest: Math.round(interest * 100) / 100,
+        principal: Math.round(principal * 100) / 100
+      }
+    },
+
+    afterPayment () {
+      if (!this.selectedLoan) {
+        return { newBalance: 0, newPenalties: 0 }
+      }
+
+      return {
+        newBalance: Math.max(0, this.selectedLoan.current_balance - this.paymentBreakdown.principal),
+        newPenalties: Math.max(0, this.selectedLoan.total_penalties - this.paymentBreakdown.penalty)
+      }
+    },
+
+    canSubmit () {
+      return this.form.loan_id && this.form.amount > 0 && this.selectedLoan?.status === 'active'
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.loansStore.fetchLoans()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load loans')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+
+    onLoanSelected () {
+      // Could fetch loan details if needed
+    },
+
+    async handleSubmit () {
+      if (!this.formRef) { return }
+
+      const { valid } = await this.formRef.validate()
+      if (!valid) { return }
+
+      this.loading = true
+      this.error = ''
+      this.success = false
+
+      const result = await this.paymentsStore.recordPayment({
+        loan_id: this.form.loan_id,
+        amount: this.form.amount,
+        payment_date: this.form.payment_date,
+        notes: this.form.notes
+      })
+
+      if (result.success) {
+        this.success = true
+        this.uiStore.showSuccess('Payment recorded successfully')
+        setTimeout(() => {
+          this.$router.push('/payments')
+        }, 1500)
+      } else {
+        this.error = result.error || 'Failed to record payment'
+        this.uiStore.showError(this.error)
+      }
+
+      this.loading = false
+    }
+  }
+})
 
 definePageMeta({
   middleware: 'auth'
-})
-
-const route = useRoute()
-const router = useRouter()
-const loansStore = useLoans()
-const paymentsStore = usePayments()
-const uiStore = useUI()
-
-const formRef = ref()
-const formValid = ref(false)
-const loading = ref(false)
-const error = ref('')
-const success = ref(false)
-
-const today = new Date().toISOString().split('T')[0]
-
-const form = reactive({
-  loan_id: (route.query.loan_id as string) || '',
-  amount: 0,
-  payment_date: today,
-  notes: ''
-})
-
-const rules = {
-  required: (v: any) => !!v || 'This field is required',
-  positive: (v: number) => v > 0 || 'Amount must be greater than 0'
-}
-
-const activeLoanOptions = computed(() => {
-  return loansStore.activeLoans.map(loan => ({
-    id: loan.id,
-    label: `${loan.account?.name} - ${formatCurrency(loan.principal_amount)} (Balance: ${formatCurrency(loan.current_balance)})`
-  }))
-})
-
-const selectedLoan = computed(() => {
-  return loansStore.loans.find(l => l.id === form.loan_id)
-})
-
-const paymentBreakdown = computed(() => {
-  if (!selectedLoan.value || form.amount <= 0) {
-    return { penalty: 0, interest: 0, principal: 0 }
-  }
-
-  let remaining = form.amount
-  let penalty = 0
-  let interest = 0
-  let principal = 0
-
-  // Apply to penalties first
-  if (selectedLoan.value.total_penalties > 0) {
-    penalty = Math.min(remaining, selectedLoan.value.total_penalties)
-    remaining -= penalty
-  }
-
-  // Calculate interest and principal portions
-  if (remaining > 0) {
-    const schedule = selectedLoan.value.amortization_schedule
-    const totalPaid = selectedLoan.value.total_paid
-
-    let accumulated = 0
-    for (const item of schedule) {
-      accumulated += item.total_due
-      if (accumulated > totalPaid) {
-        const dueForPayment = accumulated - totalPaid
-        const portionToApply = Math.min(remaining, dueForPayment)
-        const interestPortion = item.interest_due / item.total_due
-
-        interest = portionToApply * interestPortion
-        principal = portionToApply * (1 - interestPortion)
-        remaining -= portionToApply
-        break
-      }
-    }
-
-    if (remaining > 0) {
-      principal += remaining
-    }
-  }
-
-  return {
-    penalty: Math.round(penalty * 100) / 100,
-    interest: Math.round(interest * 100) / 100,
-    principal: Math.round(principal * 100) / 100
-  }
-})
-
-const afterPayment = computed(() => {
-  if (!selectedLoan.value) {
-    return { newBalance: 0, newPenalties: 0 }
-  }
-
-  return {
-    newBalance: Math.max(0, selectedLoan.value.current_balance - paymentBreakdown.value.principal),
-    newPenalties: Math.max(0, selectedLoan.value.total_penalties - paymentBreakdown.value.penalty)
-  }
-})
-
-const canSubmit = computed(() => {
-  return form.loan_id && form.amount > 0 && selectedLoan.value?.status === 'active'
-})
-
-const onLoanSelected = () => {
-  // Could fetch loan details if needed
-}
-
-const handleSubmit = async () => {
-  if (!formRef.value) { return }
-
-  const { valid } = await formRef.value.validate()
-  if (!valid) { return }
-
-  loading.value = true
-  error.value = ''
-  success.value = false
-
-  const result = await paymentsStore.recordPayment({
-    loan_id: form.loan_id,
-    amount: form.amount,
-    payment_date: form.payment_date,
-    notes: form.notes
-  })
-
-  if (result.success) {
-    success.value = true
-    uiStore.showSuccess('Payment recorded successfully')
-    setTimeout(() => {
-      router.push('/payments')
-    }, 1500)
-  } else {
-    error.value = result.error || 'Failed to record payment'
-    uiStore.showError(error.value)
-  }
-
-  loading.value = false
-}
-
-// Fetch loans on mount
-onMounted(async () => {
-  try {
-    await loansStore.fetchLoans()
-  } catch (error: any) {
-    uiStore.showError('Failed to load loans')
-  }
 })
 </script>

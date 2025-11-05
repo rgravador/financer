@@ -100,43 +100,62 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AccountsCreateIncome',
+
+  data () {
+    return {
+      formRef: null as any,
+      formValid: false
+    }
+  },
+
+  computed: {
+    creationStore () {
+      return useAccountCreation()
+    },
+
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    formData () {
+      return this.creationStore.formData
+    },
+
+    loading () {
+      return this.accountsStore.loading
+    },
+
+    accountId () {
+      return this.creationStore.accountId
+    }
+  },
+
+  methods: {
+    goBack () {
+      this.$router.push('/accounts/create')
+    },
+
+    async handleSave () {
+      if (!this.accountId) {
+        alert('Please complete Basic Identification first')
+        this.$router.push('/accounts/create/basic')
+        return
+      }
+
+      const result = await this.creationStore.saveIncomeInfo()
+      if (result.success) {
+        this.$router.push('/accounts/create')
+      }
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'auth'
 })
-
-const router = useRouter()
-const creationStore = useAccountCreation()
-const accountsStore = useAccounts()
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { formData, saveIncomeInfo, accountId } = creationStore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { loading } = accountsStore
-
-void formData
-void saveIncomeInfo
-void accountId
-void loading
-
-const formRef = ref()
-const formValid = ref(false)
-
-const goBack = () => {
-  router.push('/accounts/create')
-}
-
-const handleSave = async () => {
-  // Check if basic info is completed first
-  if (!accountId) {
-    alert('Please complete Basic Identification first')
-    router.push('/accounts/create/basic')
-    return
-  }
-
-  const result = await saveIncomeInfo()
-  if (result.success) {
-    router.push('/accounts/create')
-  }
-}
 </script>

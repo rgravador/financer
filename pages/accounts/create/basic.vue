@@ -116,100 +116,120 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AccountsCreateBasic',
+
+  data () {
+    return {
+      formRef: null as any,
+      formValid: false,
+      governmentIdTypes: [
+        { title: "Driver's License", value: 'drivers_license' },
+        { title: 'Passport', value: 'passport' },
+        { title: 'State ID', value: 'state_id' },
+        { title: 'Military ID', value: 'military_id' }
+      ],
+      secondaryIdTypes: [
+        { title: 'Birth Certificate', value: 'birth_certificate' },
+        { title: 'Social Security Card', value: 'social_security_card' },
+        { title: 'Utility Bill', value: 'utility_bill' }
+      ],
+      rules: {
+        required: (v: string) => !!v || 'This field is required'
+      }
+    }
+  },
+
+  computed: {
+    creationStore () {
+      return useAccountCreation()
+    },
+
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    formData () {
+      return this.creationStore.formData
+    },
+
+    loading () {
+      return this.accountsStore.loading
+    },
+
+    accountId () {
+      return this.$route.query.id as string | undefined
+    },
+
+    isEditMode () {
+      return !!this.accountId
+    }
+  },
+
+  async mounted () {
+    if (this.isEditMode && this.accountId) {
+      const supabase = useSupabaseClient()
+      const { data, error } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('id', this.accountId)
+        .single()
+
+      if (!error && data) {
+        this.formData.name = data.name || ''
+        this.formData.date_of_birth = data.date_of_birth || null
+        this.formData.ssn_tax_id = data.ssn_tax_id || null
+        this.formData.government_id_type = data.government_id_type || null
+        this.formData.government_id_number = data.government_id_number || null
+        this.formData.secondary_id_type = data.secondary_id_type || null
+      }
+    }
+  },
+
+  methods: {
+    goBack () {
+      if (this.isEditMode) {
+        this.$router.push(`/accounts/${this.accountId}`)
+      } else {
+        this.$router.push('/accounts/create')
+      }
+    },
+
+    async handleSave () {
+      if (this.formRef) {
+        const { valid } = await this.formRef.validate()
+        if (!valid) {
+          return
+        }
+      }
+
+      if (this.isEditMode && this.accountId) {
+        const result = await this.accountsStore.updateAccount(this.accountId, {
+          name: this.formData.name,
+          date_of_birth: this.formData.date_of_birth,
+          ssn_tax_id: this.formData.ssn_tax_id,
+          government_id_type: this.formData.government_id_type,
+          government_id_number: this.formData.government_id_number,
+          secondary_id_type: this.formData.secondary_id_type
+        })
+
+        if (result.success) {
+          this.$router.push(`/accounts/create?id=${this.accountId}`)
+        }
+      } else {
+        const result = await this.creationStore.saveBasicInfo()
+        if (result.success) {
+          this.$router.push('/accounts/create')
+        }
+      }
+    }
+  }
 })
 
-const router = useRouter()
-const route = useRoute()
-const creationStore = useAccountCreation()
-const accountsStore = useAccounts()
-
-const { formData, saveBasicInfo } = creationStore
-const { loading, updateAccount } = accountsStore
-
-// Determine if we're in edit mode
-const accountId = computed(() => route.query.id as string | undefined)
-const isEditMode = computed(() => !!accountId.value)
-
-const formRef = ref()
-const formValid = ref(false)
-
-const governmentIdTypes = [
-  { title: "Driver's License", value: 'drivers_license' },
-  { title: 'Passport', value: 'passport' },
-  { title: 'State ID', value: 'state_id' },
-  { title: 'Military ID', value: 'military_id' }
-]
-
-const secondaryIdTypes = [
-  { title: 'Birth Certificate', value: 'birth_certificate' },
-  { title: 'Social Security Card', value: 'social_security_card' },
-  { title: 'Utility Bill', value: 'utility_bill' }
-]
-
-const rules = {
-  required: (v: string) => !!v || 'This field is required'
-}
-
-const goBack = () => {
-  if (isEditMode.value) {
-    router.push(`/accounts/${accountId.value}`)
-  } else {
-    router.push('/accounts/create')
-  }
-}
-
-const handleSave = async () => {
-  if (formRef.value) {
-    const { valid } = await formRef.value.validate()
-    if (!valid) {
-      return
-    }
-  }
-
-  if (isEditMode.value && accountId.value) {
-    // Update existing account
-    const result = await updateAccount(accountId.value, {
-      name: formData.value.name,
-      date_of_birth: formData.value.date_of_birth,
-      ssn_tax_id: formData.value.ssn_tax_id,
-      government_id_type: formData.value.government_id_type,
-      government_id_number: formData.value.government_id_number,
-      secondary_id_type: formData.value.secondary_id_type
-    })
-
-    if (result.success) {
-      router.push(`/accounts/create?id=${accountId.value}`)
-    }
-  } else {
-    // Create new account
-    const result = await saveBasicInfo()
-    if (result.success) {
-      router.push('/accounts/create')
-    }
-  }
-}
-
-// Load existing account data if in edit mode
-onMounted(async () => {
-  if (isEditMode.value && accountId.value) {
-    const supabase = useSupabaseClient()
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('*')
-      .eq('id', accountId.value)
-      .single()
-
-    if (!error && data) {
-      formData.value.name = data.name || ''
-      formData.value.date_of_birth = data.date_of_birth || null
-      formData.value.ssn_tax_id = data.ssn_tax_id || null
-      formData.value.government_id_type = data.government_id_type || null
-      formData.value.government_id_number = data.government_id_number || null
-      formData.value.secondary_id_type = data.secondary_id_type || null
-    }
-  }
+definePageMeta({
+  middleware: 'auth'
 })
 </script>

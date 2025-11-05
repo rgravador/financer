@@ -296,135 +296,158 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
 import type { Cashout } from '~/types'
 
+export default defineComponent({
+  name: 'CashoutsIndex',
+
+  data () {
+    return {
+      cashoutDialog: false,
+      cashoutFormValid: false,
+      cashoutLoading: false,
+      cashoutError: '',
+      cancelDialog: false,
+      cancelLoading: false,
+      selectedCashout: null as Cashout | null,
+      cashoutForm: {
+        amount: 0,
+        notes: ''
+      }
+    }
+  },
+
+  computed: {
+    earningsStore () {
+      return useEarningsStore()
+    },
+
+    cashoutsStore () {
+      return useCashouts()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    canRequestCashout () {
+      const earnings = this.earningsStore.earnings
+      return earnings && earnings.collectible_earnings > 0
+    },
+
+    pendingCashouts () {
+      return this.cashoutsStore.cashouts.filter((c: Cashout) => c.status === 'pending')
+    },
+
+    approvedCashouts () {
+      return this.cashoutsStore.cashouts.filter((c: Cashout) => c.status === 'approved')
+    },
+
+    rules () {
+      return {
+        required: (v: any) => !!v || 'This field is required',
+        positive: (v: number) => v > 0 || 'Amount must be greater than 0',
+        maxAmount: (v: number) => {
+          const max = this.earningsStore.earnings?.collectible_earnings || 0
+          return v <= max || `Amount cannot exceed ${formatCurrency(max)}`
+        }
+      }
+    }
+  },
+
+  async mounted () {
+    try {
+      await Promise.all([
+        this.earningsStore.fetchEarnings(),
+        this.cashoutsStore.fetchCashouts()
+      ])
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load cashout data')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    getCashoutStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        pending: 'warning',
+        approved: 'success',
+        rejected: 'error'
+      }
+      return colors[status] || 'grey'
+    },
+
+    closeCashoutDialog () {
+      this.cashoutDialog = false
+      this.cashoutForm.amount = 0
+      this.cashoutForm.notes = ''
+      this.cashoutError = ''
+    },
+
+    async handleCashoutRequest () {
+      const formRef = this.$refs.cashoutFormRef as any
+      if (!formRef) { return }
+
+      const { valid } = await formRef.validate()
+      if (!valid) { return }
+
+      this.cashoutLoading = true
+      this.cashoutError = ''
+
+      const result = await this.cashoutsStore.requestCashout({
+        amount: this.cashoutForm.amount,
+        notes: this.cashoutForm.notes
+      })
+
+      if (result.success) {
+        this.uiStore.showSuccess('Cashout request submitted successfully')
+        this.closeCashoutDialog()
+        // Refresh data
+        await Promise.all([
+          this.earningsStore.fetchEarnings(),
+          this.cashoutsStore.fetchCashouts()
+        ])
+      } else {
+        this.cashoutError = result.error || 'Failed to submit cashout request'
+      }
+
+      this.cashoutLoading = false
+    },
+
+    openCancelDialog (cashout: Cashout) {
+      this.selectedCashout = cashout
+      this.cancelDialog = true
+    },
+
+    async handleCancelRequest () {
+      if (!this.selectedCashout) { return }
+
+      this.cancelLoading = true
+
+      const result = await this.cashoutsStore.rejectCashout(
+        this.selectedCashout.id,
+        'Cancelled by user'
+      )
+
+      if (result.success) {
+        this.uiStore.showSuccess('Cashout request cancelled')
+        this.cancelDialog = false
+        this.selectedCashout = null
+      } else {
+        this.uiStore.showError(result.error || 'Failed to cancel request')
+      }
+
+      this.cancelLoading = false
+    }
+  }
+})
+
 definePageMeta({
   middleware: 'auth'
-})
-
-const earningsStore = useEarnings()
-const cashoutsStore = useCashouts()
-const uiStore = useUI()
-
-const cashoutDialog = ref(false)
-const cashoutFormRef = ref()
-const cashoutFormValid = ref(false)
-const cashoutLoading = ref(false)
-const cashoutError = ref('')
-
-const cancelDialog = ref(false)
-const cancelLoading = ref(false)
-const selectedCashout = ref<Cashout | null>(null)
-
-const cashoutForm = reactive({
-  amount: 0,
-  notes: ''
-})
-
-const canRequestCashout = computed(() => {
-  const earnings = earningsStore.earnings
-  return earnings && earnings.collectible_earnings > 0
-})
-
-const pendingCashouts = computed(() => {
-  return cashoutsStore.cashouts.filter(c => c.status === 'pending')
-})
-
-const approvedCashouts = computed(() => {
-  return cashoutsStore.cashouts.filter(c => c.status === 'approved')
-})
-
-const rules = {
-  required: (v: any) => !!v || 'This field is required',
-  positive: (v: number) => v > 0 || 'Amount must be greater than 0',
-  maxAmount: (v: number) => {
-    const max = earningsStore.earnings?.collectible_earnings || 0
-    return v <= max || `Amount cannot exceed ${formatCurrency(max)}`
-  }
-}
-
-const getCashoutStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending: 'warning',
-    approved: 'success',
-    rejected: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-const closeCashoutDialog = () => {
-  cashoutDialog.value = false
-  cashoutForm.amount = 0
-  cashoutForm.notes = ''
-  cashoutError.value = ''
-}
-
-const handleCashoutRequest = async () => {
-  if (!cashoutFormRef.value) { return }
-
-  const { valid } = await cashoutFormRef.value.validate()
-  if (!valid) { return }
-
-  cashoutLoading.value = true
-  cashoutError.value = ''
-
-  const result = await cashoutsStore.requestCashout({
-    amount: cashoutForm.amount,
-    notes: cashoutForm.notes
-  })
-
-  if (result.success) {
-    uiStore.showSuccess('Cashout request submitted successfully')
-    closeCashoutDialog()
-    // Refresh data
-    await Promise.all([
-      earningsStore.fetchEarnings(),
-      cashoutsStore.fetchCashouts()
-    ])
-  } else {
-    cashoutError.value = result.error || 'Failed to submit cashout request'
-  }
-
-  cashoutLoading.value = false
-}
-
-const openCancelDialog = (cashout: Cashout) => {
-  selectedCashout.value = cashout
-  cancelDialog.value = true
-}
-
-const handleCancelRequest = async () => {
-  if (!selectedCashout.value) { return }
-
-  cancelLoading.value = true
-
-  const result = await cashoutsStore.rejectCashout(
-    selectedCashout.value.id,
-    'Cancelled by user'
-  )
-
-  if (result.success) {
-    uiStore.showSuccess('Cashout request cancelled')
-    cancelDialog.value = false
-    selectedCashout.value = null
-  } else {
-    uiStore.showError(result.error || 'Failed to cancel request')
-  }
-
-  cancelLoading.value = false
-}
-
-// Fetch data on mount
-onMounted(async () => {
-  try {
-    await Promise.all([
-      earningsStore.fetchEarnings(),
-      cashoutsStore.fetchCashouts()
-    ])
-  } catch (error: any) {
-    uiStore.showError('Failed to load cashout data')
-  }
 })
 </script>

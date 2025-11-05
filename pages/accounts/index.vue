@@ -171,58 +171,78 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AccountsPage',
+
+  data () {
+    return {
+      statusOptions: [
+        { title: 'Active', value: 'active' },
+        { title: 'Inactive', value: 'inactive' },
+        { title: 'Suspended', value: 'suspended' }
+      ],
+      headers: [
+        { title: 'Name', value: 'name', sortable: true },
+        { title: 'Contact', value: 'contact_info', sortable: false },
+        { title: 'Address', value: 'address', sortable: false },
+        { title: 'Status', value: 'status', sortable: true },
+        { title: 'Loans', value: 'loans', sortable: false },
+        { title: 'Actions', value: 'actions', sortable: false, align: 'end' as const }
+      ]
+    }
+  },
+
+  computed: {
+    accountsStore () {
+      return useAccountsStore()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    loading () {
+      return this.accountsStore.loading
+    },
+
+    filteredAccounts () {
+      return this.accountsStore.filteredAccounts
+    },
+
+    filters () {
+      return this.accountsStore.filters
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.accountsStore.fetchAccounts()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load accounts')
+    }
+  },
+
+  methods: {
+    getStatusColor (status: string) {
+      const colors: Record<string, string> = {
+        active: 'success',
+        inactive: 'grey',
+        suspended: 'error'
+      }
+      return colors[status] || 'grey'
+    },
+
+    handleRowClick (_event: any, { item }: any) {
+      this.$router.push(`/accounts/${item.id}`)
+    }
+  }
 })
 
-const router = useRouter()
-const accountsStore = useAccounts()
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { loading, filteredAccounts, filters, fetchAccounts } = accountsStore
-
-void loading
-void filteredAccounts
-void filters
-void fetchAccounts
-
-const uiStore = useUI()
-
-const statusOptions = [
-  { title: 'Active', value: 'active' },
-  { title: 'Inactive', value: 'inactive' },
-  { title: 'Suspended', value: 'suspended' }
-]
-
-const headers = [
-  { title: 'Name', value: 'name', sortable: true },
-  { title: 'Contact', value: 'contact_info', sortable: false },
-  { title: 'Address', value: 'address', sortable: false },
-  { title: 'Status', value: 'status', sortable: true },
-  { title: 'Loans', value: 'loans', sortable: false },
-  { title: 'Actions', value: 'actions', sortable: false, align: 'end' as const }
-]
-
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    active: 'success',
-    inactive: 'grey',
-    suspended: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-const handleRowClick = (_event: any, { item }: any) => {
-  router.push(`/accounts/${item.id}`)
-}
-
-// Fetch accounts on mount
-onMounted(async () => {
-  try {
-    await fetchAccounts()
-  } catch (error: any) {
-    uiStore.showError('Failed to load accounts')
-  }
+definePageMeta({
+  middleware: 'auth'
 })
 </script>
 

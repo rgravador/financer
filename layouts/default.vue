@@ -2,7 +2,7 @@
   <v-layout class="rounded rounded-md border" style="height: 100vh;">
     <!-- Navigation Drawer -->
     <v-navigation-drawer
-      :model="ui.sidebarOpen"
+      :model="uiStore.sidebarOpen"
       permanent
       fixed
     >
@@ -45,7 +45,7 @@
           to="/payments"
         />
 
-        <template v-if="auth.isAgent">
+        <template v-if="authStore.isAgent">
           <v-list-item
             prepend-icon="mdi-currency-usd"
             title="Earnings"
@@ -58,7 +58,7 @@
           />
         </template>
 
-        <template v-if="auth.isAdmin">
+        <template v-if="authStore.isAdmin">
           <v-divider class="my-2" />
           <v-listSubheader>Admin</v-listSubheader>
           <v-list-item
@@ -99,7 +99,7 @@
       </v-btn>
 
       <!-- Menu button for mobile (when not showing back button) -->
-      <v-app-barNavIcon v-else class="hide-on-desktop" @click="ui.toggleSidebar" />
+      <v-app-barNavIcon v-else class="hide-on-desktop" @click="uiStore.toggleSidebar" />
 
       <v-app-barTitle>
         <span class="text-h6 pl-4">{{ pageTitle || 'Financer' }}</span>
@@ -112,8 +112,8 @@
         <template #activator="{ props }">
           <v-btn icon v-bind="props">
             <v-badge
-              v-if="notifications.unreadCount > 0"
-              :content="notifications.unreadCount"
+              v-if="notificationsStore.unreadCount > 0"
+              :content="notificationsStore.unreadCount"
               color="error"
             >
               <v-icon>mdi-bell</v-icon>
@@ -128,10 +128,10 @@
           <v-card-title class="d-flex justify-space-between align-center">
             <span>Notifications</span>
             <v-btn
-              v-if="notifications.unreadCount > 0"
+              v-if="notificationsStore.unreadCount > 0"
               size="small"
               variant="text"
-              @click="notifications.markAllAsRead()"
+              @click="notificationsStore.markAllAsRead()"
             >
               Mark all read
             </v-btn>
@@ -139,12 +139,12 @@
 
           <v-divider />
 
-          <v-list v-if="notifications.notifications.length > 0" max-height="400">
+          <v-list v-if="notificationsStore.notifications.length > 0" max-height="400">
             <v-list-item
-              v-for="notification in notifications.recentNotifications"
+              v-for="notification in notificationsStore.recentNotifications"
               :key="notification.id"
               :class="{ 'bg-grey-lighten-4': !notification.is_read }"
-              @click="notifications.markAsRead(notification.id)"
+              @click="notificationsStore.markAsRead(notification.id)"
             >
               <v-list-item-title>{{ notification.message }}</v-list-item-title>
               <v-list-item-subtitle>{{ formatRelativeTime(notification.timestamp) }}</v-list-item-subtitle>
@@ -194,12 +194,12 @@
         <span>Loans</span>
       </v-btn>
 
-      <v-btn v-if="auth.isAgent" value="earnings" to="/earnings">
+      <v-btn v-if="authStore.isAgent" value="earnings" to="/earnings">
         <v-icon>mdi-currency-usd</v-icon>
         <span>Earnings</span>
       </v-btn>
 
-      <v-btn v-if="auth.isAdmin" value="admin" to="/admin/dashboard">
+      <v-btn v-if="authStore.isAdmin" value="admin" to="/admin/dashboard">
         <v-icon>mdi-shield-account</v-icon>
         <span>Admin</span>
       </v-btn>
@@ -212,14 +212,14 @@
 
     <!-- Global Snackbar -->
     <v-snackbar
-      v-model="ui.snackbar.show"
-      :color="ui.snackbar.color"
-      :timeout="ui.snackbar.timeout"
+      v-model="uiStore.snackbar.show"
+      :color="uiStore.snackbar.color"
+      :timeout="uiStore.snackbar.timeout"
       location="top"
     >
-      {{ ui.snackbar.message }}
+      {{ uiStore.snackbar.message }}
       <template #actions>
-        <v-btn variant="text" @click="ui.hideSnackbar()">
+        <v-btn variant="text" @click="uiStore.hideSnackbar()">
           Close
         </v-btn>
       </template>
@@ -227,50 +227,75 @@
   </v-layout>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatRelativeTime } from '~/utils/formatters'
 
-const auth = useAuth()
-const ui = useUI()
-const notifications = useNotifications()
+export default defineComponent({
+  name: 'DefaultLayout',
 
-const { user, logout } = auth
+  data () {
+    return {
+      bottomNav: 'dashboard'
+    }
+  },
 
-const bottomNav = ref('dashboard')
+  computed: {
+    authStore () {
+      return useAuthStore()
+    },
 
-// Get page title - use a simple reactive approach
-const route = useRoute()
-const pageTitle = computed(() => {
-  // Map specific routes to titles
-  const routeTitles: Record<string, string> = {
-    'accounts-create': 'Create New Account',
-    accounts: 'Accounts',
-    loans: 'Loans',
-    payments: 'Payments',
-    earnings: 'Earnings',
-    cashouts: 'Cashouts',
-    dashboard: 'Dashboard',
-    'admin-dashboard': 'Admin Dashboard',
-    'admin-approvals': 'Loan Approvals',
-    'admin-cashouts': 'Cashout Management',
-    'admin-users': 'User Management'
+    uiStore () {
+      return useUIStore()
+    },
+
+    notificationsStore () {
+      return useNotificationsStore()
+    },
+
+    user () {
+      return this.authStore.user
+    },
+
+    pageTitle (): string {
+      // Map specific routes to titles
+      const routeTitles: Record<string, string> = {
+        'accounts-create': 'Create New Account',
+        accounts: 'Accounts',
+        loans: 'Loans',
+        payments: 'Payments',
+        earnings: 'Earnings',
+        cashouts: 'Cashouts',
+        dashboard: 'Dashboard',
+        'admin-dashboard': 'Admin Dashboard',
+        'admin-approvals': 'Loan Approvals',
+        'admin-cashouts': 'Cashout Management',
+        'admin-users': 'User Management'
+      }
+
+      const routeName = this.$route.name as string
+      return routeTitles[routeName] || 'Financer'
+    },
+
+    showBackButton (): boolean {
+      const pagesWithBackButton = ['accounts-create', 'loans-create', 'accounts-edit']
+      const routeName = this.$route.name as string
+      return pagesWithBackButton.includes(routeName)
+    }
+  },
+
+  async mounted () {
+    await this.notificationsStore.fetchNotifications()
+    this.notificationsStore.subscribeToRealtime()
+  },
+
+  methods: {
+    formatRelativeTime,
+
+    logout () {
+      this.authStore.logout()
+    }
   }
-
-  const routeName = route.name as string
-  return routeTitles[routeName] || 'Financer'
-})
-
-// Show back button for specific pages
-const showBackButton = computed(() => {
-  const pagesWithBackButton = ['accounts-create', 'loans-create', 'accounts-edit']
-  const routeName = route.name as string
-  return pagesWithBackButton.includes(routeName)
-})
-
-// Fetch notifications on mount
-onMounted(async () => {
-  await notifications.fetchNotifications()
-  notifications.subscribeToRealtime()
 })
 </script>
 

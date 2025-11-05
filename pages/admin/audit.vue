@@ -285,200 +285,227 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { formatCurrency, formatDate } from '~/utils/formatters'
+
+export default defineComponent({
+  name: 'AdminAudit',
+
+  data () {
+    return {
+      filterType: '',
+      filterUser: '',
+      dateRange: 'all',
+      page: 1,
+      itemsPerPage: 50,
+      transactionTypes: [
+        { title: 'All Types', value: '' },
+        { title: 'Loan Created', value: 'loan_created' },
+        { title: 'Loan Approved', value: 'loan_approved' },
+        { title: 'Loan Rejected', value: 'loan_rejected' },
+        { title: 'Payment Recorded', value: 'payment_recorded' },
+        { title: 'Cashout Approved', value: 'cashout_approved' },
+        { title: 'Cashout Rejected', value: 'cashout_rejected' },
+        { title: 'Account Created', value: 'account_created' },
+        { title: 'Account Updated', value: 'account_updated' }
+      ],
+      dateRangeOptions: [
+        { title: 'All Time', value: 'all' },
+        { title: 'Today', value: 'today' },
+        { title: 'Last 7 Days', value: '7days' },
+        { title: 'Last 30 Days', value: '30days' },
+        { title: 'This Month', value: 'month' }
+      ]
+    }
+  },
+
+  computed: {
+    adminStore () {
+      return useAdmin()
+    },
+
+    uiStore () {
+      return useUIStore()
+    },
+
+    filteredTransactions () {
+      let transactions = [...this.adminStore.recentTransactions]
+
+      // Filter by type
+      if (this.filterType) {
+        transactions = transactions.filter((t: any) => t.transaction_type === this.filterType)
+      }
+
+      // Filter by user
+      if (this.filterUser) {
+        const searchLower = this.filterUser.toLowerCase()
+        transactions = transactions.filter((t: any) =>
+          t.user?.full_name.toLowerCase().includes(searchLower) ||
+          t.user?.display_name?.toLowerCase().includes(searchLower) ||
+          t.user?.email.toLowerCase().includes(searchLower)
+        )
+      }
+
+      // Filter by date range
+      const now = new Date()
+      transactions = transactions.filter((t: any) => {
+        const transactionDate = new Date(t.created_at)
+
+        switch (this.dateRange) {
+          case 'today':
+            return transactionDate.toDateString() === now.toDateString()
+          case '7days': {
+            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+            return transactionDate >= sevenDaysAgo
+          }
+          case '30days': {
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+            return transactionDate >= thirtyDaysAgo
+          }
+          case 'month':
+            return transactionDate.getMonth() === now.getMonth() &&
+                   transactionDate.getFullYear() === now.getFullYear()
+          default:
+            return true
+        }
+      })
+
+      return transactions
+    },
+
+    todayTransactions () {
+      const today = new Date().toDateString()
+      return this.adminStore.recentTransactions.filter(
+        (t: any) => new Date(t.created_at).toDateString() === today
+      )
+    },
+
+    loanTransactions () {
+      return this.adminStore.recentTransactions.filter((t: any) =>
+        t.transaction_type.includes('loan')
+      )
+    },
+
+    paymentTransactions () {
+      return this.adminStore.recentTransactions.filter((t: any) =>
+        t.transaction_type === 'payment_recorded'
+      )
+    },
+
+    totalPages () {
+      return Math.ceil(this.filteredTransactions.length / this.itemsPerPage)
+    },
+
+    paginationStart () {
+      return (this.page - 1) * this.itemsPerPage
+    },
+
+    paginationEnd () {
+      return Math.min(this.page * this.itemsPerPage, this.filteredTransactions.length)
+    },
+
+    paginatedTransactions () {
+      return this.filteredTransactions.slice(this.paginationStart, this.paginationEnd)
+    }
+  },
+
+  watch: {
+    filterType () {
+      this.page = 1
+    },
+    filterUser () {
+      this.page = 1
+    },
+    dateRange () {
+      this.page = 1
+    }
+  },
+
+  async mounted () {
+    try {
+      await this.adminStore.fetchRecentTransactions()
+    } catch (error: any) {
+      this.uiStore.showError('Failed to load audit log')
+    }
+  },
+
+  methods: {
+    formatCurrency,
+    formatDate,
+
+    formatTime (date: string | Date) {
+      return new Date(date).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    },
+
+    formatTransactionType (type: string) {
+      return type.split('_').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ')
+    },
+
+    getTransactionColor (type: string) {
+      const colors: Record<string, string> = {
+        loan_created: 'info',
+        loan_approved: 'success',
+        loan_rejected: 'error',
+        payment_recorded: 'success',
+        cashout_approved: 'success',
+        cashout_rejected: 'error',
+        account_created: 'info',
+        account_updated: 'warning'
+      }
+      return colors[type] || 'grey'
+    },
+
+    getTransactionIcon (type: string) {
+      const icons: Record<string, string> = {
+        loan_created: 'mdi-file-document-plus',
+        loan_approved: 'mdi-check-circle',
+        loan_rejected: 'mdi-close-circle',
+        payment_recorded: 'mdi-cash-plus',
+        cashout_approved: 'mdi-cash-check',
+        cashout_rejected: 'mdi-cash-remove',
+        account_created: 'mdi-account-plus',
+        account_updated: 'mdi-account-edit'
+      }
+      return icons[type] || 'mdi-information'
+    },
+
+    exportToCSV () {
+      const headers = ['Date', 'Time', 'Type', 'User', 'Details', 'Amount', 'Status']
+      const rows = this.filteredTransactions.map((t: any) => [
+        formatDate(t.created_at),
+        this.formatTime(t.created_at),
+        this.formatTransactionType(t.transaction_type),
+        t.user?.full_name || 'System',
+        t.details || '-',
+        t.amount ? formatCurrency(t.amount) : '-',
+        t.success ? 'Success' : 'Failed'
+      ])
+
+      const csv = [
+        headers.join(','),
+        ...rows.map((row: any[]) => row.map((cell: any) => `"${cell}"`).join(','))
+      ].join('\n')
+
+      const blob = new Blob([csv], { type: 'text/csv' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`
+      link.click()
+      window.URL.revokeObjectURL(url)
+
+      this.uiStore.showSuccess('Audit log exported successfully')
+    }
+  }
+})
 
 definePageMeta({
   middleware: ['auth', 'admin']
-})
-
-const adminStore = useAdmin()
-const uiStore = useUI()
-
-const filterType = ref('')
-const filterUser = ref('')
-const dateRange = ref('all')
-const page = ref(1)
-const itemsPerPage = 50
-
-const transactionTypes = [
-  { title: 'All Types', value: '' },
-  { title: 'Loan Created', value: 'loan_created' },
-  { title: 'Loan Approved', value: 'loan_approved' },
-  { title: 'Loan Rejected', value: 'loan_rejected' },
-  { title: 'Payment Recorded', value: 'payment_recorded' },
-  { title: 'Cashout Approved', value: 'cashout_approved' },
-  { title: 'Cashout Rejected', value: 'cashout_rejected' },
-  { title: 'Account Created', value: 'account_created' },
-  { title: 'Account Updated', value: 'account_updated' }
-]
-
-const dateRangeOptions = [
-  { title: 'All Time', value: 'all' },
-  { title: 'Today', value: 'today' },
-  { title: 'Last 7 Days', value: '7days' },
-  { title: 'Last 30 Days', value: '30days' },
-  { title: 'This Month', value: 'month' }
-]
-
-const filteredTransactions = computed(() => {
-  let transactions = [...adminStore.recentTransactions]
-
-  // Filter by type
-  if (filterType.value) {
-    transactions = transactions.filter(t => t.transaction_type === filterType.value)
-  }
-
-  // Filter by user
-  if (filterUser.value) {
-    const searchLower = filterUser.value.toLowerCase()
-    transactions = transactions.filter(t =>
-      t.user?.full_name.toLowerCase().includes(searchLower) ||
-      t.user?.display_name?.toLowerCase().includes(searchLower) ||
-      t.user?.email.toLowerCase().includes(searchLower)
-    )
-  }
-
-  // Filter by date range
-  const now = new Date()
-  transactions = transactions.filter((t) => {
-    const transactionDate = new Date(t.created_at)
-
-    switch (dateRange.value) {
-      case 'today':
-        return transactionDate.toDateString() === now.toDateString()
-      case '7days':
-        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-        return transactionDate >= sevenDaysAgo
-      case '30days':
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-        return transactionDate >= thirtyDaysAgo
-      case 'month':
-        return transactionDate.getMonth() === now.getMonth() &&
-               transactionDate.getFullYear() === now.getFullYear()
-      default:
-        return true
-    }
-  })
-
-  return transactions
-})
-
-const todayTransactions = computed(() => {
-  const today = new Date().toDateString()
-  return adminStore.recentTransactions.filter(
-    t => new Date(t.created_at).toDateString() === today
-  )
-})
-
-const loanTransactions = computed(() => {
-  return adminStore.recentTransactions.filter(t =>
-    t.transaction_type.includes('loan')
-  )
-})
-
-const paymentTransactions = computed(() => {
-  return adminStore.recentTransactions.filter(t =>
-    t.transaction_type === 'payment_recorded'
-  )
-})
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredTransactions.value.length / itemsPerPage)
-})
-
-const paginationStart = computed(() => {
-  return (page.value - 1) * itemsPerPage
-})
-
-const paginationEnd = computed(() => {
-  return Math.min(page.value * itemsPerPage, filteredTransactions.value.length)
-})
-
-const paginatedTransactions = computed(() => {
-  return filteredTransactions.value.slice(paginationStart.value, paginationEnd.value)
-})
-
-const formatTime = (date: string | Date) => {
-  return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const formatTransactionType = (type: string) => {
-  return type.split('_').map(word =>
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ')
-}
-
-const getTransactionColor = (type: string) => {
-  const colors: Record<string, string> = {
-    loan_created: 'info',
-    loan_approved: 'success',
-    loan_rejected: 'error',
-    payment_recorded: 'success',
-    cashout_approved: 'success',
-    cashout_rejected: 'error',
-    account_created: 'info',
-    account_updated: 'warning'
-  }
-  return colors[type] || 'grey'
-}
-
-const getTransactionIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    loan_created: 'mdi-file-document-plus',
-    loan_approved: 'mdi-check-circle',
-    loan_rejected: 'mdi-close-circle',
-    payment_recorded: 'mdi-cash-plus',
-    cashout_approved: 'mdi-cash-check',
-    cashout_rejected: 'mdi-cash-remove',
-    account_created: 'mdi-account-plus',
-    account_updated: 'mdi-account-edit'
-  }
-  return icons[type] || 'mdi-information'
-}
-
-const exportToCSV = () => {
-  const headers = ['Date', 'Time', 'Type', 'User', 'Details', 'Amount', 'Status']
-  const rows = filteredTransactions.value.map(t => [
-    formatDate(t.created_at),
-    formatTime(t.created_at),
-    formatTransactionType(t.transaction_type),
-    t.user?.full_name || 'System',
-    t.details || '-',
-    t.amount ? formatCurrency(t.amount) : '-',
-    t.success ? 'Success' : 'Failed'
-  ])
-
-  const csv = [
-    headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-  ].join('\n')
-
-  const blob = new Blob([csv], { type: 'text/csv' })
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`
-  link.click()
-  window.URL.revokeObjectURL(url)
-
-  uiStore.showSuccess('Audit log exported successfully')
-}
-
-// Reset pagination when filters change
-watch([filterType, filterUser, dateRange], () => {
-  page.value = 1
-})
-
-// Fetch audit log on mount
-onMounted(async () => {
-  try {
-    await adminStore.fetchRecentTransactions()
-  } catch (error: any) {
-    uiStore.showError('Failed to load audit log')
-  }
 })
 </script>
