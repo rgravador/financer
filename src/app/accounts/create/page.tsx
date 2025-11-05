@@ -74,17 +74,54 @@ export default function CreateAccountPage() {
         </CardHeader>
         <CardBody>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input label="Full Name" name="name" required />
-            <Input label="Date of Birth" name="date_of_birth" type="date" />
-            <Input label="SSN / Tax ID" name="ssn_tax_id" />
-            <Input label="Government ID Type" name="government_id_type" />
-            <Input label="Government ID Number" name="government_id_number" />
             <Input
-              label="ID Proof Document"
-              name="id_proof"
-              type="file"
-              accept="image/*,.pdf"
+              label="Full Name"
+              name="name"
+              required
+              variant="bordered"
+              labelPlacement="outside"
             />
+            <Input
+              label="Date of Birth"
+              name="date_of_birth"
+              type="date"
+              variant="bordered"
+              labelPlacement="outside"
+            />
+            <Input
+              label="SSN / Tax ID"
+              name="ssn_tax_id"
+              variant="bordered"
+              labelPlacement="outside"
+            />
+            <Input
+              label="Government ID Type"
+              name="government_id_type"
+              variant="bordered"
+              labelPlacement="outside"
+            />
+            <Input
+              label="Government ID Number"
+              name="government_id_number"
+              variant="bordered"
+              labelPlacement="outside"
+            />
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">ID Proof Document</label>
+              <input
+                name="id_proof"
+                type="file"
+                accept="image/*,.pdf"
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-2 file:border-gray-300
+                  file:text-sm file:font-medium
+                  file:bg-white file:text-gray-700
+                  hover:file:bg-gray-50 hover:file:border-primary
+                  file:cursor-pointer cursor-pointer
+                  file:transition-colors"
+              />
+            </div>
 
             <div className="flex gap-4 justify-end pt-4">
               <Button type="button" variant="light" onPress={() => router.back()}>

@@ -111,7 +111,7 @@ export default function AccountDetailPage({ params }: { params: Promise<{ id: st
         <CardBody>
           {account.loans && account.loans.length > 0 ? (
             <div className="space-y-3">
-              {account.loans.map((loan) => (
+              {account.loans.map((loan: any) => (
                 <Link key={loan.id} href={`/loans/${loan.id}`}>
                   <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <div className="flex justify-between items-start">

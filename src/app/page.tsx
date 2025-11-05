@@ -50,6 +50,8 @@ export default function HomePage() {
               type="email"
               placeholder="Enter your email"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
             <Input
               label="Password"
@@ -57,6 +59,8 @@ export default function HomePage() {
               type="password"
               placeholder="Enter your password"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
             <Button
               type="submit"

@@ -6,8 +6,8 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Input,
   Button,
+  Input,
   Table,
   TableHeader,
   TableColumn,
@@ -19,6 +19,7 @@ import {
   SelectItem,
 } from '@heroui/react'
 import Link from 'next/link'
+
 import { formatDate } from '@/utils/formatters'
 
 export default function AccountsPage() {
@@ -55,21 +56,27 @@ export default function AccountsPage() {
             value={search}
             onValueChange={setSearch}
             className="max-w-sm"
+            variant="bordered"
+            isClearable
           />
           <Select
             label="Status"
             placeholder="Select status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            selectedKeys={[statusFilter]}
+            onSelectionChange={(keys) => {
+              const value = Array.from(keys)[0] as string
+              setStatusFilter(value)
+            }}
             className="max-w-xs"
+            variant="bordered"
           >
-            <SelectItem key="active" value="active">
+            <SelectItem key="active">
               Active
             </SelectItem>
-            <SelectItem key="inactive" value="inactive">
+            <SelectItem key="inactive">
               Inactive
             </SelectItem>
-            <SelectItem key="suspended" value="suspended">
+            <SelectItem key="suspended">
               Suspended
             </SelectItem>
           </Select>

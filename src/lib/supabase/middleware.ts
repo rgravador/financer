@@ -3,6 +3,11 @@ import { type NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/supabase'
 
 export async function updateSession(request: NextRequest) {
+  // Skip middleware for API routes
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,

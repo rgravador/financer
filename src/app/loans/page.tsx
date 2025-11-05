@@ -45,23 +45,27 @@ export default function LoansPage() {
           <Select
             label="Status"
             placeholder="Select status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            selectedKeys={[statusFilter]}
+            onSelectionChange={(keys) => {
+              const value = Array.from(keys)[0] as string
+              setStatusFilter(value)
+            }}
             className="max-w-xs"
+            variant="bordered"
           >
-            <SelectItem key="active" value="active">
+            <SelectItem key="active">
               Active
             </SelectItem>
-            <SelectItem key="pending_approval" value="pending_approval">
+            <SelectItem key="pending_approval">
               Pending Approval
             </SelectItem>
-            <SelectItem key="approved" value="approved">
+            <SelectItem key="approved">
               Approved
             </SelectItem>
-            <SelectItem key="closed" value="closed">
+            <SelectItem key="closed">
               Closed
             </SelectItem>
-            <SelectItem key="rejected" value="rejected">
+            <SelectItem key="rejected">
               Rejected
             </SelectItem>
           </Select>

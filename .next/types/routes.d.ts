@@ -4,7 +4,7 @@
 type AppRoutes = "/" | "/accounts" | "/accounts/[id]" | "/accounts/create" | "/admin" | "/admin/approvals" | "/admin/cashouts" | "/auth/signup" | "/cashouts" | "/cashouts/create" | "/dashboard" | "/earnings" | "/loans" | "/loans/[id]" | "/loans/create" | "/payments" | "/payments/create"
 type AppRouteHandlerRoutes = "/api/trpc/[trpc]"
 type PageRoutes = never
-type LayoutRoutes = "/" | "/dashboard"
+type LayoutRoutes = "/"
 type RedirectRoutes = never
 type RewriteRoutes = never
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
@@ -36,7 +36,6 @@ export type ParamsOf<Route extends Routes> = ParamMap[Route]
 
 interface LayoutSlotMap {
   "/": never
-  "/dashboard": never
 }
 
 

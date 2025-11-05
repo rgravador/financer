@@ -97,6 +97,8 @@ export default function CreateCashoutPage() {
               value={amount}
               onValueChange={setAmount}
               description={`Enter amount between ${formatCurrency(minAmount)} and ${formatCurrency(collectibleAmount)}`}
+              variant="bordered"
+              labelPlacement="outside"
               startContent={
                 <div className="pointer-events-none flex items-center">
                   <span className="text-default-400 text-small">₱</span>

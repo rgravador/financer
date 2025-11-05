@@ -56,12 +56,16 @@ export default function SignupPage() {
               name="full_name"
               placeholder="Enter your full name"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
               label="Display Name (Optional)"
               name="display_name"
               placeholder="How you'd like to be called"
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
@@ -70,6 +74,8 @@ export default function SignupPage() {
               type="email"
               placeholder="Enter your email"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
@@ -79,6 +85,8 @@ export default function SignupPage() {
               placeholder="Enter your password"
               required
               description="Minimum 6 characters"
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
@@ -87,6 +95,8 @@ export default function SignupPage() {
               type="password"
               placeholder="Confirm your password"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Select
@@ -95,14 +105,16 @@ export default function SignupPage() {
               placeholder="Select your role"
               defaultSelectedKeys={['agent']}
               required
+              variant="bordered"
+              labelPlacement="outside"
             >
-              <SelectItem key="agent" value="agent">
+              <SelectItem key="agent">
                 Agent
               </SelectItem>
-              <SelectItem key="admin" value="admin">
+              <SelectItem key="admin">
                 Admin
               </SelectItem>
-              <SelectItem key="internal_admin" value="internal_admin">
+              <SelectItem key="internal_admin">
                 Internal Admin
               </SelectItem>
             </Select>

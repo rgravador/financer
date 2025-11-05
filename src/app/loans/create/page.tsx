@@ -60,10 +60,15 @@ export default function CreateLoanPage() {
               placeholder="Select account"
               isRequired
               selectedKeys={selectedAccountId ? [selectedAccountId] : []}
-              onChange={(e) => setSelectedAccountId(e.target.value)}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string
+                setSelectedAccountId(value)
+              }}
+              variant="bordered"
+              labelPlacement="outside"
             >
               {(accounts ?? []).map((account) => (
-                <SelectItem key={account.id} value={account.id}>
+                <SelectItem key={account.id}>
                   {account.name}
                 </SelectItem>
               ))}
@@ -76,6 +81,8 @@ export default function CreateLoanPage() {
               step="0.01"
               min="0"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
@@ -86,6 +93,8 @@ export default function CreateLoanPage() {
               min="0"
               max="100"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
@@ -94,6 +103,8 @@ export default function CreateLoanPage() {
               type="number"
               min="1"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Select
@@ -101,14 +112,16 @@ export default function CreateLoanPage() {
               name="payment_frequency"
               placeholder="Select frequency"
               isRequired
+              variant="bordered"
+              labelPlacement="outside"
             >
-              <SelectItem key="bi-monthly" value="bi-monthly">
+              <SelectItem key="bi-monthly">
                 Bi-Monthly (Every 15 days)
               </SelectItem>
-              <SelectItem key="monthly" value="monthly">
+              <SelectItem key="monthly">
                 Monthly
               </SelectItem>
-              <SelectItem key="weekly" value="weekly">
+              <SelectItem key="weekly">
                 Weekly
               </SelectItem>
             </Select>
@@ -118,6 +131,8 @@ export default function CreateLoanPage() {
               name="start_date"
               type="date"
               required
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <div className="flex gap-4 justify-end pt-4">

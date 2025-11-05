@@ -94,12 +94,17 @@ export default function RecordPaymentPage() {
               placeholder="Select loan"
               isRequired
               selectedKeys={selectedLoanId ? [selectedLoanId] : []}
-              onChange={(e) => setSelectedLoanId(e.target.value)}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string
+                setSelectedLoanId(value)
+              }}
+              variant="bordered"
+              labelPlacement="outside"
             >
               {(loans ?? [])
                 .filter((loan) => loan.status === 'active' || loan.status === 'approved')
                 .map((loan) => (
-                  <SelectItem key={loan.id} value={loan.id}>
+                  <SelectItem key={loan.id}>
                     Loan #{loan.principal_amount} - Balance: {loan.current_balance}
                   </SelectItem>
                 ))}
@@ -114,6 +119,8 @@ export default function RecordPaymentPage() {
               value={amount}
               onValueChange={setAmount}
               description="Total amount being paid"
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Input
@@ -122,6 +129,8 @@ export default function RecordPaymentPage() {
               type="date"
               required
               defaultValue={new Date().toISOString().split('T')[0]}
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <Select
@@ -130,14 +139,16 @@ export default function RecordPaymentPage() {
               placeholder="Select type"
               defaultSelectedKeys={['regular']}
               isRequired
+              variant="bordered"
+              labelPlacement="outside"
             >
-              <SelectItem key="regular" value="regular">
+              <SelectItem key="regular">
                 Regular Payment
               </SelectItem>
-              <SelectItem key="partial" value="partial">
+              <SelectItem key="partial">
                 Partial Payment
               </SelectItem>
-              <SelectItem key="penalty" value="penalty">
+              <SelectItem key="penalty">
                 Penalty Payment
               </SelectItem>
             </Select>
@@ -153,6 +164,8 @@ export default function RecordPaymentPage() {
                 value={penalty}
                 onValueChange={setPenalty}
                 description="Amount applied to penalties (paid first)"
+                variant="bordered"
+                labelPlacement="outside"
               />
 
               <Input
@@ -164,6 +177,8 @@ export default function RecordPaymentPage() {
                 onValueChange={setInterest}
                 description="Amount applied to interest"
                 className="mt-3"
+                variant="bordered"
+                labelPlacement="outside"
               />
 
               <Input
@@ -175,6 +190,8 @@ export default function RecordPaymentPage() {
                 onValueChange={setPrincipal}
                 description="Amount applied to principal"
                 className="mt-3"
+                variant="bordered"
+                labelPlacement="outside"
               />
 
               <p className="text-sm text-gray-600 mt-3">
@@ -187,6 +204,8 @@ export default function RecordPaymentPage() {
               name="notes"
               placeholder="Add any notes about this payment"
               rows={3}
+              variant="bordered"
+              labelPlacement="outside"
             />
 
             <div className="flex gap-4 justify-end pt-4">
