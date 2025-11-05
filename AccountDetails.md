@@ -1,9 +1,0 @@
-## Required Information
-
-| Category | Common Details/Documents | Purpose |
-|----------|---------------------------|---------|
-| **Basic Identification** | - Full name<br>- Date of birth<br>- Social Security Number (SSN) or Tax ID<br>- Government-issued photo ID (e.g., driver's license, passport, state ID)<br>- Sometimes a secondary ID (e.g., birth certificate or Social Security card) | Verifies your identity and prevents fraud. Lenders often require at least one photo ID and may ask for two forms. |
-| **Contact Information** | - Home address (current and previous, if applicable)<br>- Phone number<br>- Email address<br>- Proof of address (e.g., recent utility bill, bank statement, or lease agreement dated within 2-3 months) | Confirms your current residence and ensures they can reach you. |
-| **Employment Details** | - Employer's name and contact info (phone number)<br>- Job title and length of employment<br>- Employment verification letter (for some lenders) | Establishes employment stability; often verified via pay stubs or direct contact. |
-| **Income and Financial Information** | - Annual or monthly gross income<br>- Recent pay stubs (last 1-2 months)<br>- Tax returns (e.g., last 1-2 years' W-2s or 1099s for self-employed)<br>- Bank statements (last 2-3 months) showing direct deposits | Proves you have steady income to repay the loan; self-employed applicants may need profit/loss statements. |
-| **Debt and Expenses** | - Monthly bills and debt obligations (e.g., credit card balances, other loans)<br>- Debt-to-income ratio (calculated from provided info)<br>- List of existing loans or credit accounts | Assesses your ability to afford new payments without overextending. |
