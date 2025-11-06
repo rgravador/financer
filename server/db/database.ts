@@ -2,7 +2,7 @@ export type UserRole = 'admin' | 'tenant_officer' | 'tenant_admin' | 'tenant_app
 
 export type AccountStatus = 'active' | 'inactive' | 'suspended'
 
-export type LoanStatus = 'pending_approval' | 'approved' | 'active' | 'closed' | 'rejected'
+export type LoanStatus = 'draft' | 'pending_approval' | 'approved' | 'active' | 'closed' | 'rejected'
 
 export type PaymentFrequency = 'bi-monthly' | 'monthly' | 'weekly'
 
@@ -29,6 +29,7 @@ export type TransactionType =
   | 'create_account'
   | 'update_account'
   | 'create_loan'
+  | 'save_loan_draft'
   | 'approve_loan'
   | 'reject_loan'
   | 'receive_payment'
@@ -36,6 +37,9 @@ export type TransactionType =
   | 'cashout_approved'
   | 'cashout_rejected'
   | 'commission_update'
+  | 'create_loan_type'
+  | 'update_loan_type'
+  | 'delete_loan_type'
 
 export interface Tenant {
   id: string
@@ -133,7 +137,10 @@ export interface AmortizationScheduleItem {
 
 export interface Loan {
   id: string
+  tenant_id: string
   account_id: string
+  loan_type_id: string | null
+  co_borrower_id: string | null
   principal_amount: number
   interest_rate: number
   tenure_months: number
@@ -149,6 +156,7 @@ export interface Loan {
   approved_by: string | null
   start_date: string
   end_date: string
+  first_payment_date: string
   created_at: string
   updated_at: string
   // Aliases for backward compatibility
@@ -239,6 +247,23 @@ export interface Penalty {
   penalty_date: string
   is_paid: boolean
   created_at: string
+}
+
+export interface LoanType {
+  id: string
+  tenant_id: string
+  name: string
+  description: string | null
+  min_amount: number
+  max_amount: number
+  min_tenure_months: number
+  max_tenure_months: number
+  interest_rate: number
+  payment_frequencies: PaymentFrequency[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  created_by: string
 }
 
 // Extended types with relations

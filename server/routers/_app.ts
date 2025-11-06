@@ -3,6 +3,7 @@ import { exampleRouter } from './example'
 import { usersRouter } from './users'
 import { accountsRouter } from './accounts'
 import { loansRouter } from './loans'
+import { loanTypesRouter } from './loan-types'
 import { paymentsRouter } from './payments'
 import { earningsRouter, cashoutRouter } from './earnings'
 import { transactionsRouter } from './transactions'
@@ -16,6 +17,7 @@ export const appRouter = router({
   users: usersRouter,
   accounts: accountsRouter,
   loans: loansRouter,
+  loanTypes: loanTypesRouter,
   payments: paymentsRouter,
   earnings: earningsRouter,
   cashouts: cashoutRouter,

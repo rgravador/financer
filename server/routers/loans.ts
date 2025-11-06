@@ -2,35 +2,88 @@ import { z } from 'zod'
 import { router, tenantOfficerProcedure, tenantApproverProcedure, authenticatedProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
 
-const loanStatusEnum = z.enum(['pending_approval', 'approved', 'active', 'closed', 'rejected'])
+const loanStatusEnum = z.enum(['draft', 'pending_approval', 'approved', 'active', 'closed', 'rejected'])
 const paymentFrequencyEnum = z.enum(['bi-monthly', 'monthly', 'weekly'])
 
+// Helper function to determine bi-monthly payment dates based on start date
+// MEMORY: Bi-monthly payments should follow common payroll schedules
+// Common patterns: 15th & 30th, 10th & 25th, 5th & 20th of each month
+function getBiMonthlyPaymentDates(startDate: Date) {
+  const startDay = startDate.getDate()
+  
+  // Determine payment pattern based on start date
+  if (startDay <= 7) {
+    return [5, 20] // 5th and 20th pattern
+  } else if (startDay <= 17) {
+    return [15, 30] // 15th and 30th pattern (most common)
+  } else {
+    return [10, 25] // 10th and 25th pattern
+  }
+}
+
+// Helper function to get next bi-monthly payment date
+function getNextBiMonthlyDate(currentDate: Date, paymentDates: number[], isFirst: boolean = false) {
+  const [firstDate, secondDate] = paymentDates
+  const currentDay = currentDate.getDate()
+  
+  let targetDate = new Date(currentDate)
+  
+  if (isFirst) {
+    // For the first payment, find the next payment date
+    if (currentDay < firstDate) {
+      targetDate.setDate(firstDate)
+    } else if (currentDay < secondDate) {
+      targetDate.setDate(secondDate)
+    } else {
+      // Move to next month's first date
+      targetDate.setMonth(targetDate.getMonth() + 1)
+      targetDate.setDate(firstDate)
+    }
+  } else {
+    // For subsequent payments, alternate between the two dates
+    if (currentDay <= firstDate) {
+      targetDate.setDate(secondDate)
+    } else {
+      // Move to next month's first date
+      targetDate.setMonth(targetDate.getMonth() + 1)
+      targetDate.setDate(firstDate)
+    }
+  }
+  
+  // Handle month-end edge cases (e.g., setting 30th in February)
+  const lastDayOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0).getDate()
+  if (targetDate.getDate() > lastDayOfMonth) {
+    targetDate.setDate(lastDayOfMonth)
+  }
+  
+  return targetDate
+}
+
 // Helper function to generate amortization schedule
+// MEMORY: Monthly payments should always occur on the same day of the month as the first payment date
+// MEMORY: Bi-monthly payments should follow common payroll schedules (15th & 30th, 10th & 25th, 5th & 20th)
+// MEMORY: First payment date is the actual date of the first payment, all subsequent payments are calculated from this
 function generateAmortizationSchedule(
   principalAmount: number,
   interestRate: number,
   tenureMonths: number,
   paymentFrequency: 'bi-monthly' | 'monthly' | 'weekly',
-  startDate: string
+  firstPaymentDate: string
 ) {
   const schedule = []
   const annualRate = interestRate / 100
   let paymentsPerYear: number
-  let paymentInterval: number // days
 
   switch (paymentFrequency) {
     case 'weekly':
       paymentsPerYear = 52
-      paymentInterval = 7
       break
     case 'bi-monthly':
       paymentsPerYear = 24
-      paymentInterval = 15
       break
     case 'monthly':
     default:
       paymentsPerYear = 12
-      paymentInterval = 30
       break
   }
 
@@ -42,15 +95,45 @@ function generateAmortizationSchedule(
                   (Math.pow(1 + periodicRate, totalPayments) - 1)
 
   let remainingBalance = principalAmount
-  const start = new Date(startDate)
+  const firstPayment = new Date(firstPaymentDate)
+  
+  // For bi-monthly, determine the payment pattern based on first payment date
+  const biMonthlyDates = paymentFrequency === 'bi-monthly' ? getBiMonthlyPaymentDates(firstPayment) : null
+  let currentDate = new Date(firstPayment)
 
   for (let i = 1; i <= totalPayments; i++) {
     const interestDue = remainingBalance * periodicRate
     const principalDue = payment - interestDue
     remainingBalance = Math.max(0, remainingBalance - principalDue)
 
-    const dueDate = new Date(start)
-    dueDate.setDate(dueDate.getDate() + (i * paymentInterval))
+    let dueDate: Date
+
+    if (i === 1) {
+      // First payment uses the exact date provided
+      dueDate = new Date(firstPayment)
+    } else {
+      // Calculate subsequent payment dates based on frequency
+      if (paymentFrequency === 'monthly') {
+        // For monthly payments: Add one month to previous payment, keeping same day
+        dueDate = new Date(currentDate)
+        dueDate.setMonth(dueDate.getMonth() + 1)
+        
+        // Handle month-end edge cases (e.g., Jan 31 -> Feb 28/29)
+        const originalDay = firstPayment.getDate()
+        const lastDayOfMonth = new Date(dueDate.getFullYear(), dueDate.getMonth() + 1, 0).getDate()
+        dueDate.setDate(Math.min(originalDay, lastDayOfMonth))
+      } else if (paymentFrequency === 'bi-monthly') {
+        // For bi-monthly: Follow payroll schedule patterns, alternating between two dates
+        dueDate = getNextBiMonthlyDate(currentDate, biMonthlyDates!, false)
+      } else {
+        // For weekly: Add 7 days to previous payment
+        dueDate = new Date(currentDate)
+        dueDate.setDate(dueDate.getDate() + 7)
+      }
+    }
+
+    // Update current date for next iteration
+    currentDate = new Date(dueDate)
 
     schedule.push({
       payment_number: i,
@@ -66,6 +149,37 @@ function generateAmortizationSchedule(
 }
 
 export const loansRouter = router({
+  // Get loan type defaults (for using as template)
+  getLoanTypeDefaults: authenticatedProcedure
+    .input(z.object({ loan_type_id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { data, error } = await ctx.supabase
+        .from('loan_types')
+        .select('*')
+        .eq('id', input.loan_type_id)
+        .eq('is_active', true)
+        .single()
+
+      if (error) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Loan type not found or inactive'
+        })
+      }
+
+      // Return default values that can be used as template (not enforced)
+      return {
+        suggested_min_amount: data.min_amount,
+        suggested_max_amount: data.max_amount,
+        suggested_min_tenure: data.min_tenure_months,
+        suggested_max_tenure: data.max_tenure_months,
+        suggested_interest_rate: data.interest_rate,
+        available_payment_frequencies: data.payment_frequencies,
+        loan_type_name: data.name,
+        loan_type_description: data.description,
+      }
+    }),
+
   // Get loan by ID
   getById: authenticatedProcedure
     .input(z.object({ id: z.string() }))
@@ -152,17 +266,20 @@ export const loansRouter = router({
   create: tenantOfficerProcedure
     .input(z.object({
       account_id: z.string(),
+      loan_type_id: z.string().optional(), // Optional - used as template for defaults
       principal_amount: z.number().min(0),
       interest_rate: z.number().min(0).max(100),
       tenure_months: z.number().min(1),
       payment_frequency: paymentFrequencyEnum,
-      start_date: z.string().optional(),
+      first_payment_date: z.string().optional(),
+      co_borrower_id: z.string().optional(), // Optional co-borrower
+      is_draft: z.boolean().optional(), // Whether to save as draft
     }))
     .mutation(async ({ ctx, input }) => {
       // Check if account exists and user has access
       const { data: account } = await ctx.supabase
         .from('accounts')
-        .select('assigned_agent_id, status')
+        .select('assigned_agent_id, status, tenant_id')
         .eq('id', input.account_id)
         .single()
 
@@ -188,34 +305,46 @@ export const loansRouter = router({
         })
       }
 
-      const startDate = input.start_date || new Date().toISOString().split('T')[0]
-      const endDate = new Date(startDate)
-      endDate.setMonth(endDate.getMonth() + input.tenure_months)
+      // Default first payment date to 30 days from today if not provided
+      const firstPaymentDate = input.first_payment_date || (() => {
+        const defaultDate = new Date()
+        defaultDate.setDate(defaultDate.getDate() + 30)
+        return defaultDate.toISOString().split('T')[0]
+      })()
+      
+      // Calculate loan start date (today) and estimated end date
+      const loanStartDate = new Date().toISOString().split('T')[0]
+      const estimatedEndDate = new Date(firstPaymentDate)
+      estimatedEndDate.setMonth(estimatedEndDate.getMonth() + input.tenure_months - 1) // -1 because first payment is included in tenure
 
-      // Generate amortization schedule
+      // Generate amortization schedule based on first payment date
       const amortizationSchedule = generateAmortizationSchedule(
         input.principal_amount,
         input.interest_rate,
         input.tenure_months,
         input.payment_frequency,
-        startDate
+        firstPaymentDate
       )
 
       const { data, error } = await ctx.supabase
         .from('loans')
         .insert({
+          tenant_id: account.tenant_id,
           account_id: input.account_id,
+          loan_type_id: input.loan_type_id || null, // Optional reference to loan type template
+          co_borrower_id: input.co_borrower_id || null, // Optional co-borrower
           principal_amount: input.principal_amount,
           interest_rate: input.interest_rate,
           tenure_months: input.tenure_months,
           payment_frequency: input.payment_frequency,
-          start_date: startDate,
-          end_date: endDate.toISOString().split('T')[0],
+          start_date: loanStartDate,
+          end_date: estimatedEndDate.toISOString().split('T')[0],
+          first_payment_date: firstPaymentDate,
           amortization_schedule: amortizationSchedule,
           current_balance: input.principal_amount,
           total_paid: 0,
           total_penalties: 0,
-          status: 'pending_approval',
+          status: input.is_draft ? 'draft' : 'pending_approval',
           created_by: ctx.userProfile.id,
         })
         .select()
@@ -232,7 +361,7 @@ export const loansRouter = router({
       await ctx.supabase
         .from('transactions')
         .insert({
-          type: 'create_loan',
+          type: input.is_draft ? 'save_loan_draft' : 'create_loan',
           user_id: ctx.userProfile.id,
           account_id: input.account_id,
           loan_id: data.id,

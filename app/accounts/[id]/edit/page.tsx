@@ -104,8 +104,9 @@ export default function EditAccountPage({ params }: EditAccountPageProps) {
   }, [account])
 
   const updateMutation = trpcProvider.accounts.update.useMutation({
-    onSuccess: () => {
-      // Redirect without cache invalidation to prevent loading issues
+    onSuccess: (updatedAccount) => {
+      // Update cache with fresh data before redirect (optimistic update)
+      utils.accounts.getById.setData({ id }, updatedAccount)
       router.replace(`/accounts/${id}`)
     },
     onError: (error) => {
@@ -174,13 +175,6 @@ export default function EditAccountPage({ params }: EditAccountPageProps) {
             <p className="text-default-500 mb-6">
               The account you're trying to edit doesn't exist or you don't have permission to edit it.
             </p>
-            <Button 
-              color="primary" 
-              onPress={() => router.replace('/accounts')}
-              className="w-full"
-            >
-              Back to Accounts
-            </Button>
           </CardBody>
         </Card>
       </div>
@@ -207,17 +201,6 @@ export default function EditAccountPage({ params }: EditAccountPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="light"
-            onPress={() => router.replace(`/accounts/${id}`)}
-            startContent={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            }
-          >
-            Back to Account
-          </Button>
           <div>
             <h1 className="text-3xl font-bold">Edit Account</h1>
             <p className="text-default-500 mt-1">Update {account.name}'s information</p>

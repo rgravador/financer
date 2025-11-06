@@ -146,6 +146,7 @@ export default function AccountsPage() {
             <Input
               placeholder="Search by name, contact, or phone..."
               value={searchQuery}
+              size="lg"
               onValueChange={(value: string) => {
                 setSearchQuery(value)
                 setPage(0) // Reset to first page on search

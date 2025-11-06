@@ -67,6 +67,7 @@ CREATE POLICY "Example policy" ON table_name FOR SELECT
 **Migration Files**:
 - `00_initial_schema.sql` - Full database schema with tables, types, RLS policies
 - `04_fix_infinite_recursion.sql` - SECURITY DEFINER helper functions for RLS
+- `06_add_tenant_id_to_loans.sql` - Adds tenant_id field to loans table for proper tenant isolation
 
 ### tRPC Client Usage
 
@@ -276,3 +277,4 @@ await ctx.supabase.from('transactions').insert({
 - Add to memory, use size lg as default for all Input, Select
 - Add to memory, in all money related symbol/icon use philippines peso sign not dollar
 - Add to memory, always use router.replace instead of router.push
+- Add to memory, for tRPC mutations that redirect after success, use optimistic updates with `utils.[router].[procedure].setData()` to update cache before redirect to prevent infinite loading with `refetchOnMount: true`
