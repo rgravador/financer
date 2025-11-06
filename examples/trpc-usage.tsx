@@ -1,7 +1,7 @@
 // Example: Using tRPC in a Client Component
 'use client'
 
-import { trpc as trpcProvider } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/src/lib/trpc/Provider'
 
 export function TRPCClientExample() {
   // Simple query
@@ -60,7 +60,7 @@ export function TRPCClientExample() {
 }
 
 // Example: Using tRPC in a Server Component
-import { trpc as trpcServer } from '@/lib/trpc/client'
+import { trpc as trpcServer } from '@/src/lib/trpc/client'
 
 export async function TRPCServerExample() {
   // Call tRPC procedures directly on the server

@@ -1,7 +1,7 @@
 // Example: Using Supabase in a Client Component
 'use client'
 
-import { createClient as createClientClient } from '@/lib/supabase/client'
+import { createClient as createClientClient } from '@/src/lib/supabase/client'
 import { useEffect, useState } from 'react'
 
 export function SupabaseClientExample() {
@@ -117,7 +117,7 @@ export function SupabaseClientExample() {
 }
 
 // Example: Using Supabase in a Server Component
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createClient as createServerClient } from '@/src/lib/supabase/server'
 
 export async function SupabaseServerExample() {
   const supabase = await createServerClient()
