@@ -6,12 +6,12 @@ import { useTheme } from 'next-themes'
 import { Button } from '@heroui/button'
 import { Avatar } from '@heroui/avatar'
 import { Divider } from '@heroui/divider'
-import { Link } from '@heroui/link'
 import NextLink from 'next/link'
 import clsx from 'clsx'
 import { createClient } from '@/lib/supabase/client'
+import { useUserProfile } from '@/hooks/use-user-profile'
+import { SimplePesoIcon } from '@/components/icons/peso-icon'
 import type { User } from '@supabase/supabase-js'
-import type { UserProfile } from '@/server/db/database'
 
 interface SidenavProps {
   user: User | null
@@ -23,46 +23,17 @@ export default function Sidenav({ user }: SidenavProps) {
   const supabase = createClient()
   const { theme, setTheme } = useTheme()
   const [loading, setLoading] = useState(false)
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
-  const [profileLoading, setProfileLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const { userProfile, loading: profileLoading } = useUserProfile()
 
-  // Fetch user profile to determine role
   useEffect(() => {
     setMounted(true)
-
-    const fetchUserProfile = async () => {
-      if (!user) {
-        setProfileLoading(false)
-        return
-      }
-
-      setProfileLoading(true)
-      const { data, error } = await supabase
-        .from('users_profile')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-      if (data) {
-        console.log('User profile loaded:', data)
-        setUserProfile(data as UserProfile)
-      }
-
-      if (error) {
-        console.error('Error fetching user profile:', error)
-      }
-
-      setProfileLoading(false)
-    }
-
-    fetchUserProfile()
-  }, [user?.id])
+  }, [])
 
   const handleLogout = async () => {
     setLoading(true)
     await supabase.auth.signOut()
-    router.push('/')
+    router.replace('/')
     router.refresh()
   }
 
@@ -130,11 +101,7 @@ export default function Sidenav({ user }: SidenavProps) {
     {
       label: 'Loans',
       href: '/loans',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
+      icon: <SimplePesoIcon className="w-5 h-5" />,
     },
     {
       label: 'Payments',

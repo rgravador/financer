@@ -8,12 +8,12 @@ import { Input } from '@heroui/input'
 import { Textarea } from '@heroui/input'
 import { Switch } from '@heroui/switch'
 import { Spinner } from '@heroui/spinner'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
 
 export default function EditTenantPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { id } = use(params)
-  const { data: tenant, isLoading } = trpc.tenants.getById.useQuery({ id })
+  const { data: tenant, isLoading } = trpcProvider.tenants.getById.useQuery({ id })
   const [formData, setFormData] = useState({
     name: '',
     company_name: '',
@@ -37,9 +37,9 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
     }
   }, [tenant])
 
-  const updateMutation = trpc.tenants.update.useMutation({
+  const updateMutation = trpcProvider.tenants.update.useMutation({
     onSuccess: () => {
-      router.push(`/admin/tenants/${id}`)
+      router.replace(`/admin/tenants/${id}`)
       router.refresh()
     },
     onError: (error) => {
@@ -89,7 +89,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
         <p className="text-default-500">Tenant not found</p>
         <Button
           className="mt-4"
-          onPress={() => router.push('/admin/tenants')}
+          onPress={() => router.replace('/admin/tenants')}
         >
           Back to Tenants
         </Button>
@@ -134,7 +134,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
               labelPlacement="outside"
               placeholder="Enter company name"
               value={formData.company_name}
-              onValueChange={(value) => setFormData({ ...formData, company_name: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, company_name: value })}
               isRequired
               errorMessage={errors.company_name}
               isInvalid={!!errors.company_name}
@@ -147,7 +147,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
               labelPlacement="outside"
               placeholder="Enter primary contact name"
               value={formData.name}
-              onValueChange={(value) => setFormData({ ...formData, name: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, name: value })}
               isRequired
               errorMessage={errors.name}
               isInvalid={!!errors.name}
@@ -161,7 +161,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
               labelPlacement="outside"
               placeholder="contact@company.com"
               value={formData.contact_email}
-              onValueChange={(value) => setFormData({ ...formData, contact_email: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, contact_email: value })}
               errorMessage={errors.contact_email}
               isInvalid={!!errors.contact_email}
               variant="bordered"
@@ -174,7 +174,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
               labelPlacement="outside"
               placeholder="+1 (555) 000-0000"
               value={formData.contact_phone}
-              onValueChange={(value) => setFormData({ ...formData, contact_phone: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, contact_phone: value })}
               variant="bordered"
               size="lg"
             />
@@ -184,7 +184,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
               labelPlacement="outside"
               placeholder="Enter company address"
               value={formData.address}
-              onValueChange={(value) => setFormData({ ...formData, address: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, address: value })}
               variant="bordered"
               size="lg"
               minRows={3}
@@ -192,7 +192,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
 
             <Switch
               isSelected={formData.is_active}
-              onValueChange={(value) => setFormData({ ...formData, is_active: value })}
+              onValueChange={(value: boolean) => setFormData({ ...formData, is_active: value })}
             >
               Active Status
             </Switch>

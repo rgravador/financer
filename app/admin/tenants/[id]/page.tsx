@@ -15,13 +15,13 @@ import {
   TableRow,
   TableCell,
 } from '@heroui/table'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
 
 export default function TenantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { id } = use(params)
-  const { data: tenant, isLoading: tenantLoading } = trpc.tenants.getById.useQuery({ id })
-  const { data: users, isLoading: usersLoading } = trpc.tenants.getUsers.useQuery({ tenantId: id })
+  const { data: tenant, isLoading: tenantLoading } = trpcProvider.tenants.getById.useQuery({ id })
+  const { data: users, isLoading: usersLoading } = trpcProvider.tenants.getUsers.useQuery({ tenantId: id })
 
   if (tenantLoading) {
     return (
@@ -37,7 +37,7 @@ export default function TenantDetailPage({ params }: { params: Promise<{ id: str
         <p className="text-default-500">Tenant not found</p>
         <Button
           className="mt-4"
-          onPress={() => router.push('/admin/tenants')}
+          onPress={() => router.replace('/admin/tenants')}
         >
           Back to Tenants
         </Button>
@@ -53,7 +53,7 @@ export default function TenantDetailPage({ params }: { params: Promise<{ id: str
           <Button
             isIconOnly
             variant="light"
-            onPress={() => router.push('/admin/tenants')}
+            onPress={() => router.replace('/admin/tenants')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -66,7 +66,7 @@ export default function TenantDetailPage({ params }: { params: Promise<{ id: str
         </div>
         <Button
           color="primary"
-          onPress={() => router.push(`/admin/tenants/${id}/edit`)}
+          onPress={() => router.replace(`/admin/tenants/${id}/edit`)}
         >
           Edit Tenant
         </Button>
@@ -131,7 +131,7 @@ export default function TenantDetailPage({ params }: { params: Promise<{ id: str
           <Button
             size="sm"
             color="primary"
-            onPress={() => router.push(`/admin/tenants/${id}/users/new`)}
+            onPress={() => router.replace(`/admin/tenants/${id}/users/new`)}
           >
             Add User
           </Button>

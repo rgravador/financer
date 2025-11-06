@@ -24,6 +24,14 @@ export const accountsRouter = router({
         })
       }
 
+      // Ensure tenant isolation
+      if (ctx.userProfile.role !== 'admin' && data.tenant_id !== ctx.userProfile.tenant_id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'You can only view accounts in your tenant'
+        })
+      }
+
       // Tenant officers can only see their own accounts
       if (ctx.userProfile.role === 'tenant_officer' && data.assigned_agent_id !== ctx.userProfile.id) {
         throw new TRPCError({
@@ -50,6 +58,11 @@ export const accountsRouter = router({
         .select('*, loans(*)', { count: 'exact' })
         .range(input.offset, input.offset + input.limit - 1)
         .order('created_at', { ascending: false })
+
+      // Ensure tenant isolation - all non-admin users see only their tenant's accounts
+      if (ctx.userProfile.role !== 'admin') {
+        query = query.eq('tenant_id', ctx.userProfile.tenant_id)
+      }
 
       // Tenant officers can only see their own accounts
       if (ctx.userProfile.role === 'tenant_officer') {
@@ -119,6 +132,7 @@ export const accountsRouter = router({
         .from('accounts')
         .insert({
           ...input,
+          tenant_id: ctx.userProfile.tenant_id,
           assigned_agent_id: assignedAgentId,
           created_by: ctx.userProfile.id,
           status: 'active',
@@ -180,7 +194,7 @@ export const accountsRouter = router({
       // Check if account exists and user has access
       const { data: existingAccount } = await ctx.supabase
         .from('accounts')
-        .select('assigned_agent_id')
+        .select('assigned_agent_id, tenant_id')
         .eq('id', id)
         .single()
 
@@ -188,6 +202,14 @@ export const accountsRouter = router({
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Account not found'
+        })
+      }
+
+      // Ensure tenant isolation
+      if (ctx.userProfile.role !== 'admin' && existingAccount.tenant_id !== ctx.userProfile.tenant_id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'You can only update accounts in your tenant'
         })
       }
 

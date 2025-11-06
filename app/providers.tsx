@@ -26,7 +26,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
   return (
     <TRPCProvider>
-      <HeroUIProvider navigate={router.push}>
+      <HeroUIProvider navigate={router.replace}>
         <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
       </HeroUIProvider>
     </TRPCProvider>

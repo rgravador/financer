@@ -3,6 +3,51 @@ import { router, authenticatedProcedure, tenantAdminProcedure } from '../trpc'
 import { TRPCError } from '@trpc/server'
 
 export const dashboardRouter = router({
+  // Get general dashboard stats (alias for getAdminStats)
+  getStats: tenantAdminProcedure.query(async ({ ctx }) => {
+    // Same logic as getAdminStats
+    const { count: totalUsers } = await ctx.supabase
+      .from('users_profile')
+      .select('*', { count: 'exact', head: true })
+
+    const { count: activeAgents } = await ctx.supabase
+      .from('users_profile')
+      .select('*', { count: 'exact', head: true })
+      .in('role', ['tenant_officer'])
+      .eq('is_active', true)
+
+    const { count: totalAccounts } = await ctx.supabase
+      .from('accounts')
+      .select('*', { count: 'exact', head: true })
+
+    const { count: totalLoans } = await ctx.supabase
+      .from('loans')
+      .select('*', { count: 'exact', head: true })
+
+    const { count: activeLoans } = await ctx.supabase
+      .from('loans')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'active')
+
+    const { count: pendingLoans } = await ctx.supabase
+      .from('loans')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending_approval')
+
+    return {
+      total_loans: totalLoans || 0,
+      total_outstanding: 0,
+      total_agents: activeAgents || 0,
+      pending_approvals: pendingLoans || 0,
+      pending_cashouts: 0,
+      totalUsers: totalUsers || 0,
+      activeAgents: activeAgents || 0,
+      totalAccounts: totalAccounts || 0,
+      totalLoans: totalLoans || 0,
+      activeLoans: activeLoans || 0,
+    }
+  }),
+
   // Get agent/tenant officer dashboard stats
   getAgentStats: authenticatedProcedure.query(async ({ ctx }) => {
     const agentId = ctx.userProfile.id

@@ -50,10 +50,10 @@ export default function LoginForm() {
         // Redirect admin users to admin dashboard, others to tenant dashboard
         if (profile?.role === 'admin') {
           console.log('Login - Redirecting to admin dashboard')
-          router.push('/admin/dashboard')
+          router.replace('/admin/dashboard')
         } else {
           console.log('Login - Redirecting to tenant dashboard')
-          router.push('/dashboard')
+          router.replace('/dashboard')
         }
         router.refresh()
       }

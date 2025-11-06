@@ -139,7 +139,7 @@ export const tenantsRouter = router({
       if (authError) throw authError
 
       // Update the user profile with tenant_id (the trigger creates it without tenant_id)
-      const { data: profileData, error: profileError } = await adminClient
+      const { data: profileData, error: profileError } = await (adminClient as any)
         .from('users_profile')
         .update({
           tenant_id: input.tenant_id,

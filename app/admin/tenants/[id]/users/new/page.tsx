@@ -7,12 +7,12 @@ import { Button } from '@heroui/button'
 import { Input } from '@heroui/input'
 import { Select, SelectItem } from '@heroui/select'
 import { Spinner } from '@heroui/spinner'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
 
 export default function NewTenantUserPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { id } = use(params)
-  const { data: tenant, isLoading } = trpc.tenants.getById.useQuery({ id })
+  const { data: tenant, isLoading } = trpcProvider.tenants.getById.useQuery({ id })
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -22,9 +22,9 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const createUserMutation = trpc.tenants.createUser.useMutation({
+  const createUserMutation = trpcProvider.tenants.createUser.useMutation({
     onSuccess: () => {
-      router.push(`/admin/tenants/${id}`)
+      router.replace(`/admin/tenants/${id}`)
       router.refresh()
     },
     onError: (error) => {
@@ -75,7 +75,7 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
         <p className="text-default-500">Tenant not found</p>
         <Button
           className="mt-4"
-          onPress={() => router.push('/admin/tenants')}
+          onPress={() => router.replace('/admin/tenants')}
         >
           Back to Tenants
         </Button>
@@ -120,7 +120,7 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
               labelPlacement="outside"
               placeholder="Enter full name"
               value={formData.full_name}
-              onValueChange={(value) => setFormData({ ...formData, full_name: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, full_name: value })}
               isRequired
               errorMessage={errors.full_name}
               isInvalid={!!errors.full_name}
@@ -134,7 +134,7 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
               labelPlacement="outside"
               placeholder="user@company.com"
               value={formData.email}
-              onValueChange={(value) => setFormData({ ...formData, email: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, email: value })}
               isRequired
               errorMessage={errors.email}
               isInvalid={!!errors.email}
@@ -148,7 +148,7 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
               labelPlacement="outside"
               placeholder="Select user role"
               selectedKeys={[formData.role]}
-              onSelectionChange={(keys) => {
+              onSelectionChange={(keys: any) => {
                 const role = Array.from(keys)[0] as typeof formData.role
                 setFormData({ ...formData, role })
               }}
@@ -176,7 +176,7 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
               labelPlacement="outside"
               placeholder="Enter password (min 8 characters)"
               value={formData.password}
-              onValueChange={(value) => setFormData({ ...formData, password: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, password: value })}
               isRequired
               errorMessage={errors.password}
               isInvalid={!!errors.password}
@@ -190,7 +190,7 @@ export default function NewTenantUserPage({ params }: { params: Promise<{ id: st
               labelPlacement="outside"
               placeholder="Re-enter password"
               value={formData.confirmPassword}
-              onValueChange={(value) => setFormData({ ...formData, confirmPassword: value })}
+              onValueChange={(value: string) => setFormData({ ...formData, confirmPassword: value })}
               isRequired
               errorMessage={errors.confirmPassword}
               isInvalid={!!errors.confirmPassword}

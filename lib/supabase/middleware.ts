@@ -35,13 +35,36 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Add your authentication logic here
-  // For example, redirect to login if user is not authenticated on protected routes
-  // if (!user && !request.nextUrl.pathname.startsWith('/login')) {
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/login'
-  //   return NextResponse.redirect(url)
-  // }
+  const { pathname } = request.nextUrl
+
+  // Guest routes - allow access without authentication
+  const guestRoutes = ['/', '/login', '/signup', '/forgot-password']
+  const isGuestRoute = guestRoutes.includes(pathname)
+
+  // If user is not authenticated and trying to access protected route
+  if (!user && !isGuestRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
+  }
+
+  // If user is authenticated and trying to access guest route, redirect to dashboard
+  if (user && isGuestRoute) {
+    // Get user profile to determine redirect path
+    const { data: profile } = await supabase
+      .from('users_profile')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const url = request.nextUrl.clone()
+    if (profile?.role === 'admin') {
+      url.pathname = '/admin/dashboard'
+    } else {
+      url.pathname = '/dashboard'
+    }
+    return NextResponse.redirect(url)
+  }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:

@@ -13,12 +13,12 @@ import {
   TableCell,
 } from '@heroui/table'
 import { Chip } from '@heroui/chip'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
-  const { data: users, isLoading } = trpc.users.getTenantUsers.useQuery()
+  const { data: users, isLoading } = trpcProvider.users.getTenantUsers.useQuery()
 
   const filteredUsers = users?.filter(
     (user) =>

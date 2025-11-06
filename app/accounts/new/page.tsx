@@ -8,7 +8,8 @@ import { Input } from '@heroui/input'
 import { Textarea } from '@heroui/input'
 import { Select, SelectItem } from '@heroui/select'
 import { Divider } from '@heroui/divider'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
+import { PESO_SYMBOL } from '@/lib/utils/currency'
 import type { Selection } from '@react-types/shared'
 
 export default function NewAccountPage() {
@@ -59,9 +60,9 @@ export default function NewAccountPage() {
   const [existingLoansDetails, setExistingLoansDetails] = useState('')
   const [creditAccountsDetails, setCreditAccountsDetails] = useState('')
 
-  const createMutation = trpc.accounts.create.useMutation({
+  const createMutation = trpcProvider.accounts.create.useMutation({
     onSuccess: (data) => {
-      router.push(`/accounts/${data.id}`)
+      router.replace(`/accounts/${data.id}`)
       router.refresh()
     },
     onError: (error) => {
@@ -376,7 +377,7 @@ export default function NewAccountPage() {
                 size="lg"
                 startContent={
                   <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small">$</span>
+                    <span className="text-default-400 text-small">{PESO_SYMBOL}</span>
                   </div>
                 }
               />
@@ -392,7 +393,7 @@ export default function NewAccountPage() {
                 size="lg"
                 startContent={
                   <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small">$</span>
+                    <span className="text-default-400 text-small">{PESO_SYMBOL}</span>
                   </div>
                 }
               />
@@ -408,7 +409,7 @@ export default function NewAccountPage() {
                 size="lg"
                 startContent={
                   <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small">$</span>
+                    <span className="text-default-400 text-small">{PESO_SYMBOL}</span>
                   </div>
                 }
               />
@@ -424,7 +425,7 @@ export default function NewAccountPage() {
                 size="lg"
                 startContent={
                   <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small">$</span>
+                    <span className="text-default-400 text-small">{PESO_SYMBOL}</span>
                   </div>
                 }
               />

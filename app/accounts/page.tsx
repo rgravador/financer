@@ -16,7 +16,8 @@ import {
   TableCell,
 } from '@heroui/table'
 import { Chip } from '@heroui/chip'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
+import { SimplePesoIcon } from '@/components/icons/peso-icon'
 import type { AccountStatus } from '@/server/db/database'
 import type { Selection } from '@react-types/shared'
 
@@ -34,7 +35,7 @@ export default function AccountsPage() {
     { key: 'suspended', label: 'Suspended' },
   ] as const
 
-  const { data, isLoading } = trpc.accounts.list.useQuery({
+  const { data, isLoading } = trpcProvider.accounts.list.useQuery({
     limit: pageSize,
     offset: page * pageSize,
     status: statusFilter || undefined,
@@ -54,7 +55,7 @@ export default function AccountsPage() {
         </div>
         <Button
           color="primary"
-          onPress={() => router.push('/accounts/new')}
+          onPress={() => router.replace('/accounts/new')}
           startContent={
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -271,9 +272,7 @@ export default function AccountsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <svg className="w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <SimplePesoIcon className="w-4 h-4 text-default-400" />
                         <span className="text-sm">{account.loans?.length || 0}</span>
                       </div>
                     </TableCell>
@@ -289,9 +288,17 @@ export default function AccountsPage() {
                         <Button
                           size="sm"
                           variant="light"
-                          onPress={() => router.push(`/accounts/${account.id}`)}
+                          onPress={() => router.replace(`/accounts/${account.id}`)}
                         >
                           View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="light"
+                          color="primary"
+                          onPress={() => router.replace(`/accounts/${account.id}/edit`)}
+                        >
+                          Edit
                         </Button>
                       </div>
                     </TableCell>

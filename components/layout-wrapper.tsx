@@ -1,15 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Sidenav from '@/components/sidenav'
+import RouteGuard from '@/components/route-guard'
+import { isGuestRoute } from '@/lib/auth/route-protection'
 import type { User } from '@supabase/supabase-js'
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
 
@@ -27,13 +28,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  }, [])
 
-  // Guest routes (no authentication required)
-  const guestRoutes = ['/', '/login', '/signup', '/forgot-password']
-  const isGuestRoute = guestRoutes.includes(pathname)
-
-  // Show loading state
+  // Show loading state while checking auth
   if (loading) {
     return (
       <div className="relative flex flex-col h-screen">
@@ -44,26 +41,30 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     )
   }
 
-  // Guest Layout (no navbar/footer)
-  if (!user && isGuestRoute) {
+  // Guest Layout (no navbar/footer) for guest routes
+  if (isGuestRoute(pathname)) {
     return (
-      <div className="relative flex flex-col min-h-screen">
-        <main className="flex-grow">
-          {children}
-        </main>
-      </div>
+      <RouteGuard>
+        <div className="relative flex flex-col min-h-screen">
+          <main className="flex-grow">
+            {children}
+          </main>
+        </div>
+      </RouteGuard>
     )
   }
 
-  // Authenticated Layout (with sidenav)
+  // Authenticated Layout (with sidenav) for protected routes
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidenav user={user} />
-      <main className="flex-1 overflow-y-auto bg-background">
-        <div className="container mx-auto max-w-7xl px-6 py-8">
-          {children}
-        </div>
-      </main>
-    </div>
+    <RouteGuard>
+      <div className="flex h-screen overflow-hidden">
+        <Sidenav user={user} />
+        <main className="flex-1 overflow-y-auto bg-background">
+          <div className="container mx-auto max-w-7xl px-6 py-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </RouteGuard>
   )
 }

@@ -15,13 +15,13 @@ import {
   TableCell,
 } from '@heroui/table'
 import { Chip } from '@heroui/chip'
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
 
 export default function TenantsPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
 
-  const { data: tenants, isLoading } = trpc.tenants.getAll.useQuery()
+  const { data: tenants, isLoading } = trpcProvider.tenants.getAll.useQuery()
 
   const filteredTenants = tenants?.filter(
     (tenant) =>
@@ -48,7 +48,7 @@ export default function TenantsPage() {
         </div>
         <Button
           color="primary"
-          onPress={() => router.push('/admin/tenants/new')}
+          onPress={() => router.replace('/admin/tenants/new')}
           startContent={
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -121,7 +121,7 @@ export default function TenantsPage() {
                       <Button
                         size="sm"
                         variant="light"
-                        onPress={() => router.push(`/admin/tenants/${tenant.id}`)}
+                        onPress={() => router.replace(`/admin/tenants/${tenant.id}`)}
                       >
                         View
                       </Button>
@@ -129,7 +129,7 @@ export default function TenantsPage() {
                         size="sm"
                         variant="light"
                         color="primary"
-                        onPress={() => router.push(`/admin/tenants/${tenant.id}/edit`)}
+                        onPress={() => router.replace(`/admin/tenants/${tenant.id}/edit`)}
                       >
                         Edit
                       </Button>

@@ -274,3 +274,5 @@ await ctx.supabase.from('transactions').insert({
 - Add to memory, always outside-top label placement for Input if there is label
 - Add to memory, always outside-top label placement for Select if there is label
 - Add to memory, use size lg as default for all Input, Select
+- Add to memory, in all money related symbol/icon use philippines peso sign not dollar
+- Add to memory, always use router.replace instead of router.push

@@ -1,17 +1,17 @@
 // Example: Using tRPC in a Client Component
 'use client'
 
-import { trpc } from '@/lib/trpc/Provider'
+import { trpc as trpcProvider } from '@/lib/trpc/Provider'
 
 export function TRPCClientExample() {
   // Simple query
-  const { data, isLoading } = trpc.example.hello.useQuery({ name: 'World' })
+  const { data, isLoading } = trpcProvider.example.hello.useQuery({ name: 'World' })
 
   // Protected query (requires authentication)
-  const secretMessage = trpc.example.getSecretMessage.useQuery()
+  const secretMessage = trpcProvider.example.getSecretMessage.useQuery()
 
   // Mutation
-  const createPost = trpc.example.createPost.useMutation({
+  const createPost = trpcProvider.example.createPost.useMutation({
     onSuccess: (data) => {
       console.log('Post created:', data)
     },
@@ -60,11 +60,11 @@ export function TRPCClientExample() {
 }
 
 // Example: Using tRPC in a Server Component
-import { trpc } from '@/lib/trpc/client'
+import { trpc as trpcServer } from '@/lib/trpc/client'
 
 export async function TRPCServerExample() {
   // Call tRPC procedures directly on the server
-  const greeting = await trpc.example.hello.query({ name: 'Server' })
+  const greeting = await trpcServer.example.hello.query({ name: 'Server' })
 
   return (
     <div>

@@ -1,13 +1,13 @@
 // Example: Using Supabase in a Client Component
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
+import { createClient as createClientClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 
 export function SupabaseClientExample() {
   const [user, setUser] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
-  const supabase = createClient()
+  const supabase = createClientClient()
 
   useEffect(() => {
     // Get current user
@@ -117,10 +117,10 @@ export function SupabaseClientExample() {
 }
 
 // Example: Using Supabase in a Server Component
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 export async function SupabaseServerExample() {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
 
   // Get current user
   const {
@@ -165,7 +165,7 @@ export async function SupabaseServerExample() {
 
 // Example: Using Supabase Auth Helpers
 export function SupabaseAuthHelpers() {
-  const supabase = createClient()
+  const supabase = createClientClient()
 
   const signUpWithEmail = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({

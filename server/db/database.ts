@@ -70,6 +70,7 @@ export interface UserProfileWithMeta extends UserProfile {
 
 export interface Account {
   id: string
+  tenant_id: string
   assigned_agent_id: string
   name: string
   contact_info: string | null
