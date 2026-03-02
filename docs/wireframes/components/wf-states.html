@@ -1,0 +1,499 @@
+<!-- wf-states.html - UI State Templates (Loading, Error, Success) -->
+<!--
+  Usage: Copy appropriate state template into your wireframe
+  - Use loading state while fetching data
+  - Use error state when requests fail
+  - Use success state for confirmations
+  - Customize messages and actions as needed
+-->
+
+<!-- ==================== LOADING STATE ==================== -->
+
+<!-- Full Page Loading -->
+<div class="loading-state">
+  <div class="spinner"></div>
+  <p class="loading-text">Loading...</p>
+</div>
+
+<!-- Inline Loading (for cards or sections) -->
+<div class="loading-state inline">
+  <div class="spinner-sm"></div>
+  <p class="loading-text">Loading data...</p>
+</div>
+
+<!-- Skeleton Screen (for tables and lists) -->
+<div class="skeleton-container">
+  <div class="skeleton-line"></div>
+  <div class="skeleton-line" style="width: 80%;"></div>
+  <div class="skeleton-line" style="width: 60%;"></div>
+  <div class="skeleton-line"></div>
+</div>
+
+<!-- Button Loading State -->
+<button class="btn btn-primary" disabled>
+  <span class="spinner-btn"></span>
+  Submitting...
+</button>
+
+<!-- ==================== ERROR STATE ==================== -->
+
+<!-- Full Page Error -->
+<div class="error-state">
+  <div class="error-icon">⚠️</div>
+  <h3 class="error-title">Something went wrong</h3>
+  <p class="error-message">
+    We couldn't load this data. Please try again or contact support if the problem persists.
+  </p>
+  <div class="error-actions">
+    <button class="btn btn-primary">Retry</button>
+    <button class="btn btn-secondary">Go Back</button>
+  </div>
+</div>
+
+<!-- Inline Error (for forms) -->
+<div class="error-state inline">
+  <div class="error-icon-sm">⚠️</div>
+  <div>
+    <h4 class="error-title-sm">Error</h4>
+    <p class="error-message-sm">Unable to save changes. Please check your input and try again.</p>
+  </div>
+</div>
+
+<!-- Form Field Error -->
+<div class="form-group">
+  <label class="form-label required">Email</label>
+  <input type="email" class="form-input error" value="invalid-email">
+  <span class="error-message">Please enter a valid email address</span>
+</div>
+
+<!-- Toast/Alert Error -->
+<div class="toast toast-error">
+  <span class="toast-icon">⚠️</span>
+  <div class="toast-content">
+    <strong>Error</strong>
+    <p>Operation failed. Please try again.</p>
+  </div>
+  <button class="toast-close">×</button>
+</div>
+
+<!-- ==================== SUCCESS STATE ==================== -->
+
+<!-- Full Page Success -->
+<div class="success-state">
+  <div class="success-icon">✓</div>
+  <h3 class="success-title">Success!</h3>
+  <p class="success-message">
+    Your changes have been saved successfully.
+  </p>
+  <button class="btn btn-primary">Continue</button>
+</div>
+
+<!-- Inline Success (for cards or sections) -->
+<div class="success-state inline">
+  <div class="success-icon-sm">✓</div>
+  <div>
+    <h4 class="success-title-sm">Saved</h4>
+    <p class="success-message-sm">Your changes have been saved.</p>
+  </div>
+</div>
+
+<!-- Toast/Alert Success -->
+<div class="toast toast-success">
+  <span class="toast-icon">✓</span>
+  <div class="toast-content">
+    <strong>Success</strong>
+    <p>Item created successfully.</p>
+  </div>
+  <button class="toast-close">×</button>
+</div>
+
+<!-- Banner Success (at top of page) -->
+<div class="banner banner-success">
+  <span class="banner-icon">✓</span>
+  <p>Your loan application has been submitted successfully.</p>
+  <button class="banner-close">×</button>
+</div>
+
+<!-- ==================== WARNING STATE ==================== -->
+
+<!-- Warning Banner -->
+<div class="banner banner-warning">
+  <span class="banner-icon">⚠️</span>
+  <p>Your session will expire in 5 minutes. Please save your work.</p>
+  <button class="btn btn-sm btn-secondary">Extend Session</button>
+  <button class="banner-close">×</button>
+</div>
+
+<!-- ==================== INFO STATE ==================== -->
+
+<!-- Info Banner -->
+<div class="banner banner-info">
+  <span class="banner-icon">ℹ️</span>
+  <p>System maintenance scheduled for tonight at 2 AM EST.</p>
+  <button class="banner-close">×</button>
+</div>
+
+<!-- Required CSS (included in common-styles.css) -->
+<style>
+  /* ==================== LOADING STATES ==================== */
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+  }
+
+  .loading-state.inline {
+    padding: 32px 20px;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #1e3a8a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .spinner-sm {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #1e3a8a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .spinner-btn {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    margin-top: 16px;
+    font-size: 15px;
+    color: #6b7280;
+  }
+
+  .skeleton-container {
+    padding: 20px;
+  }
+
+  .skeleton-line {
+    height: 16px;
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* ==================== ERROR STATES ==================== */
+
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+  }
+
+  .error-state.inline {
+    flex-direction: row;
+    text-align: left;
+    padding: 16px;
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+  }
+
+  .error-icon {
+    font-size: 64px;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .error-icon-sm {
+    font-size: 32px;
+    margin-right: 12px;
+  }
+
+  .error-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #991b1b;
+    margin-bottom: 12px;
+  }
+
+  .error-title-sm {
+    font-size: 16px;
+    font-weight: 600;
+    color: #991b1b;
+    margin-bottom: 4px;
+  }
+
+  .error-message {
+    font-size: 16px;
+    color: #6b7280;
+    max-width: 400px;
+    margin-bottom: 24px;
+  }
+
+  .error-message-sm {
+    font-size: 14px;
+    color: #991b1b;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .form-input.error {
+    border-color: #ef4444;
+  }
+
+  .error-message {
+    display: block;
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  /* ==================== SUCCESS STATES ==================== */
+
+  .success-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+  }
+
+  .success-state.inline {
+    flex-direction: row;
+    text-align: left;
+    padding: 16px;
+    background: #d1fae5;
+    border-left: 4px solid #10b981;
+  }
+
+  .success-icon {
+    font-size: 64px;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: #065f46;
+  }
+
+  .success-icon-sm {
+    font-size: 32px;
+    margin-right: 12px;
+    color: #065f46;
+  }
+
+  .success-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #065f46;
+    margin-bottom: 12px;
+  }
+
+  .success-title-sm {
+    font-size: 16px;
+    font-weight: 600;
+    color: #065f46;
+    margin-bottom: 4px;
+  }
+
+  .success-message {
+    font-size: 16px;
+    color: #6b7280;
+    max-width: 400px;
+    margin-bottom: 24px;
+  }
+
+  .success-message-sm {
+    font-size: 14px;
+    color: #065f46;
+  }
+
+  /* ==================== TOAST NOTIFICATIONS ==================== */
+
+  .toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    min-width: 300px;
+    max-width: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+    z-index: 9999;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .toast-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .toast-content {
+    flex: 1;
+  }
+
+  .toast-content strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .toast-content p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .toast-close {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    line-height: 1;
+    color: #9ca3af;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .toast-success {
+    border-left: 4px solid #10b981;
+  }
+
+  .toast-success .toast-content strong {
+    color: #065f46;
+  }
+
+  .toast-error {
+    border-left: 4px solid #ef4444;
+  }
+
+  .toast-error .toast-content strong {
+    color: #991b1b;
+  }
+
+  /* ==================== BANNERS ==================== */
+
+  .banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+
+  .banner-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .banner p {
+    flex: 1;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .banner-close {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .banner-close:hover {
+    opacity: 1;
+  }
+
+  .banner-success {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .banner-error {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .banner-warning {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .banner-info {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+</style>

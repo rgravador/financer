@@ -1,0 +1,182 @@
+<!-- wf-sidebar.html - Navigation Sidebar Component (260px fixed width) -->
+<!--
+  Usage: Copy this template and customize navigation items for each role
+  - Update logo if needed
+  - Update user info (name, role)
+  - Replace nav-item list with role-specific menu
+  - Mark active page with "active" class
+-->
+
+<aside class="sidebar">
+  <!-- Logo Header -->
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">A</div>
+      <div class="logo-text">ASCENDENT</div>
+    </div>
+  </div>
+
+  <!-- User Info -->
+  <div class="user-info">
+    <div class="user-avatar">JD</div>
+    <div>
+      <div class="user-name">John Doe</div>
+      <div class="user-role">Role Name</div>
+    </div>
+  </div>
+
+  <!-- Navigation Menu (customize for each role) -->
+  <nav class="nav-menu">
+    <a href="#" class="nav-item active">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">👥</span>
+      <span class="nav-label">Users</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">💰</span>
+      <span class="nav-label">Loan Types</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">📄</span>
+      <span class="nav-label">Applications</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">📈</span>
+      <span class="nav-label">Reports</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Settings</span>
+    </a>
+  </nav>
+
+  <!-- Logout (bottom of sidebar) -->
+  <div class="sidebar-footer">
+    <a href="login.html" class="nav-item">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label">Logout</span>
+    </a>
+  </div>
+</aside>
+
+<!-- Required CSS (included in common-styles.css) -->
+<style>
+  .sidebar {
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e3a8a;
+  }
+
+  .user-info {
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .user-role {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .nav-menu {
+    flex: 1;
+    padding: 12px 8px;
+    overflow-y: auto;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover {
+    background: #f3f4f6;
+    color: #1e3a8a;
+  }
+
+  .nav-item.active {
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-weight: 600;
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-footer {
+    padding: 12px 8px;
+    border-top: 1px solid #e5e7eb;
+  }
+</style>

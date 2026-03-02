@@ -1,0 +1,76 @@
+<!-- wf-header.html - Reusable Page Header Component -->
+<!--
+  Usage: Copy this template and customize for each page
+  - Replace breadcrumb items as needed
+  - Change page title
+  - Add/remove action buttons
+-->
+
+<div class="page-header">
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs">
+    <span class="breadcrumb-item">Dashboard</span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item active">Page Name</span>
+  </div>
+
+  <!-- Page Title -->
+  <h1 class="page-title">Page Title</h1>
+
+  <!-- Page Actions (optional) -->
+  <div class="page-actions">
+    <button class="btn btn-primary">
+      <span class="btn-icon">+</span>
+      Primary Action
+    </button>
+    <button class="btn btn-secondary">
+      <span class="btn-icon">⚙️</span>
+      Secondary Action
+    </button>
+  </div>
+</div>
+
+<!-- Required CSS (add to page <style> section if not using common-styles.css) -->
+<style>
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+
+  .breadcrumb-item {
+    color: #6b7280;
+    text-decoration: none;
+  }
+
+  .breadcrumb-item:hover {
+    color: #1e3a8a;
+  }
+
+  .breadcrumb-item.active {
+    color: #1e3a8a;
+    font-weight: 500;
+  }
+
+  .breadcrumb-separator {
+    color: #d1d5db;
+  }
+
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 16px;
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 12px;
+  }
+</style>

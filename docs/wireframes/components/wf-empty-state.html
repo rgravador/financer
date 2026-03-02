@@ -1,0 +1,139 @@
+<!-- wf-empty-state.html - Empty State Component -->
+<!--
+  Usage: Copy this template when showing empty/no-data states
+  - Replace icon, title, and message
+  - Add appropriate action button
+  - Customize for different contexts (no users, no loans, no results, etc.)
+-->
+
+<!-- Empty State: No Data -->
+<div class="empty-state">
+  <div class="empty-icon">📭</div>
+  <h3 class="empty-title">No items found</h3>
+  <p class="empty-message">
+    Get started by creating your first item.
+  </p>
+  <button class="btn btn-primary">
+    <span class="btn-icon">+</span>
+    Create Item
+  </button>
+</div>
+
+<!-- Empty State: No Search Results -->
+<div class="empty-state">
+  <div class="empty-icon">🔍</div>
+  <h3 class="empty-title">No results found</h3>
+  <p class="empty-message">
+    Try adjusting your search or filter to find what you're looking for.
+  </p>
+  <button class="btn btn-secondary">Clear Filters</button>
+</div>
+
+<!-- Empty State: No Pending Items -->
+<div class="empty-state">
+  <div class="empty-icon">✓</div>
+  <h3 class="empty-title">All caught up!</h3>
+  <p class="empty-message">
+    There are no pending items to review at this time.
+  </p>
+</div>
+
+<!-- Empty State: Error / Not Found -->
+<div class="empty-state">
+  <div class="empty-icon error">⚠️</div>
+  <h3 class="empty-title">Something went wrong</h3>
+  <p class="empty-message">
+    We couldn't load this data. Please try again or contact support if the problem persists.
+  </p>
+  <div class="empty-actions">
+    <button class="btn btn-primary">Retry</button>
+    <button class="btn btn-secondary">Go Back</button>
+  </div>
+</div>
+
+<!-- Empty State: Access Denied -->
+<div class="empty-state">
+  <div class="empty-icon error">🔒</div>
+  <h3 class="empty-title">Access Denied</h3>
+  <p class="empty-message">
+    You don't have permission to view this content. Contact your administrator if you believe this is a mistake.
+  </p>
+  <button class="btn btn-secondary">Go to Dashboard</button>
+</div>
+
+<!-- Required CSS (included in common-styles.css) -->
+<style>
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .empty-icon.error {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  }
+
+  .empty-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 12px;
+  }
+
+  .empty-message {
+    font-size: 16px;
+    color: #6b7280;
+    max-width: 400px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .empty-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-icon {
+    margin-right: 6px;
+  }
+
+  /* Inline variant (smaller, for table rows or cards) */
+  .empty-state.inline {
+    padding: 32px 20px;
+  }
+
+  .empty-state.inline .empty-icon {
+    font-size: 48px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+  }
+
+  .empty-state.inline .empty-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .empty-state.inline .empty-message {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+</style>
