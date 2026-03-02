@@ -1,7 +1,136 @@
+<template>
+  <v-container fluid class="wf-content-padding">
+    <!-- Page Header -->
+    <div class="wf-page-header">
+      <h1>Approver Dashboard</h1>
+      <p class="wf-page-subtitle">Review and approve loan applications</p>
+    </div>
+
+    <!-- Stat Cards -->
+    <v-row class="wf-section-gap">
+      <v-col cols="12" sm="6" md="3">
+        <v-card class="wf-stat-card">
+          <v-card-text>
+            <div class="wf-stat-value">{{ stats?.pendingApproval || 0 }}</div>
+            <div class="wf-stat-label">Pending Approval</div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" md="3">
+        <v-card class="wf-stat-card">
+          <v-card-text>
+            <div class="wf-stat-value">{{ stats?.approvedToday || 0 }}</div>
+            <div class="wf-stat-label">Approved Today</div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" md="3">
+        <v-card class="wf-stat-card">
+          <v-card-text>
+            <div class="wf-stat-value">{{ stats?.rejectedToday || 0 }}</div>
+            <div class="wf-stat-label">Rejected Today</div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" md="3">
+        <v-card class="wf-stat-card">
+          <v-card-text>
+            <div class="wf-stat-value">{{ stats?.totalReviewed || 0 }}</div>
+            <div class="wf-stat-label">Total Reviewed</div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Pending Review Queue -->
+    <v-card class="wf-section-card wf-section-gap">
+      <v-card-title class="wf-section-title">Pending Review Queue</v-card-title>
+
+      <v-table class="wf-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Client</th>
+            <th>Loan Type</th>
+            <th>Amount</th>
+            <th>Submitted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="app in pendingApplications"
+            :key="app.id"
+            @click="$router.push(`/approver/queue/${app.id}`)"
+          >
+            <td><strong class="wf-app-id">#{{ app.id.slice(0, 6) }}</strong></td>
+            <td>
+              <div>
+                <strong>{{ app.borrower?.firstName }} {{ app.borrower?.lastName }}</strong>
+                <div v-if="app.borrower?.email" class="wf-table-subtext">
+                  {{ app.borrower.email }}
+                </div>
+              </div>
+            </td>
+            <td>{{ app.loanType?.name || 'N/A' }}</td>
+            <td class="wf-amount">{{ formatCurrency(app.loanDetails?.requestedAmount || 0) }}</td>
+            <td>{{ formatDate(app.submittedAt || app.createdAt) }}</td>
+            <td>
+              <a
+                class="action-btn"
+                @click.stop="$router.push(`/approver/queue/${app.id}`)"
+              >
+                Review
+              </a>
+            </td>
+          </tr>
+          <tr v-if="pendingApplications.length === 0">
+            <td colspan="6" class="text-center pa-8">
+              <div class="wf-empty-state">
+                <v-icon class="empty-icon">mdi-check-circle-outline</v-icon>
+                <div class="empty-title">No pending applications</div>
+                <div class="empty-message">All applications have been reviewed</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+    </v-card>
+
+    <!-- Quick Actions -->
+    <v-row class="wf-section-gap">
+      <v-col cols="12" md="6">
+        <v-card class="wf-card quick-action-card" @click="$router.push('/approver/queue')">
+          <v-card-text class="d-flex align-center gap-4">
+            <v-icon size="48" color="primary">mdi-clipboard-list</v-icon>
+            <div>
+              <div class="quick-action-title">Review Queue</div>
+              <div class="quick-action-subtitle">View all pending applications</div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" md="6">
+        <v-card class="wf-card quick-action-card" @click="$router.push('/admin/audit-logs')">
+          <v-card-text class="d-flex align-center gap-4">
+            <v-icon size="48" color="primary">mdi-history</v-icon>
+            <div>
+              <div class="quick-action-title">Approval History</div>
+              <div class="quick-action-subtitle">View your approval activity</div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import StatCard from '~/components/shared/StatCard.vue'
-import { useLoansStore } from '~/stores/loans'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
@@ -11,456 +140,123 @@ definePageMeta({
 })
 
 interface ApproverStats {
-  queueCount: number
-  reviewedToday: number
-  approvedTotal: number
-  rejectedTotal: number
-  avgProcessingTime: number
-  pendingDocumentsCount: number
+  pendingApproval: number
+  approvedToday: number
+  rejectedToday: number
+  totalReviewed: number
 }
 
 const { authenticatedFetch } = useAuth()
 const stats = ref<ApproverStats | null>(null)
-const loansStore = useLoansStore()
-const loading = ref(false)
+const pendingApplications = ref<any[]>([])
 
 onMounted(async () => {
   await fetchStats()
-  await fetchQueuePreview()
+  await fetchPendingApplications()
 })
 
 const fetchStats = async () => {
-  loading.value = true
   try {
     const data = await authenticatedFetch<ApproverStats>('/api/approver/stats', {
       method: 'GET',
     })
-
     stats.value = data
   } catch (error) {
     console.error('Failed to fetch approver stats:', error)
-  } finally {
-    loading.value = false
   }
 }
 
-const fetchQueuePreview = async () => {
-  await loansStore.fetchQueue({ page: 1, limit: 5 })
+const fetchPendingApplications = async () => {
+  try {
+    const response = await authenticatedFetch<{ applications: any[] }>('/api/approver/queue', {
+      method: 'GET',
+      query: { limit: 10 },
+    })
+    pendingApplications.value = response.applications || []
+  } catch (error) {
+    console.error('Failed to fetch pending applications:', error)
+  }
 }
 
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-PH', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'PHP',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount)
 }
 
-const formatDate = (dateString: string | Date) => {
+const formatDate = (dateString: string | Date | undefined) => {
+  if (!dateString) return 'N/A'
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
 }
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'submitted':
-      return '#3b82f6'
-    case 'under_review':
-      return '#f59e0b'
-    case 'pending_documents':
-      return '#8b5cf6'
-    default:
-      return '#6b7280'
-  }
-}
-
-const getStatusLabel = (status: string) => {
-  return status
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
 </script>
 
-<template>
-  <div class="approver-dashboard">
-    <div class="page-header">
-      <h1>Approver Dashboard</h1>
-      <p class="subtitle">Your review queue and performance metrics</p>
-    </div>
-
-    <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <div class="spinner" />
-      <p>Loading dashboard...</p>
-    </div>
-
-    <!-- Dashboard Content -->
-    <div v-else-if="stats" class="dashboard-content">
-      <!-- Stat Cards -->
-      <div class="stats-grid">
-        <StatCard
-          label="In Queue"
-          :value="stats.queueCount"
-          subtext="Awaiting review"
-          color="#f59e0b"
-          icon="⏳"
-        />
-
-        <StatCard
-          label="Reviewed Today"
-          :value="stats.reviewedToday"
-          subtext="Decisions made"
-          color="#3b82f6"
-          icon="✓"
-        />
-
-        <StatCard
-          label="Total Approved"
-          :value="stats.approvedTotal"
-          subtext="All time"
-          color="#10b981"
-          icon="✓"
-        />
-
-        <StatCard
-          label="Pending Documents"
-          :value="stats.pendingDocumentsCount"
-          subtext="Awaiting uploads"
-          color="#8b5cf6"
-          icon="📄"
-        />
-      </div>
-
-      <!-- Processing Time Card -->
-      <div class="section-card processing-card">
-        <h2>Average Processing Time</h2>
-        <div class="processing-time">
-          {{ stats.avgProcessingTime }}
-          <span class="time-unit">hours</span>
-        </div>
-        <p class="processing-subtext">From submission to decision</p>
-      </div>
-
-      <!-- Queue Preview -->
-      <div class="section-card">
-        <div class="section-header">
-          <h2>Queue Preview</h2>
-          <button class="go-to-queue-button" @click="navigateTo('/approver/queue')">
-            Go to Full Queue →
-          </button>
-        </div>
-
-        <div v-if="loansStore.applications.length > 0" class="table-container">
-          <table class="queue-table">
-            <thead>
-              <tr>
-                <th>Applicant</th>
-                <th>Loan Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Submitted</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="app in loansStore.applications"
-                :key="app.id"
-                class="table-row"
-                @click="navigateTo(`/approver/queue/${app.id}`)"
-              >
-                <td class="applicant-name">{{ app.applicantName || 'N/A' }}</td>
-                <td>{{ app.loanTypeName || 'N/A' }}</td>
-                <td class="amount-cell">{{ formatCurrency(app.loanDetails.requestedAmount) }}</td>
-                <td>
-                  <span
-                    class="status-badge"
-                    :style="{ backgroundColor: getStatusColor(app.status) }"
-                  >
-                    {{ getStatusLabel(app.status) }}
-                  </span>
-                </td>
-                <td class="date-cell">{{ formatDate(app.submittedAt || app.createdAt) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else class="empty-state">
-          <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <p>No applications in queue</p>
-        </div>
-      </div>
-
-      <!-- Performance Summary -->
-      <div class="performance-grid">
-        <div class="performance-card">
-          <h3>Approval Rate</h3>
-          <div class="performance-value">
-            {{ stats.approvedTotal + stats.rejectedTotal > 0
-              ? Math.round((stats.approvedTotal / (stats.approvedTotal + stats.rejectedTotal)) * 100)
-              : 0 }}%
-          </div>
-        </div>
-
-        <div class="performance-card">
-          <h3>Total Decisions</h3>
-          <div class="performance-value">
-            {{ stats.approvedTotal + stats.rejectedTotal }}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-.approver-dashboard {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 16px;
-  color: #6b7280;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: #6b7280;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-}
-
-.section-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+.wf-stat-card {
+  text-align: center;
   padding: 24px;
 }
 
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
+.wf-stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 8px;
 }
 
-.section-card h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.go-to-queue-button {
-  padding: 10px 20px;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
+.wf-stat-label {
   font-size: 14px;
-  font-weight: 600;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.wf-table-subtext {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.quick-action-card {
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.go-to-queue-button:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
+.quick-action-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-.processing-card {
-  text-align: center;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  border: none;
-}
-
-.processing-card h2 {
-  color: white;
-  opacity: 0.9;
-}
-
-.processing-time {
-  font-size: 56px;
-  font-weight: 700;
-  margin: 16px 0;
-}
-
-.time-unit {
-  font-size: 24px;
-  font-weight: 400;
-  margin-left: 8px;
-}
-
-.processing-subtext {
-  margin: 0;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.queue-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.queue-table thead {
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.queue-table th {
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 13px;
+.quick-action-title {
+  font-size: 18px;
   font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 4px;
+}
+
+.quick-action-subtitle {
+  font-size: 14px;
   color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.queue-table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.queue-table tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-.queue-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.queue-table td {
-  padding: 16px;
-  font-size: 14px;
-  color: #111827;
-}
-
-.applicant-name {
-  font-weight: 600;
-}
-
-.amount-cell {
-  font-weight: 600;
-  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-}
-
-.date-cell {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.empty-icon {
-  color: #d1d5db;
-  margin-bottom: 12px;
-}
-
-.empty-state p {
-  margin: 0;
-  font-size: 14px;
-  color: #9ca3af;
-}
-
-.performance-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.performance-card {
-  padding: 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.performance-card h3 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
+.action-btn {
+  color: #1e3a8a;
+  text-decoration: none;
   font-weight: 500;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: inline-block;
+  cursor: pointer;
 }
 
-.performance-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: #111827;
+.action-btn:hover {
+  background: #f0f4ff;
 }
 </style>

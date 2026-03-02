@@ -1,3 +1,261 @@
+<template>
+  <v-container fluid class="wf-content-padding">
+    <!-- Loading State -->
+    <v-progress-circular
+      v-if="loansStore.loading && !application"
+      indeterminate
+      color="primary"
+      class="mx-auto d-block my-16"
+    />
+
+    <!-- Application Details -->
+    <div v-else-if="application">
+      <!-- Back Button -->
+      <NuxtLink to="/approver/queue" class="back-btn">
+        ← Back to Queue
+      </NuxtLink>
+
+      <!-- Page Header -->
+      <div class="wf-page-header">
+        <div class="d-flex align-center justify-space-between">
+          <h1>Application Review</h1>
+          <span class="wf-status-badge" :class="getStatusClass(application.status)">
+            <span class="wf-status-dot"></span>
+            {{ getStatusLabel(application.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <!-- Left Panel -->
+        <div>
+          <!-- Applicant Information -->
+          <v-card class="wf-section-card mb-6">
+            <div class="card-title">Applicant Information</div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Name</span>
+              <span class="wf-info-value">{{ application.applicantName || 'N/A' }}</span>
+            </div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Email</span>
+              <span class="wf-info-value">{{ application.borrowerId?.email || 'N/A' }}</span>
+            </div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Phone</span>
+              <span class="wf-info-value">{{ application.borrowerId?.phoneNumber || 'N/A' }}</span>
+            </div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Employment Status</span>
+              <span class="wf-info-value">{{ application.borrowerId?.employmentStatus || 'N/A' }}</span>
+            </div>
+          </v-card>
+
+          <!-- Loan Details -->
+          <v-card class="wf-section-card mb-6">
+            <div class="card-title">Loan Details</div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Loan Type</span>
+              <span class="wf-info-value">{{ application.loanTypeName || 'N/A' }}</span>
+            </div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Requested Amount</span>
+              <span class="wf-info-value wf-amount">{{ formatCurrency(application.loanDetails.requestedAmount) }}</span>
+            </div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Term</span>
+              <span class="wf-info-value">{{ application.loanDetails.requestedTerm }} months</span>
+            </div>
+            <div class="wf-info-row">
+              <span class="wf-info-label">Officer Notes</span>
+              <span class="wf-info-value">{{ application.loanDetails.officerNotes || 'None' }}</span>
+            </div>
+          </v-card>
+
+          <!-- Documents -->
+          <v-card class="wf-section-card mb-6">
+            <div class="card-title">Uploaded Documents ({{ application.documents?.length || 0 }})</div>
+            <div v-if="application.documents && application.documents.length > 0" class="documents-list">
+              <div v-for="doc in application.documents" :key="doc.id" class="document-item">
+                <v-icon class="document-icon">mdi-file-document</v-icon>
+                <div class="document-info">
+                  <div class="document-name">{{ doc.documentName }}</div>
+                  <div class="wf-table-subtext">Uploaded {{ formatDate(doc.uploadedAt) }}</div>
+                </div>
+                <v-btn
+                  size="small"
+                  color="primary"
+                  variant="text"
+                  :href="doc.fileUrl"
+                  target="_blank"
+                >
+                  View
+                </v-btn>
+              </div>
+            </div>
+            <div v-else class="wf-empty-state pa-8">
+              <v-icon class="empty-icon">mdi-file-document-outline</v-icon>
+              <div class="empty-message">No documents uploaded yet</div>
+            </div>
+          </v-card>
+
+          <!-- Rate Decision (Only show when under review) -->
+          <v-card v-if="application.status === 'under_review'" class="wf-section-card mb-6">
+            <RateDecisionBox
+              v-if="application.loanTypeId"
+              :default-rate="application.defaultRate || 0"
+              :suggested-rate="application.suggestedRate || 0"
+              :min-rate="application.loanTypeId.minInterestRate"
+              :max-rate="application.loanTypeId.maxInterestRate"
+              v-model="finalRate"
+              @validate="(valid) => (isRateValid = valid)"
+            />
+          </v-card>
+
+          <!-- Decision Notes -->
+          <v-card v-if="application.status === 'under_review'" class="wf-section-card mb-6">
+            <div class="card-title">Decision Notes</div>
+            <v-textarea
+              v-model="approvalNotes"
+              rows="4"
+              variant="outlined"
+              placeholder="Add any notes about your decision (optional)..."
+            />
+          </v-card>
+
+          <!-- Reject Form -->
+          <v-card v-if="showRejectForm" class="wf-section-card mb-6 reject-section">
+            <div class="card-title">Rejection Reason</div>
+            <v-textarea
+              v-model="rejectNotes"
+              rows="4"
+              variant="outlined"
+              placeholder="Explain why this application is being rejected (required)..."
+            />
+            <div class="d-flex gap-3 mt-4">
+              <v-btn variant="outlined" @click="showRejectForm = false" :disabled="actionLoading">
+                Cancel
+              </v-btn>
+              <v-btn
+                color="error"
+                @click="handleReject"
+                :disabled="!rejectNotes.trim() || actionLoading"
+              >
+                {{ actionLoading ? 'Rejecting...' : 'Confirm Rejection' }}
+              </v-btn>
+            </div>
+          </v-card>
+
+          <!-- Action Buttons -->
+          <v-card class="wf-section-card">
+            <div class="d-flex flex-column gap-3">
+              <v-btn
+                v-if="canStartReview"
+                color="primary"
+                size="large"
+                block
+                @click="handleStartReview"
+                :disabled="actionLoading"
+              >
+                {{ actionLoading ? 'Starting...' : 'Start Review' }}
+              </v-btn>
+
+              <template v-if="application.status === 'under_review'">
+                <v-btn
+                  color="success"
+                  size="large"
+                  block
+                  @click="handleApprove"
+                  :disabled="!canApprove || actionLoading"
+                >
+                  {{ actionLoading ? 'Approving...' : 'Approve Application' }}
+                </v-btn>
+
+                <v-btn
+                  v-if="!showRejectForm"
+                  color="error"
+                  variant="outlined"
+                  size="large"
+                  block
+                  @click="showRejectForm = true"
+                  :disabled="actionLoading"
+                >
+                  Reject Application
+                </v-btn>
+
+                <v-btn
+                  variant="outlined"
+                  size="large"
+                  block
+                  @click="showRequestDocsModal = true"
+                  :disabled="actionLoading"
+                >
+                  Request Documents
+                </v-btn>
+              </template>
+            </div>
+          </v-card>
+        </div>
+
+        <!-- Right Panel -->
+        <div>
+          <!-- Loan Summary -->
+          <v-card class="wf-card mb-6">
+            <div class="card-title">Loan Summary</div>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="summary-label">Requested</span>
+                <span class="summary-value">{{ formatCurrency(application.loanDetails.requestedAmount) }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Term</span>
+                <span class="summary-value">{{ application.loanDetails.requestedTerm }} mo</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Default Rate</span>
+                <span class="summary-value">{{ application.defaultRate?.toFixed(2) }}%</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Suggested Rate</span>
+                <span class="summary-value">{{ application.suggestedRate?.toFixed(2) }}%</span>
+              </div>
+            </div>
+          </v-card>
+
+          <!-- Status Timeline -->
+          <v-card class="wf-card">
+            <div class="card-title">Status History</div>
+            <v-timeline side="end" density="compact">
+              <v-timeline-item
+                v-for="(entry, index) in application.statusHistory"
+                :key="entry.id || index"
+                :dot-color="getTimelineColor(entry.status)"
+                size="small"
+              >
+                <template v-slot:opposite>
+                  <div class="timeline-date">{{ formatDateTime(entry.timestamp) }}</div>
+                </template>
+                <div class="timeline-content">
+                  <div class="timeline-status">{{ getStatusLabel(entry.status) }}</div>
+                  <div v-if="entry.notes" class="timeline-notes">{{ entry.notes }}</div>
+                </div>
+              </v-timeline-item>
+            </v-timeline>
+          </v-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Documents Modal -->
+    <RequestDocumentsModal
+      :show="showRequestDocsModal"
+      :application-id="applicationId"
+      :loading="actionLoading"
+      @close="showRequestDocsModal = false"
+      @submit="handleRequestDocuments"
+    />
+  </v-container>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -7,7 +265,8 @@ import RequestDocumentsModal from '~/components/approver/RequestDocumentsModal.v
 
 definePageMeta({
   layout: 'default',
-  // Auth handled by auth.global.ts middleware
+  middleware: ['role'],
+  allowedRoles: ['tenant_approver', 'tenant_admin'],
 })
 
 const route = useRoute()
@@ -41,21 +300,12 @@ const canApprove = computed(() => {
   return application.value?.status === 'under_review' && isRateValid.value
 })
 
-const canReject = computed(() => {
-  return application.value?.status === 'under_review'
-})
-
-const canRequestDocuments = computed(() => {
-  return application.value?.status === 'under_review'
-})
-
 const handleStartReview = async () => {
   if (!application.value) return
 
   actionLoading.value = true
   try {
     await loansStore.startReview(application.value.id)
-    // Refresh application
     await loansStore.fetchApplicationById(applicationId)
   } catch (error) {
     console.error('Failed to start review:', error)
@@ -135,9 +385,9 @@ const handleRequestDocuments = async (payload: any) => {
 }
 
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-PH', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'PHP',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount)
@@ -148,26 +398,30 @@ const formatDate = (dateString: string) => {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+  })
+}
+
+const formatDateTime = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   })
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'submitted':
-      return '#3b82f6'
-    case 'under_review':
-      return '#f59e0b'
-    case 'pending_documents':
-      return '#8b5cf6'
-    case 'approved':
-      return '#10b981'
-    case 'rejected':
-      return '#ef4444'
-    default:
-      return '#6b7280'
+const getStatusClass = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    draft: 'pending',
+    submitted: 'review',
+    under_review: 'review',
+    pending_documents: 'pending',
+    approved: 'approved',
+    rejected: 'rejected',
+    disbursed: 'approved',
   }
+  return statusMap[status] || 'pending'
 }
 
 const getStatusLabel = (status: string) => {
@@ -176,393 +430,49 @@ const getStatusLabel = (status: string) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 }
+
+const getTimelineColor = (status: string) => {
+  const colorMap: Record<string, string> = {
+    submitted: 'blue',
+    under_review: 'orange',
+    pending_documents: 'purple',
+    approved: 'success',
+    rejected: 'error',
+  }
+  return colorMap[status] || 'grey'
+}
 </script>
 
-<template>
-  <div class="approval-detail-page">
-    <!-- Loading State -->
-    <div v-if="loansStore.loading && !application" class="loading-state">
-      <div class="spinner" />
-      <p>Loading application...</p>
-    </div>
-
-    <!-- Application Details -->
-    <div v-else-if="application" class="detail-container">
-      <!-- Header -->
-      <div class="page-header">
-        <button class="back-button" @click="router.push('/approver/queue')">
-          ← Back to Queue
-        </button>
-        <div class="header-content">
-          <h1>Application Review</h1>
-          <span
-            class="status-badge"
-            :style="{ backgroundColor: getStatusColor(application.status) }"
-          >
-            {{ getStatusLabel(application.status) }}
-          </span>
-        </div>
-      </div>
-
-      <div class="content-grid">
-        <!-- Left Panel -->
-        <div class="left-panel">
-          <!-- Applicant Information -->
-          <section class="info-section">
-            <h2>Applicant Information</h2>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">Name</span>
-                <span class="value">{{ application.applicantName || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Email</span>
-                <span class="value">{{ application.borrowerId?.email || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Phone</span>
-                <span class="value">{{ application.borrowerId?.phoneNumber || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Employment Status</span>
-                <span class="value">{{ application.borrowerId?.employmentStatus || 'N/A' }}</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Loan Details -->
-          <section class="info-section">
-            <h2>Loan Details</h2>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">Loan Type</span>
-                <span class="value">{{ application.loanTypeName || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Requested Amount</span>
-                <span class="value amount">{{ formatCurrency(application.loanDetails.requestedAmount) }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Term</span>
-                <span class="value">{{ application.loanDetails.requestedTerm }} months</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Officer Notes</span>
-                <span class="value">{{ application.loanDetails.officerNotes || 'None' }}</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Documents -->
-          <section class="info-section">
-            <h2>Uploaded Documents ({{ application.documents?.length || 0 }})</h2>
-            <div v-if="application.documents && application.documents.length > 0" class="documents-list">
-              <div
-                v-for="doc in application.documents"
-                :key="doc.id"
-                class="document-item"
-              >
-                <div class="document-icon">📄</div>
-                <div class="document-info">
-                  <div class="document-name">{{ doc.documentName }}</div>
-                  <div class="document-date">
-                    Uploaded {{ formatDate(doc.uploadedAt) }}
-                  </div>
-                </div>
-                <a :href="doc.fileUrl" target="_blank" class="document-link">
-                  View
-                </a>
-              </div>
-            </div>
-            <div v-else class="empty-documents">
-              No documents uploaded yet
-            </div>
-          </section>
-
-          <!-- Rate Decision (Only show when under review) -->
-          <section v-if="application.status === 'under_review'" class="info-section">
-            <RateDecisionBox
-              v-if="application.loanTypeId"
-              :default-rate="application.defaultRate || 0"
-              :suggested-rate="application.suggestedRate || 0"
-              :min-rate="application.loanTypeId.minInterestRate"
-              :max-rate="application.loanTypeId.maxInterestRate"
-              v-model="finalRate"
-              @validate="(valid) => (isRateValid = valid)"
-            />
-          </section>
-
-          <!-- Decision Notes -->
-          <section v-if="application.status === 'under_review'" class="info-section">
-            <h2>Decision Notes</h2>
-            <textarea
-              v-model="approvalNotes"
-              rows="4"
-              placeholder="Add any notes about your decision (optional)..."
-              class="notes-textarea"
-            />
-          </section>
-
-          <!-- Reject Form -->
-          <section v-if="showRejectForm" class="info-section reject-section">
-            <h2>Rejection Reason</h2>
-            <textarea
-              v-model="rejectNotes"
-              rows="4"
-              placeholder="Explain why this application is being rejected (required)..."
-              class="notes-textarea"
-            />
-            <div class="reject-actions">
-              <button class="cancel-button" @click="showRejectForm = false" :disabled="actionLoading">
-                Cancel
-              </button>
-              <button
-                class="reject-button"
-                @click="handleReject"
-                :disabled="!rejectNotes.trim() || actionLoading"
-              >
-                {{ actionLoading ? 'Rejecting...' : 'Confirm Rejection' }}
-              </button>
-            </div>
-          </section>
-
-          <!-- Action Buttons -->
-          <section class="action-section">
-            <button
-              v-if="canStartReview"
-              class="primary-button"
-              @click="handleStartReview"
-              :disabled="actionLoading"
-            >
-              {{ actionLoading ? 'Starting...' : 'Start Review' }}
-            </button>
-
-            <template v-if="application.status === 'under_review'">
-              <button
-                class="approve-button"
-                @click="handleApprove"
-                :disabled="!canApprove || actionLoading"
-              >
-                {{ actionLoading ? 'Approving...' : 'Approve Application' }}
-              </button>
-
-              <button
-                v-if="!showRejectForm"
-                class="reject-outline-button"
-                @click="showRejectForm = true"
-                :disabled="actionLoading"
-              >
-                Reject Application
-              </button>
-
-              <button
-                class="secondary-button"
-                @click="showRequestDocsModal = true"
-                :disabled="actionLoading"
-              >
-                Request Documents
-              </button>
-            </template>
-          </section>
-        </div>
-
-        <!-- Right Panel -->
-        <div class="right-panel">
-          <!-- Loan Summary -->
-          <section class="summary-section">
-            <h2>Loan Summary</h2>
-            <div class="summary-grid">
-              <div class="summary-item">
-                <span class="summary-label">Requested</span>
-                <span class="summary-value">{{ formatCurrency(application.loanDetails.requestedAmount) }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Term</span>
-                <span class="summary-value">{{ application.loanDetails.requestedTerm }} mo</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Default Rate</span>
-                <span class="summary-value">{{ application.defaultRate?.toFixed(2) }}%</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Suggested Rate</span>
-                <span class="summary-value">{{ application.suggestedRate?.toFixed(2) }}%</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Status Timeline -->
-          <section class="timeline-section">
-            <h2>Status History</h2>
-            <div class="timeline">
-              <div
-                v-for="(entry, index) in application.statusHistory"
-                :key="entry.id || index"
-                class="timeline-item"
-              >
-                <div class="timeline-dot" :style="{ backgroundColor: getStatusColor(entry.status) }" />
-                <div class="timeline-content">
-                  <div class="timeline-status">{{ getStatusLabel(entry.status) }}</div>
-                  <div class="timeline-date">{{ formatDate(entry.timestamp) }}</div>
-                  <div v-if="entry.notes" class="timeline-notes">{{ entry.notes }}</div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-
-    <!-- Request Documents Modal -->
-    <RequestDocumentsModal
-      :show="showRequestDocsModal"
-      :application-id="applicationId"
-      :loading="actionLoading"
-      @close="showRequestDocsModal = false"
-      @submit="handleRequestDocuments"
-    />
-  </div>
-</template>
-
 <style scoped>
-.approval-detail-page {
-  min-height: 100vh;
-  background: #f9fafb;
+.details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
 }
 
-.loading-state {
-  display: flex;
-  flex-direction: column;
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.back-btn {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 400px;
+  gap: 8px;
   color: #6b7280;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.detail-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 32px;
-}
-
-.page-header {
-  margin-bottom: 32px;
-}
-
-.back-button {
-  padding: 8px 16px;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #374151;
+  text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
+  margin-bottom: 16px;
   transition: all 0.2s;
-  margin-bottom: 16px;
 }
 
-.back-button:hover {
-  background: #f9fafb;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.header-content h1 {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.status-badge {
-  padding: 6px 16px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-  text-transform: capitalize;
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 24px;
-}
-
-.left-panel,
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.info-section,
-.summary-section,
-.timeline-section {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 24px;
-}
-
-.info-section h2,
-.summary-section h2,
-.timeline-section h2 {
-  margin: 0 0 20px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.info-item .label {
-  font-size: 13px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.info-item .value {
-  font-size: 15px;
-  color: #111827;
-  font-weight: 500;
-}
-
-.info-item .value.amount {
-  font-size: 18px;
-  font-weight: 700;
-  color: #10b981;
+.back-btn:hover {
+  color: #1e3a8a;
 }
 
 .documents-list {
@@ -582,7 +492,7 @@ const getStatusLabel = (status: string) => {
 }
 
 .document-icon {
-  font-size: 24px;
+  color: #6b7280;
 }
 
 .document-info {
@@ -595,150 +505,8 @@ const getStatusLabel = (status: string) => {
   color: #111827;
 }
 
-.document-date {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 2px;
-}
-
-.document-link {
-  padding: 6px 12px;
-  background: #3b82f6;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.document-link:hover {
-  background: #2563eb;
-}
-
-.empty-documents {
-  padding: 40px 20px;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 14px;
-}
-
-.notes-textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  transition: border-color 0.2s;
-}
-
-.notes-textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
 .reject-section {
   border: 2px solid #ef4444;
-}
-
-.reject-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.action-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-}
-
-.primary-button,
-.approve-button,
-.reject-outline-button,
-.reject-button,
-.secondary-button,
-.cancel-button {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.primary-button {
-  background: #3b82f6;
-  color: white;
-}
-
-.primary-button:hover:not(:disabled) {
-  background: #2563eb;
-}
-
-.approve-button {
-  background: #10b981;
-  color: white;
-}
-
-.approve-button:hover:not(:disabled) {
-  background: #059669;
-}
-
-.reject-outline-button {
-  background: white;
-  border: 2px solid #ef4444;
-  color: #ef4444;
-}
-
-.reject-outline-button:hover:not(:disabled) {
-  background: #fef2f2;
-}
-
-.reject-button {
-  background: #ef4444;
-  color: white;
-}
-
-.reject-button:hover:not(:disabled) {
-  background: #dc2626;
-}
-
-.secondary-button {
-  background: white;
-  border: 1px solid #d1d5db;
-  color: #374151;
-}
-
-.secondary-button:hover:not(:disabled) {
-  background: #f9fafb;
-}
-
-.cancel-button {
-  background: white;
-  border: 1px solid #d1d5db;
-  color: #374151;
-}
-
-.cancel-button:hover:not(:disabled) {
-  background: #f9fafb;
-}
-
-.primary-button:disabled,
-.approve-button:disabled,
-.reject-outline-button:disabled,
-.reject-button:disabled,
-.secondary-button:disabled,
-.cancel-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .summary-grid {
@@ -770,40 +538,14 @@ const getStatusLabel = (status: string) => {
   color: #111827;
 }
 
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.timeline-item {
-  display: flex;
-  gap: 16px;
-  position: relative;
-}
-
-.timeline-item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 24px;
-  bottom: -24px;
-  width: 2px;
-  background: #e5e7eb;
-}
-
-.timeline-dot {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 0 0 2px #e5e7eb;
-  z-index: 1;
+.timeline-date {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: right;
 }
 
 .timeline-content {
-  flex: 1;
+  padding-left: 8px;
 }
 
 .timeline-status {
@@ -813,18 +555,19 @@ const getStatusLabel = (status: string) => {
   margin-bottom: 4px;
 }
 
-.timeline-date {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 8px;
-}
-
 .timeline-notes {
   font-size: 14px;
-  color: #374151;
+  color: #6b7280;
   line-height: 1.5;
-  padding: 12px;
+  padding: 8px;
   background: #f9fafb;
-  border-radius: 6px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+@media (max-width: 1024px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

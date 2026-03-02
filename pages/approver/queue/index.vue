@@ -1,3 +1,121 @@
+<template>
+  <v-container fluid class="wf-content-padding">
+    <!-- Page Header -->
+    <div class="wf-page-header">
+      <h1>Approval Queue</h1>
+      <p class="wf-page-subtitle">Review and process loan applications</p>
+    </div>
+
+    <!-- Tabs -->
+    <v-card class="wf-section-card mb-6">
+      <v-tabs v-model="selectedTab" @update:model-value="handleTabChange">
+        <v-tab v-for="tab in tabs" :key="tab.key" :value="tab.key">
+          {{ tab.label }}
+        </v-tab>
+      </v-tabs>
+    </v-card>
+
+    <!-- Loading State -->
+    <v-progress-circular
+      v-if="loansStore.loading"
+      indeterminate
+      color="primary"
+      class="mx-auto d-block my-16"
+    />
+
+    <!-- Applications Table -->
+    <v-card v-else-if="filteredApplications.length > 0" class="wf-section-card">
+      <v-table class="wf-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Applicant</th>
+            <th>Loan Type</th>
+            <th>Amount</th>
+            <th>Suggested Rate</th>
+            <th>Rate Variance</th>
+            <th>Documents</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="app in filteredApplications"
+            :key="app.id"
+            @click="handleRowClick(app)"
+          >
+            <td><strong class="wf-app-id">#{{ app.id.slice(0, 6) }}</strong></td>
+            <td>
+              <div>
+                <strong>{{ app.applicantName || 'N/A' }}</strong>
+              </div>
+            </td>
+            <td>{{ app.loanTypeName || 'N/A' }}</td>
+            <td class="wf-amount">{{ formatCurrency(app.loanDetails.requestedAmount) }}</td>
+            <td>
+              <span class="rate-value">{{ app.suggestedRate?.toFixed(2) }}%</span>
+            </td>
+            <td>
+              <span class="variance-badge" :class="getVarianceClass(app.rateVariance || 0)">
+                {{ app.rateVariance > 0 ? '+' : '' }}{{ app.rateVariance?.toFixed(2) }}%
+              </span>
+            </td>
+            <td class="text-center">
+              <v-chip size="small" color="grey-lighten-2">
+                {{ app.documentsCount || 0 }}
+              </v-chip>
+            </td>
+            <td>{{ formatDate(app.submittedAt || app.createdAt) }}</td>
+            <td>
+              <span class="wf-status-badge" :class="getStatusClass(app.status)">
+                <span class="wf-status-dot"></span>
+                {{ getStatusLabel(app.status) }}
+              </span>
+            </td>
+            <td>
+              <a class="action-btn" @click.stop="handleRowClick(app)">
+                Review
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+
+      <!-- Pagination -->
+      <div class="wf-pagination" v-if="loansStore.pagination.totalPages > 1">
+        <button
+          class="wf-pagination-btn"
+          :disabled="loansStore.pagination.page === 1"
+          @click="fetchQueue(loansStore.pagination.page - 1)"
+        >
+          ← Previous
+        </button>
+        <span class="wf-pagination-info">
+          Page {{ loansStore.pagination.page }} of {{ loansStore.pagination.totalPages }}
+        </span>
+        <button
+          class="wf-pagination-btn"
+          :disabled="loansStore.pagination.page === loansStore.pagination.totalPages"
+          @click="fetchQueue(loansStore.pagination.page + 1)"
+        >
+          Next →
+        </button>
+      </div>
+    </v-card>
+
+    <!-- Empty State -->
+    <v-card v-else class="wf-section-card">
+      <div class="wf-empty-state pa-16">
+        <v-icon class="empty-icon" size="64">mdi-clipboard-check-outline</v-icon>
+        <div class="empty-title">No applications found</div>
+        <div class="empty-message">There are no applications in this queue at the moment</div>
+      </div>
+    </v-card>
+  </v-container>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useLoansStore } from '~/stores/loans'
@@ -5,12 +123,12 @@ import type { LoanApplication } from '~/types'
 
 definePageMeta({
   layout: 'default',
-  // Auth handled by auth.global.ts middleware
+  middleware: ['role'],
+  allowedRoles: ['tenant_approver', 'tenant_admin'],
 })
 
 const loansStore = useLoansStore()
-
-const selectedTab = ref<'all' | 'submitted' | 'under_review' | 'pending_documents'>('all')
+const selectedTab = ref('all')
 
 const tabs = [
   { key: 'all', label: 'All', status: undefined },
@@ -23,13 +141,13 @@ onMounted(async () => {
   await fetchQueue()
 })
 
-const fetchQueue = async () => {
+const fetchQueue = async (page = 1) => {
   const status = tabs.find((tab) => tab.key === selectedTab.value)?.status
-  await loansStore.fetchQueue({ status, page: 1, limit: 50 })
+  await loansStore.fetchQueue({ status, page, limit: 50 })
 }
 
 const handleTabChange = async (tabKey: string) => {
-  selectedTab.value = tabKey as typeof selectedTab.value
+  selectedTab.value = tabKey
   await fetchQueue()
 }
 
@@ -38,9 +156,9 @@ const handleRowClick = (application: LoanApplication) => {
 }
 
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-PH', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'PHP',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount)
@@ -54,21 +172,17 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'submitted':
-      return '#3b82f6'
-    case 'under_review':
-      return '#f59e0b'
-    case 'pending_documents':
-      return '#8b5cf6'
-    case 'approved':
-      return '#10b981'
-    case 'rejected':
-      return '#ef4444'
-    default:
-      return '#6b7280'
+const getStatusClass = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    draft: 'pending',
+    submitted: 'review',
+    under_review: 'review',
+    pending_documents: 'pending',
+    approved: 'approved',
+    rejected: 'rejected',
+    disbursed: 'approved',
   }
+  return statusMap[status] || 'pending'
 }
 
 const getStatusLabel = (status: string) => {
@@ -78,10 +192,11 @@ const getStatusLabel = (status: string) => {
     .join(' ')
 }
 
-const getRateVarianceColor = (variance: number) => {
-  if (Math.abs(variance) < 0.5) return '#10b981'
-  if (Math.abs(variance) < 1.5) return '#f59e0b'
-  return '#ef4444'
+const getVarianceClass = (variance: number): string => {
+  const absVariance = Math.abs(variance)
+  if (absVariance < 0.5) return 'variance-low'
+  if (absVariance < 1.5) return 'variance-medium'
+  return 'variance-high'
 }
 
 const filteredApplications = computed(() => {
@@ -89,360 +204,49 @@ const filteredApplications = computed(() => {
 })
 </script>
 
-<template>
-  <div class="queue-page">
-    <div class="page-header">
-      <h1>Approval Queue</h1>
-      <p class="subtitle">Review and process loan applications</p>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button
-        v-for="tab in tabs"
-        :key="tab.key"
-        class="tab"
-        :class="{ active: selectedTab === tab.key }"
-        @click="handleTabChange(tab.key)"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <!-- Loading State -->
-    <div v-if="loansStore.loading" class="loading-state">
-      <div class="spinner" />
-      <p>Loading applications...</p>
-    </div>
-
-    <!-- Empty State -->
-    <div v-else-if="filteredApplications.length === 0" class="empty-state">
-      <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-      </svg>
-      <h3>No applications found</h3>
-      <p>There are no applications in this queue at the moment.</p>
-    </div>
-
-    <!-- Applications Table -->
-    <div v-else class="table-container">
-      <table class="applications-table">
-        <thead>
-          <tr>
-            <th>Applicant</th>
-            <th>Loan Type</th>
-            <th>Amount</th>
-            <th>Suggested Rate</th>
-            <th>Rate Variance</th>
-            <th>Documents</th>
-            <th>Submitted</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="app in filteredApplications"
-            :key="app.id"
-            class="application-row"
-            @click="handleRowClick(app)"
-          >
-            <td class="applicant-cell">
-              <div class="applicant-name">{{ app.applicantName || 'N/A' }}</div>
-            </td>
-            <td>{{ app.loanTypeName || 'N/A' }}</td>
-            <td class="amount-cell">{{ formatCurrency(app.loanDetails.requestedAmount) }}</td>
-            <td class="rate-cell">{{ app.suggestedRate?.toFixed(2) }}%</td>
-            <td class="variance-cell">
-              <span
-                class="variance-badge"
-                :style="{ color: getRateVarianceColor(app.rateVariance || 0) }"
-              >
-                {{ app.rateVariance > 0 ? '+' : '' }}{{ app.rateVariance?.toFixed(2) }}%
-              </span>
-            </td>
-            <td class="documents-cell">
-              <span class="documents-count">{{ app.documentsCount || 0 }}</span>
-            </td>
-            <td class="date-cell">{{ formatDate(app.submittedAt || app.createdAt) }}</td>
-            <td>
-              <span
-                class="status-badge"
-                :style="{ backgroundColor: getStatusColor(app.status) }"
-              >
-                {{ getStatusLabel(app.status) }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    <div v-if="loansStore.pagination.totalPages > 1" class="pagination">
-      <button
-        class="pagination-button"
-        :disabled="loansStore.pagination.page === 1"
-        @click="() => fetchQueue()"
-      >
-        Previous
-      </button>
-      <span class="pagination-info">
-        Page {{ loansStore.pagination.page }} of {{ loansStore.pagination.totalPages }}
-      </span>
-      <button
-        class="pagination-button"
-        :disabled="loansStore.pagination.page === loansStore.pagination.totalPages"
-        @click="() => fetchQueue()"
-      >
-        Next
-      </button>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-.queue-page {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 16px;
-  color: #6b7280;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 0;
-}
-
-.tab {
-  padding: 12px 24px;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  color: #6b7280;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: -2px;
-}
-
-.tab:hover {
-  color: #111827;
-}
-
-.tab.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  color: #6b7280;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  text-align: center;
-}
-
-.empty-icon {
-  color: #d1d5db;
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.empty-state p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.table-container {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.applications-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.applications-table thead {
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.applications-table th {
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.applications-table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.applications-table tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-.applications-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.applications-table td {
-  padding: 16px;
-  font-size: 14px;
-  color: #111827;
-}
-
-.applicant-cell {
-  font-weight: 600;
-}
-
-.applicant-name {
-  color: #111827;
-}
-
-.amount-cell {
+.rate-value {
   font-weight: 600;
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-}
-
-.rate-cell {
-  font-weight: 600;
-  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-}
-
-.variance-cell {
-  font-weight: 600;
+  color: #374151;
 }
 
 .variance-badge {
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
   font-weight: 700;
-}
-
-.documents-cell {
-  text-align: center;
-}
-
-.documents-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 28px;
-  height: 28px;
-  padding: 0 8px;
-  background: #f3f4f6;
-  border-radius: 14px;
-  font-weight: 600;
   font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
-.date-cell {
-  color: #6b7280;
+.variance-low {
+  background: #d1fae5;
+  color: #065f46;
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  text-transform: capitalize;
+.variance-medium {
+  background: #fef3c7;
+  color: #92400e;
 }
 
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 24px;
+.variance-high {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
-.pagination-button {
-  padding: 8px 16px;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #374151;
-  font-size: 14px;
+.action-btn {
+  color: #1e3a8a;
+  text-decoration: none;
   font-weight: 500;
-  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
   transition: all 0.2s;
+  display: inline-block;
+  cursor: pointer;
 }
 
-.pagination-button:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #9ca3af;
-}
-
-.pagination-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-info {
-  font-size: 14px;
-  color: #6b7280;
+.action-btn:hover {
+  background: #f0f4ff;
 }
 </style>
