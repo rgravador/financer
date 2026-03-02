@@ -592,15 +592,15 @@ Each component is a self-contained HTML snippet that can be included/adapted int
 **Priority:** LOW - Admin tools
 
 ##### system-admin/audit-logs.html
-- [ ] Same structure as tenant-admin/audit-logs.html but system-wide scope
-- [ ] Filter by tenant (dropdown with all tenants)
-- [ ] Filter by user (search/select)
-- [ ] Filter by action type (user created, loan approved, settings changed, etc.)
-- [ ] Filter by date range (calendar date pickers)
-- [ ] Expandable rows with JSON metadata
-- [ ] Export to CSV button
-- [ ] Pagination
-- [ ] States: loading, normal, empty (no logs), error
+- [x] Same structure as tenant-admin/audit-logs.html but system-wide scope
+- [x] Filter by tenant (dropdown with all tenants)
+- [x] Filter by user (search/select)
+- [x] Filter by action type (user created, loan approved, settings changed, etc.)
+- [x] Filter by date range (calendar date pickers)
+- [x] Expandable rows with JSON metadata
+- [x] Export to CSV button
+- [x] Pagination
+- [x] States: loading, normal, empty (no logs), error
 
 **Success Criteria:**
 - System admin audit log wireframe created

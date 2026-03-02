@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System-Wide Audit Logs - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .filters-section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+
+    .filters-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 16px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-btn:hover {
+      background: #1e40af;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #f9fafb;
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .table tr {
+      transition: background 0.2s;
+    }
+
+    .table tbody tr:hover {
+      background: rgba(30, 58, 138, 0.04);
+    }
+
+    .table tbody tr.expandable {
+      cursor: pointer;
+    }
+
+    .table tbody tr.expandable:hover {
+      background: rgba(30, 58, 138, 0.06);
+    }
+
+    .expand-icon {
+      font-size: 16px;
+      color: #6b7280;
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+
+    .expand-icon.expanded {
+      transform: rotate(90deg);
+    }
+
+    .expanded-row {
+      background: #f9fafb;
+    }
+
+    .expanded-content {
+      padding: 16px 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .json-viewer {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-x: auto;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .json-key {
+      color: #38bdf8;
+    }
+
+    .json-string {
+      color: #34d399;
+    }
+
+    .json-number {
+      color: #fb923c;
+    }
+
+    .json-boolean {
+      color: #a78bfa;
+    }
+
+    .tenant-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .action-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .action-type.create {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .action-type.update {
+      background: #dbeafe;
+      color: #1e3a8a;
+    }
+
+    .action-type.delete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .action-type.login {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .action-type.logout {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .action-type.approve {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .action-type.reject {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .timestamp {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .ip-address {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .pagination {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn:disabled:hover {
+      border-color: #e5e7eb;
+      background: white;
+    }
+
+    .empty-state {
+      padding: 64px 24px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .empty-message {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .stats-bar {
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+      padding: 20px 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1e3a8a;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">SA</div>
+        <div>
+          <div class="user-name">System Admin</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="tenants-list.html" class="nav-item">
+          <span class="nav-icon">🏢</span>
+          <span class="nav-label">Tenants</span>
+        </a>
+        <a href="loan-types-list.html" class="nav-item">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">Loan Types</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Audit Logs</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">System-Wide Audit Logs</div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search logs...">
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">2</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">SA</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1>System-Wide Audit Logs</h1>
+          <p class="page-subtitle">Complete activity history across all tenants and users</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-value">1,247</div>
+            <div class="stat-label">Total Events (24h)</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">15</div>
+            <div class="stat-label">Active Tenants</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">342</div>
+            <div class="stat-label">Active Users</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">89</div>
+            <div class="stat-label">Critical Events</div>
+          </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+          <div class="filters-title">Filter Logs</div>
+          <div class="filters-grid">
+            <div class="form-group">
+              <label class="form-label">Tenant</label>
+              <select class="form-input">
+                <option value="">All Tenants</option>
+                <option value="tenant1">ABC Lending Corp</option>
+                <option value="tenant2">First National Bank</option>
+                <option value="tenant3">Community Credit Union</option>
+                <option value="tenant4">Online Loans Inc</option>
+                <option value="tenant5">XYZ Financial Services</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">User</label>
+              <input type="text" class="form-input" placeholder="Search user by name or email...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Action Type</label>
+              <select class="form-input">
+                <option value="">All Actions</option>
+                <option value="create">Create</option>
+                <option value="update">Update</option>
+                <option value="delete">Delete</option>
+                <option value="login">Login</option>
+                <option value="logout">Logout</option>
+                <option value="approve">Approve</option>
+                <option value="reject">Reject</option>
+                <option value="export">Export</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Entity Type</label>
+              <select class="form-input">
+                <option value="">All Entities</option>
+                <option value="user">User</option>
+                <option value="tenant">Tenant</option>
+                <option value="borrower">Borrower</option>
+                <option value="loan_application">Loan Application</option>
+                <option value="loan_type">Loan Type</option>
+                <option value="document">Document</option>
+                <option value="settings">Settings</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">From Date</label>
+              <input type="date" class="form-input" value="2026-02-01">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">To Date</label>
+              <input type="date" class="form-input" value="2026-03-03">
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn-secondary">Reset Filters</button>
+            <button class="btn btn-primary">Apply Filters</button>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+          <div class="table-header">
+            <div class="table-title">Audit Events (247 results)</div>
+            <button class="export-btn">
+              <span>📥</span>
+              Export to CSV
+            </button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 40px;"></th>
+                <th>Timestamp</th>
+                <th>Tenant</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="expandable" data-row="1">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 14:32:15</span></td>
+                <td><span class="tenant-badge">🏢 ABC Lending</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Jane Doe</div>
+                    <div class="user-email">jane.doe@abclending.com</div>
+                  </div>
+                </td>
+                <td><span class="action-type approve">✓ Approve</span></td>
+                <td>Loan Application #APP-2024-015</td>
+                <td><span class="ip-address">192.168.1.100</span></td>
+              </tr>
+              <tr class="expanded-row" style="display: none;" data-row="1">
+                <td colspan="7">
+                  <div class="expanded-content">
+                    <div class="json-viewer">
+{
+  "<span class="json-key">event_id</span>": "<span class="json-string">evt_1234567890</span>",
+  "<span class="json-key">action</span>": "<span class="json-string">loan.approved</span>",
+  "<span class="json-key">entity_type</span>": "<span class="json-string">loan_application</span>",
+  "<span class="json-key">entity_id</span>": "<span class="json-string">APP-2024-015</span>",
+  "<span class="json-key">user_id</span>": "<span class="json-string">user_987654321</span>",
+  "<span class="json-key">tenant_id</span>": "<span class="json-string">tenant_abc</span>",
+  "<span class="json-key">metadata</span>": {
+    "<span class="json-key">approved_amount</span>": <span class="json-number">50000</span>,
+    "<span class="json-key">interest_rate</span>": <span class="json-number">6.5</span>,
+    "<span class="json-key">loan_term</span>": <span class="json-number">60</span>,
+    "<span class="json-key">conditions</span>": "<span class="json-string">Proof of collateral required</span>"
+  },
+  "<span class="json-key">ip_address</span>": "<span class="json-string">192.168.1.100</span>",
+  "<span class="json-key">user_agent</span>": "<span class="json-string">Mozilla/5.0 (Windows NT 10.0; Win64; x64)...</span>"
+}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="expandable" data-row="2">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 14:15:42</span></td>
+                <td><span class="tenant-badge">🏢 First National</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">John Smith</div>
+                    <div class="user-email">john.smith@firstnational.com</div>
+                  </div>
+                </td>
+                <td><span class="action-type create">+ Create</span></td>
+                <td>Borrower #BRW-2024-089</td>
+                <td><span class="ip-address">10.0.0.45</span></td>
+              </tr>
+
+              <tr class="expandable" data-row="3">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 13:58:23</span></td>
+                <td><span class="tenant-badge">🏢 Community CU</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Sarah Johnson</div>
+                    <div class="user-email">s.johnson@communitycu.org</div>
+                  </div>
+                </td>
+                <td><span class="action-type update">✏️ Update</span></td>
+                <td>Loan Application #APP-2024-012</td>
+                <td><span class="ip-address">172.16.0.88</span></td>
+              </tr>
+
+              <tr class="expandable" data-row="4">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 13:45:10</span></td>
+                <td><span class="tenant-badge">🏢 Online Loans</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Michael Chen</div>
+                    <div class="user-email">mchen@onlineloans.com</div>
+                  </div>
+                </td>
+                <td><span class="action-type delete">✕ Delete</span></td>
+                <td>Document #DOC-2024-567</td>
+                <td><span class="ip-address">203.0.113.42</span></td>
+              </tr>
+
+              <tr class="expandable" data-row="5">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 13:30:55</span></td>
+                <td><span class="tenant-badge">🏢 ABC Lending</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Robert Wilson</div>
+                    <div class="user-email">rwilson@abclending.com</div>
+                  </div>
+                </td>
+                <td><span class="action-type login">🔓 Login</span></td>
+                <td>System</td>
+                <td><span class="ip-address">192.168.1.105</span></td>
+              </tr>
+
+              <tr class="expandable" data-row="6">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 13:12:18</span></td>
+                <td><span class="tenant-badge">🏢 XYZ Financial</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Emily Davis</div>
+                    <div class="user-email">edavis@xyzfinancial.com</div>
+                  </div>
+                </td>
+                <td><span class="action-type reject">✕ Reject</span></td>
+                <td>Loan Application #APP-2024-008</td>
+                <td><span class="ip-address">198.51.100.23</span></td>
+              </tr>
+
+              <tr class="expandable" data-row="7">
+                <td><span class="expand-icon">▶</span></td>
+                <td><span class="timestamp">Mar 3, 2026 12:55:34</span></td>
+                <td><span class="tenant-badge">🏢 First National</span></td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">System Admin</div>
+                    <div class="user-email">admin@ascendent.com</div>
+                  </div>
+                </td>
+                <td><span class="action-type update">✏️ Update</span></td>
+                <td>Tenant Settings</td>
+                <td><span class="ip-address">10.0.0.1</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <div class="pagination-info">Showing 1-10 of 247 results</div>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>← Previous</button>
+              <button class="pagination-btn">1</button>
+              <button class="pagination-btn">2</button>
+              <button class="pagination-btn">3</button>
+              <button class="pagination-btn">...</button>
+              <button class="pagination-btn">25</button>
+              <button class="pagination-btn">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Expandable rows
+    const expandableRows = document.querySelectorAll('tr.expandable');
+
+    expandableRows.forEach(row => {
+      row.addEventListener('click', () => {
+        const rowId = row.dataset.row;
+        const expandedRow = document.querySelector(`tr.expanded-row[data-row="${rowId}"]`);
+        const expandIcon = row.querySelector('.expand-icon');
+
+        if (expandedRow.style.display === 'none' || !expandedRow.style.display) {
+          expandedRow.style.display = 'table-row';
+          expandIcon.classList.add('expanded');
+        } else {
+          expandedRow.style.display = 'none';
+          expandIcon.classList.remove('expanded');
+        }
+      });
+    });
+
+    // Export to CSV (demo)
+    const exportBtn = document.querySelector('.export-btn');
+    exportBtn.addEventListener('click', () => {
+      alert('CSV export started! (This is a wireframe - no actual export)');
+    });
+  </script>
+</body>
+</html>
