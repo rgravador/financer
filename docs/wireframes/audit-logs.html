@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="common-styles.css">
+  <style>
+    .filters-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-input {
+      padding: 10px 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #1e3a8a;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #f9fafb;
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .log-row {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .log-row:hover {
+      background: rgba(30, 58, 138, 0.04);
+    }
+
+    .timestamp {
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .user-email {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      margin-top: 4px;
+    }
+
+    .role-admin {
+      background: #ef4444;
+    }
+
+    .role-officer {
+      background: #3b82f6;
+    }
+
+    .action-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    }
+
+    .action-create {
+      background: #10b981;
+    }
+
+    .action-update {
+      background: #f59e0b;
+    }
+
+    .action-delete {
+      background: #ef4444;
+    }
+
+    .action-approve {
+      background: #3b82f6;
+    }
+
+    .entity-id {
+      display: block;
+      font-size: 12px;
+      color: #9ca3af;
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      margin-top: 2px;
+    }
+
+    .expand-icon {
+      color: #9ca3af;
+      transition: transform 0.2s;
+      font-size: 18px;
+    }
+
+    .expanded-row {
+      background: #f9fafb;
+    }
+
+    .expanded-content {
+      padding: 16px 24px;
+      display: none;
+    }
+
+    .log-row.expanded + .expanded-row .expanded-content {
+      display: block;
+    }
+
+    .log-row.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .detail-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      color: #1e293b;
+      word-break: break-all;
+    }
+
+    .metadata-json {
+      margin: 0;
+      padding: 12px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      border-color: #1e3a8a;
+      color: #1e3a8a;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      color: #6b7280;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">A</div>
+        <div class="logo-text">ASCENDENT</div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Tenant Admin</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="tenant-admin-dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="users-management.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Users</span>
+        </a>
+        <a href="loan-types.html" class="nav-item">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">Loan Types</span>
+        </a>
+        <a href="loan-applications.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Loan Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">💳</span>
+          <span class="nav-label">Payments</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">📜</span>
+          <span class="nav-label">Audit Logs</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="page-title">Audit Logs</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">🔔</button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="page-header">
+          <h1>Organization Audit Logs</h1>
+          <p class="page-subtitle">Activity trail for your organization</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card">
+          <div class="filters-grid">
+            <div class="form-group">
+              <label class="form-label">Action</label>
+              <input type="text" class="form-input" placeholder="e.g., loan.submitted">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Entity</label>
+              <input type="text" class="form-input" placeholder="e.g., User, LoanApplication">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Date From</label>
+              <input type="date" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Date To</label>
+              <input type="date" class="form-input">
+            </div>
+          </div>
+
+          <button class="btn btn-outline">Clear Filters</button>
+        </div>
+
+        <!-- Table -->
+        <div class="section-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>IP Address</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="log-row" onclick="this.classList.toggle('expanded')">
+                <td class="timestamp">Mar 1, 2025 10:30 AM</td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Jane Doe</div>
+                    <div class="user-email">jane.doe@abcbank.com</div>
+                    <span class="role-badge role-officer">Officer</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="action-badge action-create">loan.created</span>
+                </td>
+                <td>
+                  Loan
+                  <span class="entity-id">a1b2c3d4...</span>
+                </td>
+                <td>192.168.1.100</td>
+                <td><span class="expand-icon">▼</span></td>
+              </tr>
+              <tr class="expanded-row">
+                <td colspan="6">
+                  <div class="expanded-content">
+                    <div class="detail-grid">
+                      <div class="detail-item">
+                        <span class="detail-label">User Agent:</span>
+                        <span class="detail-value">Mozilla/5.0 (Windows NT 10.0; Win64; x64)...</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="detail-label">Entity ID:</span>
+                        <span class="detail-value">a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6</span>
+                      </div>
+                      <div class="detail-item" style="grid-column: 1 / -1;">
+                        <span class="detail-label">Metadata:</span>
+                        <pre class="metadata-json">{
+  "amount": 50000,
+  "loanType": "personal",
+  "term": 36,
+  "applicantName": "John Smith"
+}</pre>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="log-row" onclick="this.classList.toggle('expanded')">
+                <td class="timestamp">Mar 1, 2025 9:15 AM</td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">John Doe</div>
+                    <div class="user-email">john.doe@abcbank.com</div>
+                    <span class="role-badge role-admin">Admin</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="action-badge action-update">user.updated</span>
+                </td>
+                <td>
+                  User
+                  <span class="entity-id">x9y8z7w6...</span>
+                </td>
+                <td>192.168.1.50</td>
+                <td><span class="expand-icon">▼</span></td>
+              </tr>
+              <tr class="expanded-row">
+                <td colspan="6">
+                  <div class="expanded-content">
+                    <div class="detail-grid">
+                      <div class="detail-item">
+                        <span class="detail-label">User Agent:</span>
+                        <span class="detail-value">Mozilla/5.0 (Macintosh; Intel Mac OS X...)...</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="detail-label">Entity ID:</span>
+                        <span class="detail-value">x9y8z7w6-v5u4-t3s2-r1q0-p9o8n7m6l5k4</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="log-row" onclick="this.classList.toggle('expanded')">
+                <td class="timestamp">Feb 28, 2025 4:45 PM</td>
+                <td>
+                  <div class="user-info">
+                    <div class="user-name">Bob Wilson</div>
+                    <div class="user-email">bob.wilson@abcbank.com</div>
+                    <span class="role-badge role-officer">Officer</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="action-badge action-approve">loan.approved</span>
+                </td>
+                <td>
+                  Loan
+                  <span class="entity-id">m3n4o5p6...</span>
+                </td>
+                <td>192.168.1.75</td>
+                <td><span class="expand-icon">▼</span></td>
+              </tr>
+              <tr class="expanded-row">
+                <td colspan="6">
+                  <div class="expanded-content">
+                    <div class="detail-grid">
+                      <div class="detail-item">
+                        <span class="detail-label">User Agent:</span>
+                        <span class="detail-value">Mozilla/5.0 (Windows NT 10.0; Win64; x64)...</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="detail-label">Entity ID:</span>
+                        <span class="detail-value">m3n4o5p6-q7r8-s9t0-u1v2-w3x4y5z6a7b8</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="pagination-btn" disabled>← Previous</button>
+            <span class="pagination-info">Page 1 of 50 (2,500 total)</span>
+            <button class="pagination-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

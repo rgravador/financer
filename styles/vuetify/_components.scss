@@ -1,0 +1,97 @@
+// Reduce Material Design's prominent shadows
+.v-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+
+  &.v-card--elevation-2 {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  &.v-card--elevation-3 {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+  }
+}
+
+// Clean table styling
+.v-data-table {
+  .v-data-table__tr:hover {
+    background-color: rgba(30, 58, 138, 0.06) !important; // Navy blue hover
+  }
+
+  .v-data-table__th {
+    font-weight: 600 !important;
+    color: #475569 !important;
+  }
+}
+
+// Button refinements
+.v-btn {
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+
+  &.v-btn--elevated:not(.v-btn--disabled) {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+
+    &:hover {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+
+  // Ensure primary buttons have white text
+  &.bg-primary {
+    color: rgb(var(--v-theme-on-primary)) !important;
+  }
+
+  // Ensure secondary (gold) buttons have dark text
+  &.bg-secondary {
+    color: rgb(var(--v-theme-on-secondary)) !important;
+  }
+}
+
+// Avatar text visibility
+.v-avatar {
+  &.bg-primary {
+    color: rgb(var(--v-theme-on-primary)) !important;
+  }
+
+  &.bg-secondary {
+    color: rgb(var(--v-theme-on-secondary)) !important;
+  }
+}
+
+// Navigation items with primary color
+.v-list-item {
+  &.v-list-item--active {
+    .v-list-item__content,
+    .v-list-item-title,
+    .v-icon {
+      color: rgb(var(--v-theme-on-primary)) !important;
+    }
+  }
+}
+
+// Input field refinements
+.v-text-field,
+.v-select {
+  .v-field__outline {
+    --v-field-border-opacity: 0.3;
+  }
+
+  &:hover .v-field__outline {
+    --v-field-border-opacity: 0.6;
+  }
+}
+
+// Navigation drawer
+.v-navigation-drawer {
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+// App bar
+.v-app-bar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+// Chip styling
+.v-chip {
+  font-weight: 500 !important;
+}

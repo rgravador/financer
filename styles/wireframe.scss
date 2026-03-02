@@ -1,0 +1,592 @@
+/**
+ * Wireframe Design System Stylesheet
+ *
+ * Shared CSS patterns for wireframe-styled components
+ * Based on designs in docs/wireframes/
+ */
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.wf-page-header {
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+}
+
+.wf-page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.wf-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+/* ============================================
+   SPACING & LAYOUT
+   ============================================ */
+
+.wf-content-padding {
+  padding: 32px;
+}
+
+.wf-section-gap {
+  margin-bottom: 24px;
+}
+
+.wf-form-field-spacing {
+  margin-bottom: 16px;
+}
+
+/* ============================================
+   CARDS & CONTAINERS
+   ============================================ */
+
+.wf-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+}
+
+.wf-section-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+.wf-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #f9fafb;
+    padding: 12px 24px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 16px 24px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 14px;
+  }
+
+  tr:hover {
+    background: rgba(30, 58, 138, 0.04);
+    cursor: pointer;
+  }
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+
+.wf-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.pending {
+    background: #fef3c7;
+    color: #92400e;
+
+    .status-dot {
+      background: #f59e0b;
+    }
+  }
+
+  &.approved,
+  &.active {
+    background: #d1fae5;
+    color: #065f46;
+
+    .status-dot {
+      background: #10b981;
+    }
+  }
+
+  &.rejected,
+  &.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+
+    .status-dot {
+      background: #ef4444;
+    }
+  }
+
+  &.review,
+  &.in-review {
+    background: #dbeafe;
+    color: #1e40af;
+
+    .status-dot {
+      background: #3b82f6;
+    }
+  }
+}
+
+.wf-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+
+.wf-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.wf-form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+
+  &.required::after {
+    content: ' *';
+    color: #ef4444;
+  }
+}
+
+.wf-form-input,
+.wf-form-select {
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #1e3a8a;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.wf-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: inherit;
+
+  &.primary {
+    background: #1e3a8a;
+    color: white;
+
+    &:hover {
+      background: #1e3a8a;
+      filter: brightness(1.1);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &.outline {
+    background: transparent;
+    border: 2px solid #e5e7eb;
+    color: #1e3a8a;
+
+    &:hover {
+      border-color: #1e3a8a;
+      background: rgba(30, 58, 138, 0.04);
+    }
+  }
+
+  &.icon {
+    padding: 8px;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
+
+    &:hover {
+      background: #f3f4f6;
+    }
+  }
+}
+
+/* ============================================
+   TOOLBAR
+   ============================================ */
+
+.wf-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.wf-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   SEARCH BOX
+   ============================================ */
+
+.wf-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+    pointer-events: none;
+  }
+
+  .search-input {
+    padding: 10px 16px 10px 36px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 300px;
+
+    &:focus {
+      outline: none;
+      border-color: #1e3a8a;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+
+.wf-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.wf-pagination-btn {
+  padding: 8px 16px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: #1e3a8a;
+    color: #1e3a8a;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.wf-pagination-info {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ============================================
+   FILTER CARDS
+   ============================================ */
+
+.wf-filters-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.wf-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* ============================================
+   INFO ROWS (Detail Pages)
+   ============================================ */
+
+.wf-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.wf-info-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.wf-info-value {
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* ============================================
+   ACTION BADGES (Audit Logs)
+   ============================================ */
+
+.wf-action-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+
+  &.create {
+    background: #10b981;
+  }
+
+  &.update {
+    background: #f59e0b;
+  }
+
+  &.delete {
+    background: #ef4444;
+  }
+
+  &.approve {
+    background: #3b82f6;
+  }
+}
+
+/* ============================================
+   EXPANDABLE ROWS
+   ============================================ */
+
+.wf-expand-icon {
+  color: #9ca3af;
+  transition: transform 0.2s;
+  font-size: 18px;
+}
+
+.wf-expanded-row {
+  background: #f9fafb;
+
+  .expanded-content {
+    padding: 16px 24px;
+  }
+}
+
+.wf-log-row {
+  &.expanded {
+    .wf-expand-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/* ============================================
+   TWO-COLUMN LAYOUTS
+   ============================================ */
+
+.wf-form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   MONOSPACE ELEMENTS
+   ============================================ */
+
+.wf-monospace {
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.wf-timestamp {
+  @extend .wf-monospace;
+  color: #6b7280;
+}
+
+.wf-app-id {
+  @extend .wf-monospace;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.wf-entity-id {
+  @extend .wf-monospace;
+  display: block;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.wf-amount {
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.wf-loan-type {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f0f4ff;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #1e3a8a;
+  font-weight: 500;
+}
+
+.wf-role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  margin-top: 4px;
+
+  &.admin {
+    background: #ef4444;
+  }
+
+  &.officer {
+    background: #3b82f6;
+  }
+
+  &.approver {
+    background: #10b981;
+  }
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.wf-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+  }
+
+  .empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+
+  .empty-message {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+  .wf-content-padding {
+    padding: 16px;
+  }
+
+  .wf-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wf-filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .wf-search-box .search-input {
+    width: 100%;
+  }
+
+  .wf-table {
+    font-size: 13px;
+
+    th,
+    td {
+      padding: 8px 12px;
+    }
+  }
+}

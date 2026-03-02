@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Types - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="common-styles.css">
+  <style>
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #f9fafb;
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .table tr:hover {
+      background: rgba(30, 58, 138, 0.04);
+      cursor: pointer;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-active .status-dot {
+      background: #10b981;
+    }
+
+    .status-inactive .status-dot {
+      background: #ef4444;
+    }
+
+    .action-btn {
+      color: #1e3a8a;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .action-btn:hover {
+      background: #f0f4ff;
+    }
+
+    .rate {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">A</div>
+        <div class="logo-text">ASCENDENT</div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Tenant Admin</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="tenant-admin-dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="users-management.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Users</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">Loan Types</span>
+        </a>
+        <a href="loan-applications.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Loan Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">💳</span>
+          <span class="nav-label">Payments</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="audit-logs.html" class="nav-item">
+          <span class="nav-icon">📜</span>
+          <span class="nav-label">Audit Logs</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="page-title">Loan Types</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">🔔</button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="page-header">
+          <h1>Loan Types Management</h1>
+          <p class="page-subtitle">Configure available loan products</p>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <a href="loan-type-form.html" class="btn btn-primary">+ Create Loan Type</a>
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search loan types...">
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="section-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Interest Rate</th>
+                <th>Term Range</th>
+                <th>Amount Range</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Personal Loan</strong></td>
+                <td><span class="rate">8.5%</span></td>
+                <td>1 - 5 years</td>
+                <td>$5,000 - $100,000</td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td><a href="loan-type-form.html" class="action-btn">Edit</a></td>
+              </tr>
+              <tr>
+                <td><strong>Auto Loan</strong></td>
+                <td><span class="rate">6.2%</span></td>
+                <td>2 - 7 years</td>
+                <td>$10,000 - $75,000</td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td><a href="loan-type-form.html" class="action-btn">Edit</a></td>
+              </tr>
+              <tr>
+                <td><strong>Home Loan</strong></td>
+                <td><span class="rate">4.5%</span></td>
+                <td>5 - 30 years</td>
+                <td>$50,000 - $1,000,000</td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td><a href="loan-type-form.html" class="action-btn">Edit</a></td>
+              </tr>
+              <tr>
+                <td><strong>Business Loan</strong></td>
+                <td><span class="rate">9.0%</span></td>
+                <td>1 - 10 years</td>
+                <td>$25,000 - $500,000</td>
+                <td>
+                  <span class="status-badge status-inactive">
+                    <span class="status-dot"></span>
+                    Inactive
+                  </span>
+                </td>
+                <td><a href="loan-type-form.html" class="action-btn">Edit</a></td>
+              </tr>
+              <tr>
+                <td><strong>Education Loan</strong></td>
+                <td><span class="rate">5.8%</span></td>
+                <td>1 - 15 years</td>
+                <td>$5,000 - $150,000</td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td><a href="loan-type-form.html" class="action-btn">Edit</a></td>
+              </tr>
+              <tr>
+                <td><strong>Emergency Loan</strong></td>
+                <td><span class="rate">12.5%</span></td>
+                <td>6 months - 2 years</td>
+                <td>$1,000 - $25,000</td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td><a href="loan-type-form.html" class="action-btn">Edit</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

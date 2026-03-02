@@ -1,21 +1,60 @@
-# Financer — Compound Engineering Plan
+# Ascendent — Compound Engineering Plan
 
 **Multi-Tenant Lender Application**
-Version 1.1 | February 2026 (Updated with Security Hardening)
+Version 1.2 | March 2026 (Updated with Vuetify Component Library Integration)
+
+-----
+
+## Implementation Status
+
+| Step | Module | Status | Notes |
+|------|--------|--------|-------|
+| 1 | Project Scaffold | 🟢 Complete | Folder structure, dependencies, MongoDB connection, models, types all implemented. |
+| 2 | Authentication Module | 🟢 Complete | JWT auth, login/refresh/me endpoints, Pinia store, auth middleware, login page, seeder complete. |
+| 3 | Security Hardening | 🟢 Complete | CSRF, rate limiting, password reset, session management, file validation, account lockout all implemented. |
+| 4 | System Admin Module | 🟢 Complete | Role guards, tenant CRUD API, system admin dashboard, tenant management UI all complete. |
+| 5 | User Management Module | 🟢 Complete | User CRUD API, tenant-scoped operations, role badges, user management dashboard, invite modal all complete. |
+| 6 | Loan Types Module | ⚪ Not Started | Requires Step 5 completion |
+| 7 | Loan Application Module | ⚪ Not Started | Requires Step 6 completion |
+| 8 | Loan Approval Module | ⚪ Not Started | Requires Step 7 completion |
+| 9 | Audit Log Module | ⚪ Not Started | Requires Step 8 completion |
+| 10 | Dashboards Module | 🟢 Complete | All four role-specific dashboards implemented with stats APIs, StatCard component, authentication fixes, and role-based navigation. |
+| 11 | UI Component Library (Vuetify) | 🟢 Complete | Vuetify 3 installed, custom theme, dashboard page, theme system complete. |
+| 11b | UI Polish & Shared Components | ⚪ Not Started | Requires Step 11 completion (can start now) |
+| 12 | Web Deployment | ⚪ Not Started | Requires Step 11b completion |
+| 13 | Desktop Packaging (Tauri) | ⚪ Not Started | Requires Step 12 completion |
+
+**Status Legend:** 🟢 Complete | 🟡 In Progress | ⚪ Not Started
+
+**Related Documents:**
+- [Component Library Brainstorm](../brainstorms/2026-03-02-component-library-brainstorm.md) - Decision rationale for Vuetify 3
+- [Implementation Status](../IMPLEMENTATION_STATUS.md) - Detailed progress tracking and file inventory
 
 -----
 
 ## Overview
 
-This document outlines the Compound Engineering build plan for **Financer**, a multi-tenant lending platform built with Nuxt 3 (SPA), TypeScript, Pinia, MongoDB Atlas, JWT authentication, and Tauri for desktop packaging. Each step is a self-contained compound prompt designed to be executed sequentially in Claude Code, where each module builds cleanly on the last.
+This document outlines the Compound Engineering build plan for **Ascendent**, a multi-tenant lending platform built with Nuxt 3 (SPA), TypeScript, Pinia, MongoDB Atlas, JWT authentication, and Tauri for desktop packaging. Each step is a self-contained compound prompt designed to be executed sequentially in Claude Code, where each module builds cleanly on the last.
 
-**Version 1.1 Update:** Added comprehensive security hardening (Step 3) covering account protection, CSRF, input validation, file upload security, session management, and password reset flows to ensure production-ready security posture.
+**Version History:**
+- **v1.0** (February 2026): Initial plan with 11 steps
+- **v1.1** (February 2026): Added comprehensive security hardening (Step 3) covering account protection, CSRF, input validation, file upload security, session management, and password reset flows
+- **v1.2** (March 2026): Integrated Vuetify 3 as the UI component library (new Step 11), split original Step 11 into Step 11 (Vuetify Integration) and Step 11b (Application-Specific Components)
+
+**Component Library Decision:**
+After thorough evaluation (see [brainstorm document](../brainstorms/2026-03-02-component-library-brainstorm.md)), **Vuetify 3** was selected as the UI component library for Ascendent. Key factors:
+- Comprehensive enterprise component set (100+ components) suitable for financial applications
+- Excellent Nuxt 3 integration via `vuetify-nuxt-module`
+- Powerful theming system allowing deep customization away from default Material Design
+- Strong TypeScript support and production-ready stability
+- Rich form components, data tables, and validation patterns needed for lending workflows
 
 ### Tech Stack Summary
 
 |Layer           |Technology                             |
 |----------------|---------------------------------------|
 |Frontend        |Nuxt 3 (SPA, `ssr: false`) + TypeScript|
+|UI Components   |Vuetify 3 (Material Design, customized)|
 |State Management|Pinia                                  |
 |Backend API     |Nuxt server/api                        |
 |Database        |MongoDB Atlas (Mongoose)               |
@@ -44,7 +83,7 @@ This document outlines the Compound Engineering build plan for **Financer**, a m
 **Compound Prompt:**
 
 ```
-Scaffold a Nuxt 3 SPA (ssr: false) TypeScript project named "Financer" for a multi-tenant lending application.
+Scaffold a Nuxt 3 SPA (ssr: false) TypeScript project named "Ascendent" for a multi-tenant lending application.
 
 Requirements:
 - Set ssr: false in nuxt.config.ts
@@ -117,7 +156,7 @@ User model (users collection):
 **Compound Prompt:**
 
 ```
-Build the complete authentication module for the Financer multi-tenant app.
+Build the complete authentication module for the Ascendent multi-tenant app.
 
 Server-side:
 
@@ -155,7 +194,7 @@ Server-side:
    - Returns 401 if missing or invalid token
 
 7. Create a database seeder script at /scripts/seed.ts:
-   - Creates one system_admin user: admin@Financer.com / Admin@123
+   - Creates one system_admin user: admin@Ascendent.com / Admin@123
    - Logs credentials on completion
 
 Client-side:
@@ -208,7 +247,7 @@ Client-side:
 **Compound Prompt:**
 
 ```
-Implement comprehensive security hardening for Financer to protect against common vulnerabilities.
+Implement comprehensive security hardening for Ascendent to protect against common vulnerabilities.
 
 Server-side security utilities in /server/utils/:
 
@@ -374,7 +413,7 @@ Environment variables to add to .env.example:
   SMTP_PORT=
   SMTP_USER=
   SMTP_PASSWORD=
-  SMTP_FROM=noreply@Financer.com
+  SMTP_FROM=noreply@Ascendent.com
   APP_URL=http://localhost:3000 (for password reset links)
   CLAMAV_HOST= (optional, for virus scanning)
   CLAMAV_PORT=
@@ -415,7 +454,7 @@ Testing checklist:
 **Compound Prompt:**
 
 ```
-Build the System Admin module for Financer. Only users with role 'system_admin' can access these routes.
+Build the System Admin module for Ascendent. Only users with role 'system_admin' can access these routes.
 
 Server-side API routes in /server/api/system/:
 
@@ -478,7 +517,7 @@ Client-side pages (all require definePageMeta with role: ['system_admin']):
 **Compound Prompt:**
 
 ```
-Build the User Management module for Financer tenant admins.
+Build the User Management module for Ascendent tenant admins.
 
 Server-side API routes in /server/api/tenant/users/:
 
@@ -543,7 +582,7 @@ Client-side:
 **Compound Prompt:**
 
 ```
-Build the Loan Types module for Financer.
+Build the Loan Types module for Ascendent.
 
 Create Mongoose model /server/models/LoanType.ts:
   - tenantId: ObjectId (required, ref: Tenant)
@@ -625,7 +664,7 @@ Client-side:
 **Compound Prompt:**
 
 ```
-Build the Loan Application creation module for Financer loan officers.
+Build the Loan Application creation module for Ascendent loan officers.
 
 Create Mongoose model /server/models/Notification.ts (used for notifying approvers):
   - tenantId: ObjectId (ref: Tenant)
@@ -782,7 +821,7 @@ Client-side:
 **Compound Prompt:**
 
 ```
-Build the Loan Approval module for Financer approvers.
+Build the Loan Approval module for Ascendent approvers.
 
 Note: The Notification model was created in Step 7.
 
@@ -895,7 +934,7 @@ Client-side:
 **Compound Prompt:**
 
 ```
-Build the Audit Log module for Financer.
+Build the Audit Log module for Ascendent.
 
 Create Mongoose model /server/models/AuditLog.ts:
   - tenantId: ObjectId (nullable, ref: Tenant — null for system-level actions)
@@ -965,7 +1004,7 @@ Client-side:
 **Compound Prompt:**
 
 ```
-Build role-specific dashboards for Financer.
+Build role-specific dashboards for Ascendent.
 
 Server-side API routes:
 
@@ -1027,86 +1066,465 @@ Update the role-based redirect in /pages/auth/login.vue:
 
 -----
 
-## Step 11 — UI Polish & Shared Components
+## Step 11 — UI Component Library Integration (Vuetify 3)
 
-**Goal:** Build a consistent design system with shared components, loading states, and error handling throughout the app.
+**Goal:** Integrate Vuetify 3 as the component library and configure custom theme for modern, professional financial application aesthetic.
+
+**Related Documentation:** See [Component Library Brainstorm](../brainstorms/2026-03-02-component-library-brainstorm.md) for decision rationale.
 
 **Compound Prompt:**
 
 ```
-Build the shared UI component library and apply consistent styling across Financer.
+Integrate Vuetify 3 into the Ascendent Nuxt 3 application with a heavily customized theme.
 
-Install and configure:
-- @nuxtjs/tailwindcss (if not already present)
-- Configure tailwind.config.ts with the Financer color palette:
-  navy: '#1A1A2E', accent: '#2D5BE3', success: '#1A8A5A',
-  warning: '#C47A1A', danger: '#C42A2A'
+Installation and setup:
 
-Create the following shared components in /components/shared/:
+1. Install Vuetify 3 and related dependencies:
+   npm install vuetify vuetify-nuxt-module @mdi/font sass
 
-1. AppLayout.vue — base layout wrapper with sidebar + topbar
-   - Sidebar with role-appropriate navigation links
-   - Top bar with page title, notification bell, user avatar + name + logout
-   - Responsive (collapsible sidebar on mobile)
+2. Update nuxt.config.ts to add vuetify-nuxt-module:
+   modules: [
+     '@pinia/nuxt',
+     'vuetify-nuxt-module'
+   ]
 
-2. AppSidebar.vue — navigation sidebar
-   - Dynamic links based on user role (computed from useAuth)
-   - Active state highlighting
-   - Logo at top
+3. Create /styles/vuetify/ directory structure:
+   /styles/
+     vuetify/
+       _variables.scss      # SCSS variable overrides
+       _theme.scss          # Main theme configuration
+       _components.scss     # Component-specific style overrides
+       index.scss           # Import all theme files
 
-3. AppTopbar.vue — top navigation bar
-   - Page title slot
-   - Right slot: NotificationBell + UserMenu
+Custom Theme Configuration:
 
-4. UserMenu.vue — avatar dropdown
-   - Shows: name, role badge, email
-   - Links: Profile, Sign Out
+4. Create /plugins/vuetify.ts with custom theme:
 
-5. DataTable.vue — reusable table component
-   - Props: columns (label, key, width), rows, loading, emptyText
-   - Loading skeleton rows
-   - Empty state with icon and message
+   import { createVuetify } from 'vuetify'
+   import * as components from 'vuetify/components'
+   import * as directives from 'vuetify/directives'
+   import '@mdi/font/css/materialdesignicons.css'
+   import '../styles/vuetify/index.scss'
 
-6. PageHeader.vue — page title + breadcrumb + action slot
-   - Props: title, subtitle, breadcrumb array
-   - Right slot for action buttons
+   export default defineNuxtPlugin((nuxtApp) => {
+     const vuetify = createVuetify({
+       components,
+       directives,
+       theme: {
+         defaultTheme: 'financerLight',
+         themes: {
+           financerLight: {
+             dark: false,
+             colors: {
+               // Primary financial blue palette
+               primary: '#2563EB',      // Modern blue
+               secondary: '#64748B',    // Slate gray
+               accent: '#0EA5E9',       // Sky blue
 
-7. ConfirmModal.vue — reusable confirmation dialog
-   - Props: title, message, confirmLabel, confirmVariant (danger/primary)
-   - Emits: confirmed, cancelled
+               // Semantic colors
+               success: '#10B981',      // Emerald green
+               warning: '#F59E0B',      // Amber
+               error: '#EF4444',        // Red
+               info: '#3B82F6',         // Blue
 
-8. FormDrawer.vue — slide-in drawer for forms
-   - Props: title, open (v-model)
-   - Slot for form content
-   - Footer slot for action buttons
+               // Surface colors
+               background: '#F8FAFC',   // Very light gray
+               surface: '#FFFFFF',      // White
+               'surface-variant': '#F1F5F9', // Light slate
 
-9. LoadingSpinner.vue — centered spinner with optional message
+               // Text colors
+               'on-primary': '#FFFFFF',
+               'on-secondary': '#FFFFFF',
+               'on-success': '#FFFFFF',
+               'on-warning': '#000000',
+               'on-error': '#FFFFFF',
+               'on-background': '#1E293B',
+               'on-surface': '#1E293B',
+             }
+           },
+           financerDark: {
+             dark: true,
+             colors: {
+               primary: '#3B82F6',
+               secondary: '#64748B',
+               accent: '#0EA5E9',
+               success: '#10B981',
+               warning: '#F59E0B',
+               error: '#EF4444',
+               info: '#3B82F6',
+               background: '#0F172A',   // Dark slate
+               surface: '#1E293B',      // Slate
+               'surface-variant': '#334155',
+               'on-primary': '#FFFFFF',
+               'on-secondary': '#FFFFFF',
+               'on-success': '#FFFFFF',
+               'on-warning': '#000000',
+               'on-error': '#FFFFFF',
+               'on-background': '#F1F5F9',
+               'on-surface': '#F1F5F9',
+             }
+           }
+         }
+       },
+       defaults: {
+         VBtn: {
+           style: 'text-transform: none;', // Remove uppercase
+           rounded: 'lg',                  // Softer corners
+           elevation: 0,                   // Flat by default
+         },
+         VCard: {
+           elevation: 1,                   // Subtle shadow
+           rounded: 'lg',
+         },
+         VTextField: {
+           variant: 'outlined',
+           density: 'comfortable',
+         },
+         VSelect: {
+           variant: 'outlined',
+           density: 'comfortable',
+         },
+         VDataTable: {
+           density: 'comfortable',
+         }
+       }
+     })
 
-10. EmptyState.vue — empty state with icon, title, description, optional action button
+     nuxtApp.vueApp.use(vuetify)
+   })
 
-11. StatusBadge.vue — renders loan application status as color-coded badge:
-    draft → gray, submitted → blue, under_review → indigo,
-    pending_documents → amber, approved → green, rejected → red, disbursed → teal
+5. Create /styles/vuetify/_variables.scss with SCSS overrides:
 
-Apply AppLayout.vue as the default layout in /layouts/default.vue.
-Apply a minimal /layouts/auth.vue for login page (no sidebar).
+   // Typography
+   $body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+   $heading-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-Add global error handling in /plugins/error-handler.ts:
-  - Intercepts 401 → clears auth store → redirects to /login
-  - Intercepts 403 → redirects to /unauthorized
-  - Intercepts 500 → shows toast notification "Something went wrong"
+   // Spacing
+   $spacer: 8px;
 
-Create /composables/useToast.ts:
-  - show(message, type: 'success'|'error'|'warning'|'info', duration = 3000)
-  - Renders toasts in a fixed position overlay
+   // Border radius (softer than Material Design default)
+   $border-radius-root: 12px;
+
+   // Shadows (more subtle than Material Design)
+   $shadow-key-umbra-opacity: 0.08;
+   $shadow-key-penumbra-opacity: 0.05;
+   $shadow-key-ambient-opacity: 0.03;
+
+6. Create /styles/vuetify/_components.scss for component overrides:
+
+   // Reduce Material Design's prominent shadows
+   .v-card {
+     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+
+     &.elevation-2 {
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+     }
+   }
+
+   // Clean table styling
+   .v-data-table {
+     .v-data-table__tr:hover {
+       background-color: rgba(37, 99, 235, 0.04);
+     }
+   }
+
+   // Button refinements
+   .v-btn {
+     font-weight: 500;
+     letter-spacing: 0.01em;
+   }
+
+7. Create /styles/vuetify/index.scss to import all theme files:
+
+   @import './variables';
+   @import './theme';
+   @import './components';
+
+8. Update nuxt.config.ts to include CSS:
+
+   css: [
+     'vuetify/styles',
+     '@mdi/font/css/materialdesignicons.css',
+     '~/styles/vuetify/index.scss'
+   ],
+
+   vite: {
+     css: {
+       preprocessorOptions: {
+         scss: {
+           additionalData: `@import "~/styles/vuetify/_variables.scss";`
+         }
+       }
+     }
+   }
+
+Typography Setup:
+
+9. Install Inter font (modern, professional):
+   - Add to index.html or use @nuxtjs/google-fonts module
+   - Or use nuxt.config.ts:
+
+     app: {
+       head: {
+         link: [
+           {
+             rel: 'stylesheet',
+             href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+           }
+         ]
+       }
+     }
+
+Sample Component Integration:
+
+10. Create a sample page /pages/index.vue to demonstrate Vuetify integration:
+
+    <template>
+      <v-app>
+        <v-main>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <h1 class="text-h3 mb-4">Ascendent</h1>
+                <p class="text-body-1 text-medium-emphasis mb-8">
+                  Multi-tenant lending platform with modern design
+                </p>
+              </v-col>
+            </v-row>
+
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card>
+                  <v-card-title>Applications</v-card-title>
+                  <v-card-subtitle>Total submitted this month</v-card-subtitle>
+                  <v-card-text>
+                    <div class="text-h2 font-weight-bold text-primary">156</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="4">
+                <v-card>
+                  <v-card-title>Pending</v-card-title>
+                  <v-card-subtitle>Awaiting approval</v-card-subtitle>
+                  <v-card-text>
+                    <div class="text-h2 font-weight-bold text-warning">23</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="4">
+                <v-card>
+                  <v-card-title>Approved</v-card-title>
+                  <v-card-subtitle>This month</v-card-subtitle>
+                  <v-card-text>
+                    <div class="text-h2 font-weight-bold text-success">98</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+
+            <v-row class="mt-8">
+              <v-col cols="12">
+                <v-card>
+                  <v-card-title>Component Demo</v-card-title>
+                  <v-card-text>
+                    <v-btn color="primary" class="mr-2">Primary Button</v-btn>
+                    <v-btn color="secondary" class="mr-2">Secondary Button</v-btn>
+                    <v-btn variant="outlined" color="primary">Outlined</v-btn>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-main>
+      </v-app>
+    </template>
+
+11. Create dark mode toggle composable /composables/useTheme.ts:
+
+    export const useTheme = () => {
+      const theme = useState('theme', () => 'financerLight')
+
+      const toggleTheme = () => {
+        theme.value = theme.value === 'financerLight' ? 'financerDark' : 'financerLight'
+        if (process.client) {
+          localStorage.setItem('financer-theme', theme.value)
+        }
+      }
+
+      const initTheme = () => {
+        if (process.client) {
+          const saved = localStorage.getItem('financer-theme')
+          if (saved) theme.value = saved
+        }
+      }
+
+      return {
+        theme,
+        toggleTheme,
+        initTheme
+      }
+    }
+
+Documentation:
+
+12. Create /docs/VUETIFY_CUSTOMIZATION.md documenting:
+    - Theme color palette and usage guidelines
+    - Component default overrides
+    - How to customize additional components
+    - Dark mode implementation
+    - Accessibility considerations
+    - Do's and don'ts for maintaining design consistency
+
+Testing:
+
+13. Verify Vuetify integration:
+    - Run npm run dev
+    - Check that the sample page renders correctly
+    - Verify dark mode toggle works
+    - Test responsive behavior (mobile, tablet, desktop)
+    - Verify all Vuetify components are available
+    - Check bundle size impact (should use tree-shaking)
+
+Next Steps:
+After completing this step, proceed to Step 11b (UI Polish & Shared Components) to build
+application-specific reusable components on top of Vuetify's foundation.
 ```
 
 **Expected Output:**
 
-- Consistent design system across all pages
-- Role-aware sidebar navigation
+- Vuetify 3 fully integrated with Nuxt 3
+- Custom theme with modern financial aesthetic (not default Material Design)
+- Dark mode support built-in
+- Component defaults configured for consistency
+- Inter font or similar professional typeface
+- Sample page demonstrating integration
+- Documentation for future customization
+
+-----
+
+## Step 11b — UI Polish & Shared Components
+
+**Goal:** Build application-specific shared components on top of Vuetify foundation, with consistent patterns and error handling.
+
+**Compound Prompt:**
+
+```
+Build Ascendent-specific shared UI components using Vuetify as the foundation.
+
+Create the following Ascendent-specific shared components in /components/shared/:
+
+1. AppLayout.vue — base layout wrapper using Vuetify's v-navigation-drawer and v-app-bar
+   - v-navigation-drawer with role-appropriate navigation links
+   - v-app-bar with page title, notification bell, user avatar + name + logout
+   - Responsive (drawer.mobile prop handles mobile behavior)
+   - Uses Vuetify's built-in breakpoint system
+
+2. AppSidebar.vue — navigation sidebar using v-list
+   - Dynamic v-list-item components based on user role (computed from useAuth)
+   - v-list-item-title for link labels
+   - Active state using v-list-item's active prop
+   - Logo at top (v-img or custom component)
+   - Ascendent branding colors
+
+3. AppTopbar.vue — top navigation bar using v-app-bar
+   - v-app-bar-title for page title slot
+   - v-spacer to push items right
+   - Right side: NotificationBell + UserMenu components
+   - Theme toggle button (dark/light mode)
+
+4. UserMenu.vue — avatar dropdown using v-menu + v-list
+   - v-avatar showing user initials or photo
+   - v-menu activator
+   - v-list with: name, role badge, email, divider, Profile link, Sign Out
+   - Uses RoleBadge component
+
+5. AscendentDataTable.vue — wrapper around v-data-table with Ascendent defaults
+   - Props: columns (text, value, sortable), items, loading, emptyText
+   - Built-in loading state (v-data-table handles this)
+   - Empty state with v-icon and message
+   - Hover effects and selection styling
+   - Pagination controls
+
+6. PageHeader.vue — page title + breadcrumbs using v-breadcrumbs
+   - Props: title, subtitle, breadcrumbs array
+   - Uses v-breadcrumbs component
+   - Right slot for v-btn action buttons
+   - Optional back button
+
+7. ConfirmDialog.vue — reusable confirmation using v-dialog
+   - Props: modelValue (v-model), title, message, confirmText, cancelText, confirmColor
+   - v-dialog with v-card
+   - v-card-title, v-card-text, v-card-actions
+   - Emits: update:modelValue, confirm, cancel
+   - Color variants: error (red), primary (blue), warning (amber)
+
+8. FormDrawer.vue — slide-in drawer using v-navigation-drawer (temporary)
+   - Props: modelValue (v-model), title, width
+   - v-navigation-drawer with location="right" and temporary
+   - v-toolbar for title with close button
+   - Default slot for form content
+   - v-card-actions slot for action buttons (Cancel, Save)
+
+9. LoadingOverlay.vue — centered spinner using v-overlay + v-progress-circular
+   - Props: loading (boolean), message (optional)
+   - v-overlay with v-progress-circular
+   - Optional loading message below spinner
+
+10. EmptyState.vue — empty state using v-sheet
+    - Props: icon, title, description, actionText, actionCallback
+    - v-sheet centered content
+    - v-icon (large, using mdi icons)
+    - Typography: title (text-h6), description (text-body-2)
+    - Optional v-btn for action
+
+11. StatusBadge.vue — loan application status using v-chip
+    - Props: status (string)
+    - v-chip with appropriate color:
+      draft → color="grey", submitted → color="blue",
+      under_review → color="indigo", pending_documents → color="amber",
+      approved → color="success", rejected → color="error", disbursed → color="teal"
+    - Size: small
+    - Label variant (pill shape)
+
+12. StatCard.vue — dashboard metric card using v-card
+    - Props: title, value, subtitle, icon, color, trend (up/down/neutral)
+    - v-card with hover effect
+    - v-icon in specified color
+    - Large value display (text-h3)
+    - Optional trend indicator (v-icon: mdi-trending-up/down)
+
+Apply AppLayout.vue as the default layout in /layouts/default.vue.
+Apply a minimal /layouts/auth.vue for login page (no sidebar, centered content, v-card for login form).
+
+Add global error handling in /plugins/error-handler.ts:
+  - Intercepts 401 → clears auth store → redirects to /login
+  - Intercepts 403 → redirects to /unauthorized
+  - Intercepts 500 → shows Vuetify snackbar notification "Something went wrong"
+  - Uses Nuxt's useFetch error handling
+
+Create /composables/useSnackbar.ts (using Vuetify's v-snackbar):
+  - State: { show, message, color, timeout }
+  - Methods: showSuccess(msg), showError(msg), showWarning(msg), showInfo(msg)
+  - Renders v-snackbar component in app layout
+  - Auto-dismiss after timeout (default: 3000ms)
+
+Create a global SnackbarContainer component in /components/shared/SnackbarContainer.vue:
+  - Consumes useSnackbar composable
+  - Renders v-snackbar with current state
+  - Include in AppLayout.vue
+```
+
+**Expected Output:**
+
+- Ascendent-specific shared components built on Vuetify foundation
+- Consistent component patterns across all pages
+- Role-aware sidebar navigation using v-navigation-drawer
 - Global error and loading state handling
-- Toast notifications
+- Snackbar notifications using Vuetify's v-snackbar
+- Reusable data table wrapper with Ascendent styling
+- Dialog and drawer components for forms and confirmations
 
 -----
 
@@ -1117,7 +1535,7 @@ Create /composables/useToast.ts:
 **Compound Prompt:**
 
 ```
-Prepare Financer for production web deployment.
+Prepare Ascendent for production web deployment.
 
 1. Create /server/api/health.get.ts — health check endpoint returning { status: 'ok', timestamp }
 
@@ -1173,14 +1591,14 @@ Prepare Financer for production web deployment.
 **Compound Prompt:**
 
 ```
-Finalize Tauri desktop packaging for Financer.
+Finalize Tauri desktop packaging for Ascendent.
 
 1. Update /src-tauri/tauri.conf.json:
-   - Set productName: "Financer"
+   - Set productName: "Ascendent"
    - Set version from package.json
-   - Set identifier: "com.Financer.app"
+   - Set identifier: "com.Ascendent.app"
    - Point distDir to "../dist"
-   - Set window title: "Financer — Lending Platform"
+   - Set window title: "Ascendent — Lending Platform"
    - Set default window size: 1280x800, minWidth: 1024, minHeight: 768
    - Set window decorations: true, resizable: true
 
@@ -1189,7 +1607,7 @@ Finalize Tauri desktop packaging for Financer.
    - Set endpoint to a GitHub Releases URL pattern
    - Set pubkey (generate with tauri signer generate)
 
-3. Create /src-tauri/icons/ — add Financer app icons in all required sizes:
+3. Create /src-tauri/icons/ — add Ascendent app icons in all required sizes:
    - Use a placeholder script that generates icons from a base SVG
    - Sizes: 32x32, 128x128, 256x256, 512x512, icon.icns (Mac), icon.ico (Windows)
 
@@ -1236,18 +1654,23 @@ Note: The desktop app is a shell around the same web frontend. All data still fl
 
 ```
 Step 1 (Scaffold)
-    └── Step 2 (Auth)
-            └── Step 3 (Security Hardening)
-                    ├── Step 4 (System Admin)
-                    ├── Step 5 (User Management)
-                    │       └── Step 6 (Loan Types)
-                    │               └── Step 7 (Loan Application — Officer)
-                    │                       └── Step 8 (Loan Approval — Approver)
-                    │                               └── Step 9 (Audit Logs)
-                    │                                       └── Step 10 (Dashboards)
-                    │                                               └── Step 11 (UI Polish)
-                    │                                                       ├── Step 12 (Web Deploy)
-                    │                                                       └── Step 13 (Desktop Build)
+    ├── Step 2 (Auth)
+    │       └── Step 3 (Security Hardening)
+    │               ├── Step 4 (System Admin)
+    │               ├── Step 5 (User Management)
+    │               │       └── Step 6 (Loan Types)
+    │               │               └── Step 7 (Loan Application — Officer)
+    │               │                       └── Step 8 (Loan Approval — Approver)
+    │               │                               └── Step 9 (Audit Logs)
+    │               │                                       └── Step 10 (Dashboards)
+    │
+    └── Step 11 (Vuetify Component Library Integration)
+            └── Step 11b (UI Polish & Shared Components)
+                    ├── Step 12 (Web Deploy)
+                    └── Step 13 (Desktop Build)
+
+Note: Step 11 (Vuetify) can be implemented in parallel with Steps 2-10,
+      but Step 11b requires both Step 11 and Step 10 to be complete.
 ```
 
 -----
@@ -1346,5 +1769,5 @@ Final Rate locked on application upon approval
 
 -----
 
-*Financer Compound Engineering Plan — v1.0*
+*Ascendent Compound Engineering Plan — v1.0*
 *Generated for use with Claude Code*

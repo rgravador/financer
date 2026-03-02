@@ -1,0 +1,14 @@
+// Typography - Inter font family
+$body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
+$heading-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
+
+// Spacing
+$spacer: 8px !default;
+
+// Border radius (softer than Material Design default)
+$border-radius-root: 12px !default;
+
+// Shadows (more subtle than Material Design)
+$shadow-key-umbra-opacity: 0.08 !default;
+$shadow-key-penumbra-opacity: 0.05 !default;
+$shadow-key-ambient-opacity: 0.03 !default;

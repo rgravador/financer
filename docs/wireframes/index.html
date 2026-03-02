@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ascendent - Wireframes Index</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #F8FAFC;
+      color: #1E293B;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #1e3a8a;
+      font-size: 42px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 48px;
+      font-size: 18px;
+    }
+
+    .color-palette {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 48px;
+    }
+
+    .color-palette h2 {
+      color: #1e3a8a;
+      margin-bottom: 20px;
+    }
+
+    .colors {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .color-box {
+      text-align: center;
+    }
+
+    .color-swatch {
+      height: 80px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 2px solid #e5e7eb;
+    }
+
+    .color-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .color-value {
+      font-size: 11px;
+      color: #6b7280;
+      font-family: monospace;
+    }
+
+    .wireframes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .wireframe-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .wireframe-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(30, 58, 138, 0.15);
+    }
+
+    .wireframe-preview {
+      height: 200px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+    }
+
+    .wireframe-info {
+      padding: 20px;
+    }
+
+    .wireframe-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .wireframe-desc {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .wireframe-role {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #f59e0b;
+      color: white;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      color: #1e3a8a;
+      margin: 48px 0 24px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ Ascendent Wireframes</h1>
+    <p class="subtitle">Interactive HTML wireframes for the loan management system</p>
+
+    <!-- Color Palette -->
+    <div class="color-palette">
+      <h2>Color Palette - Navy Blue & Gold</h2>
+      <div class="colors">
+        <div class="color-box">
+          <div class="color-swatch" style="background: #1e3a8a;"></div>
+          <div class="color-label">Primary</div>
+          <div class="color-value">#1e3a8a</div>
+        </div>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #f59e0b;"></div>
+          <div class="color-label">Secondary</div>
+          <div class="color-value">#f59e0b</div>
+        </div>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #eab308;"></div>
+          <div class="color-label">Accent</div>
+          <div class="color-value">#eab308</div>
+        </div>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #10B981;"></div>
+          <div class="color-label">Success</div>
+          <div class="color-value">#10B981</div>
+        </div>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #EF4444;"></div>
+          <div class="color-label">Error</div>
+          <div class="color-value">#EF4444</div>
+        </div>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #F8FAFC;"></div>
+          <div class="color-label">Background</div>
+          <div class="color-value">#F8FAFC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authentication -->
+    <h2 class="section-title">Authentication</h2>
+    <div class="wireframes-grid">
+      <a href="login.html" class="wireframe-card">
+        <div class="wireframe-preview">🔐</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Login Page</div>
+          <div class="wireframe-desc">User authentication page with email and password fields</div>
+          <span class="wireframe-role">All Users</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- System Admin -->
+    <h2 class="section-title">System Admin Views</h2>
+    <div class="wireframes-grid">
+      <a href="system-admin-dashboard.html" class="wireframe-card">
+        <div class="wireframe-preview">📊</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">System Admin Dashboard</div>
+          <div class="wireframe-desc">Overview of all tenants and system metrics</div>
+          <span class="wireframe-role">System Admin</span>
+        </div>
+      </a>
+
+      <a href="tenants-list.html" class="wireframe-card">
+        <div class="wireframe-preview">🏢</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Tenants Management</div>
+          <div class="wireframe-desc">List and manage all organizational tenants</div>
+          <span class="wireframe-role">System Admin</span>
+        </div>
+      </a>
+
+      <a href="tenant-details.html" class="wireframe-card">
+        <div class="wireframe-preview">📋</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Tenant Details</div>
+          <div class="wireframe-desc">Detailed view and management of a single tenant</div>
+          <span class="wireframe-role">System Admin</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Tenant Admin -->
+    <h2 class="section-title">Tenant Admin Views</h2>
+    <div class="wireframes-grid">
+      <a href="tenant-admin-dashboard.html" class="wireframe-card">
+        <div class="wireframe-preview">🎯</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Tenant Admin Dashboard</div>
+          <div class="wireframe-desc">Organization dashboard with key metrics and recent activity</div>
+          <span class="wireframe-role">Tenant Admin</span>
+        </div>
+      </a>
+
+      <a href="users-management.html" class="wireframe-card">
+        <div class="wireframe-preview">👥</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Users Management</div>
+          <div class="wireframe-desc">Manage users and their roles within the organization</div>
+          <span class="wireframe-role">Tenant Admin</span>
+        </div>
+      </a>
+
+      <a href="loan-types.html" class="wireframe-card">
+        <div class="wireframe-preview">💰</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Loan Types</div>
+          <div class="wireframe-desc">Configure available loan products and their parameters</div>
+          <span class="wireframe-role">Tenant Admin</span>
+        </div>
+      </a>
+
+      <a href="loan-type-form.html" class="wireframe-card">
+        <div class="wireframe-preview">📝</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Loan Type Form</div>
+          <div class="wireframe-desc">Create or edit loan type configuration</div>
+          <span class="wireframe-role">Tenant Admin</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Common Views -->
+    <h2 class="section-title">Common Views</h2>
+    <div class="wireframes-grid">
+      <a href="audit-logs.html" class="wireframe-card">
+        <div class="wireframe-preview">📜</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Audit Logs</div>
+          <div class="wireframe-desc">Activity trail with filtering and search capabilities</div>
+          <span class="wireframe-role">Admin Roles</span>
+        </div>
+      </a>
+
+      <a href="loan-applications.html" class="wireframe-card">
+        <div class="wireframe-preview">📄</div>
+        <div class="wireframe-info">
+          <div class="wireframe-title">Loan Applications</div>
+          <div class="wireframe-desc">Manage and track loan applications</div>
+          <span class="wireframe-role">All Roles</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

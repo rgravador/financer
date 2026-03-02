@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Loan Type - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="common-styles.css">
+  <style>
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-label.required::after {
+      content: " *";
+      color: #ef4444;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .input-suffix {
+      position: relative;
+    }
+
+    .input-suffix input {
+      padding-right: 40px;
+    }
+
+    .suffix-text {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .checkbox-group {
+      margin-top: 16px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #1e3a8a;
+    }
+
+    .checkbox-label span {
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .info-value {
+      color: #1e293b;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">A</div>
+        <div class="logo-text">ASCENDENT</div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Tenant Admin</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="tenant-admin-dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="users-management.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Users</span>
+        </a>
+        <a href="loan-types.html" class="nav-item active">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">Loan Types</span>
+        </a>
+        <a href="loan-applications.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Loan Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">💳</span>
+          <span class="nav-label">Payments</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="audit-logs.html" class="nav-item">
+          <span class="nav-icon">📜</span>
+          <span class="nav-label">Audit Logs</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="page-title">Edit Loan Type</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">🔔</button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <a href="loan-types.html" class="back-btn">← Back to Loan Types</a>
+
+        <div class="page-header">
+          <h1>Edit Loan Type</h1>
+        </div>
+
+        <!-- Form Grid -->
+        <div class="form-grid">
+          <!-- Main Form -->
+          <div class="card">
+            <div class="card-title">Basic Information</div>
+
+            <div class="form-group">
+              <label class="form-label required">Name</label>
+              <input type="text" class="form-input" value="Personal Loan" placeholder="Enter loan type name">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea class="form-textarea" placeholder="Enter loan type description">Unsecured personal loan for various purposes including debt consolidation, home improvements, and major purchases.</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required">Interest Rate</label>
+              <div class="input-suffix">
+                <input type="number" class="form-input" value="8.5" step="0.1" min="0" max="100">
+                <span class="suffix-text">%</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label required">Minimum Amount</label>
+                <div class="input-suffix">
+                  <input type="number" class="form-input" value="5000" step="1000" min="0">
+                  <span class="suffix-text">$</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required">Maximum Amount</label>
+                <div class="input-suffix">
+                  <input type="number" class="form-input" value="100000" step="1000" min="0">
+                  <span class="suffix-text">$</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label required">Minimum Term</label>
+                <div class="input-suffix">
+                  <input type="number" class="form-input" value="1" step="1" min="0">
+                  <span class="suffix-text">years</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required">Maximum Term</label>
+                <div class="input-suffix">
+                  <input type="number" class="form-input" value="5" step="1" min="0">
+                  <span class="suffix-text">years</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Required Documents</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" checked>
+                  <span>ID Proof</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" checked>
+                  <span>Income Proof</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" checked>
+                  <span>Address Proof</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox">
+                  <span>Collateral Documents</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox">
+                  <span>Bank Statements (last 6 months)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-outline">Cancel</button>
+              <button class="btn btn-primary">Save Loan Type</button>
+            </div>
+          </div>
+
+          <!-- Sidebar Info -->
+          <div class="card">
+            <div class="card-title">Loan Type Information</div>
+
+            <div class="info-row">
+              <span class="info-label">Status</span>
+              <span class="info-value">
+                <span class="status-badge status-active">
+                  <span class="status-dot"></span>
+                  Active
+                </span>
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Created</span>
+              <span class="info-value">January 15, 2025</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Last Updated</span>
+              <span class="info-value">March 1, 2025</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Total Applications</span>
+              <span class="info-value">342</span>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+              <button class="btn btn-outline" style="width: 100%; color: #ef4444; border-color: #fecaca;">
+                Deactivate Loan Type
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

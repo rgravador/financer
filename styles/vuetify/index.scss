@@ -1,0 +1,29 @@
+// Import Vuetify theme files
+@use './variables';
+@use './components';
+
+/**
+ * ASCENDENT THEME - Navy Blue & Gold/Yellow (The "Premium" Blend)
+ *
+ * This color palette reinforces trust (navy blue) and wealth/prosperity (gold).
+ * Perfect for a financial application focused on loan management.
+ *
+ * Light Mode:
+ *   - Primary: #1e3a8a (Navy Blue) - Trust, professionalism
+ *   - Secondary: #f59e0b (Amber Gold) - Wealth, prosperity
+ *   - Accent: #eab308 (Yellow Gold) - Premium, success
+ *
+ * Dark Mode:
+ *   - Primary: #3b82f6 (Bright Blue) - Enhanced visibility
+ *   - Secondary: #fbbf24 (Bright Gold) - Wealth, prosperity
+ *   - Accent: #f59e0b (Amber Gold) - Premium accent
+ */
+
+// Global Ascendent styles
+body {
+  font-family: $body-font-family;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $heading-font-family;
+}

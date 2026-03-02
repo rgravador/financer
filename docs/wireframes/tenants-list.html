@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tenants Management - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="common-styles.css">
+  <style>
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #f9fafb;
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .table tr:hover {
+      background: rgba(30, 58, 138, 0.04);
+      cursor: pointer;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-suspended {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-active .status-dot {
+      background: #10b981;
+    }
+
+    .status-pending .status-dot {
+      background: #f59e0b;
+    }
+
+    .status-suspended .status-dot {
+      background: #ef4444;
+    }
+
+    .action-btn {
+      color: #1e3a8a;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .action-btn:hover {
+      background: #f0f4ff;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      border-color: #1e3a8a;
+      color: #1e3a8a;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      color: #6b7280;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">A</div>
+        <div class="logo-text">ASCENDENT</div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">SA</div>
+        <div>
+          <div class="user-name">System Admin</div>
+          <div class="user-role">System Admin</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="system-admin-dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">🏢</span>
+          <span class="nav-label">Tenants</span>
+        </a>
+        <a href="audit-logs.html" class="nav-item">
+          <span class="nav-icon">📜</span>
+          <span class="nav-label">Audit Logs</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="page-title">Tenants</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">🔔</button>
+          <div class="user-menu">
+            <div class="user-avatar">SA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="page-header">
+          <h1>Tenants Management</h1>
+          <p class="page-subtitle">Manage all organizational tenants</p>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <button class="btn btn-primary">+ Create Tenant</button>
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search tenants...">
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="section-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Users</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ABC Bank</strong></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>250</td>
+                <td>Jan 15, 2025</td>
+                <td><a href="tenant-details.html" class="action-btn">View</a></td>
+              </tr>
+              <tr>
+                <td><strong>XYZ Credit Union</strong></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>120</td>
+                <td>Jan 10, 2025</td>
+                <td><a href="tenant-details.html" class="action-btn">View</a></td>
+              </tr>
+              <tr>
+                <td><strong>DEF Finance</strong></td>
+                <td>
+                  <span class="status-badge status-pending">
+                    <span class="status-dot"></span>
+                    Pending
+                  </span>
+                </td>
+                <td>45</td>
+                <td>Feb 1, 2025</td>
+                <td><a href="tenant-details.html" class="action-btn">View</a></td>
+              </tr>
+              <tr>
+                <td><strong>GHI Loans</strong></td>
+                <td>
+                  <span class="status-badge status-suspended">
+                    <span class="status-dot"></span>
+                    Suspended
+                  </span>
+                </td>
+                <td>80</td>
+                <td>Dec 5, 2024</td>
+                <td><a href="tenant-details.html" class="action-btn">View</a></td>
+              </tr>
+              <tr>
+                <td><strong>JKL Mortgage</strong></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>165</td>
+                <td>Nov 22, 2024</td>
+                <td><a href="tenant-details.html" class="action-btn">View</a></td>
+              </tr>
+              <tr>
+                <td><strong>MNO Financial Services</strong></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>95</td>
+                <td>Oct 8, 2024</td>
+                <td><a href="tenant-details.html" class="action-btn">View</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="pagination-btn" disabled>← Previous</button>
+            <span class="pagination-info">Page 1 of 5 (25 total)</span>
+            <button class="pagination-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
