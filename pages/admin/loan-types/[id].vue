@@ -1,82 +1,88 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <div class="d-flex align-center mb-4">
-          <v-btn
-            icon="mdi-arrow-left"
-            variant="text"
-            @click="$router.push('/admin/loan-types')"
+  <v-container fluid class="wf-content-padding">
+    <!-- Back Button -->
+    <NuxtLink to="/admin/loan-types" class="back-btn">
+      ← Back to Loan Types
+    </NuxtLink>
+
+    <!-- Page Header -->
+    <div class="wf-page-header">
+      <h1>{{ isNew ? 'New Loan Type' : 'Edit Loan Type' }}</h1>
+    </div>
+
+    <!-- Loading State -->
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      color="primary"
+      class="mx-auto d-block my-16"
+    />
+
+    <!-- Main Content -->
+    <div v-else-if="loanType" class="details-grid">
+      <!-- Form Section -->
+      <div>
+        <v-card class="wf-section-card">
+          <AdminLoanTypeForm
+            :loan-type="isNew ? null : loanType"
+            @created="handleCreated"
+            @updated="handleUpdated"
+            @cancel="$router.push('/admin/loan-types')"
           />
-          <h1 class="text-h4 ml-2">{{ isNew ? 'New Loan Type' : 'Edit Loan Type' }}</h1>
-        </div>
-      </v-col>
-    </v-row>
-
-    <v-row v-if="!loading && loanType">
-      <v-col cols="12" md="8">
-        <AdminLoanTypeForm
-          :loan-type="isNew ? null : loanType"
-          @created="handleCreated"
-          @updated="handleUpdated"
-          @cancel="$router.push('/admin/loan-types')"
-        />
-      </v-col>
-
-      <v-col cols="12" md="4">
-        <v-card v-if="!isNew">
-          <v-card-title>Loan Type Information</v-card-title>
-          <v-card-text>
-            <div class="mb-3">
-              <div class="text-caption text-medium-emphasis">Status</div>
-              <v-chip :color="loanType.isActive ? 'success' : 'error'" size="small" class="mt-1">
-                {{ loanType.isActive ? 'Active' : 'Inactive' }}
-              </v-chip>
-            </div>
-
-            <div class="mb-3">
-              <div class="text-caption text-medium-emphasis">Created</div>
-              <div class="text-body-2">{{ formatDate(loanType.createdAt) }}</div>
-            </div>
-
-            <div class="mb-3">
-              <div class="text-caption text-medium-emphasis">Last Updated</div>
-              <div class="text-body-2">{{ formatDate(loanType.updatedAt) }}</div>
-            </div>
-
-            <v-divider class="my-4" />
-
-            <v-btn
-              v-if="loanType.isActive"
-              block
-              color="error"
-              variant="outlined"
-              prepend-icon="mdi-close-circle"
-              @click="handleDeactivate"
-            >
-              Deactivate Loan Type
-            </v-btn>
-            <v-btn
-              v-else
-              block
-              color="success"
-              variant="outlined"
-              prepend-icon="mdi-check-circle"
-              @click="handleActivate"
-            >
-              Activate Loan Type
-            </v-btn>
-          </v-card-text>
         </v-card>
-      </v-col>
-    </v-row>
+      </div>
 
-    <v-row v-if="loading">
-      <v-col cols="12" class="text-center py-8">
-        <v-progress-circular indeterminate color="primary" size="64" />
-        <div class="text-body-1 mt-4">Loading loan type...</div>
-      </v-col>
-    </v-row>
+      <!-- Sidebar Info -->
+      <div>
+        <v-card v-if="!isNew" class="wf-card">
+          <div class="card-title">Loan Type Information</div>
+
+          <div class="wf-info-row">
+            <span class="wf-info-label">Status</span>
+            <span
+              class="wf-status-badge"
+              :class="loanType.isActive ? 'active' : 'inactive'"
+            >
+              <span class="wf-status-dot"></span>
+              {{ loanType.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+
+          <div class="wf-info-row">
+            <span class="wf-info-label">Created</span>
+            <span class="wf-info-value">{{ formatDate(loanType.createdAt) }}</span>
+          </div>
+
+          <div class="wf-info-row">
+            <span class="wf-info-label">Last Updated</span>
+            <span class="wf-info-value">{{ formatDate(loanType.updatedAt) }}</span>
+          </div>
+
+          <v-divider class="my-4" />
+
+          <v-btn
+            v-if="loanType.isActive"
+            block
+            color="error"
+            variant="outlined"
+            prepend-icon="mdi-close-circle"
+            @click="handleDeactivate"
+          >
+            Deactivate Loan Type
+          </v-btn>
+          <v-btn
+            v-else
+            block
+            color="success"
+            variant="outlined"
+            prepend-icon="mdi-check-circle"
+            @click="handleActivate"
+          >
+            Activate Loan Type
+          </v-btn>
+        </v-card>
+      </div>
+    </div>
 
     <!-- Success Snackbar -->
     <v-snackbar v-model="showSnackbar" :color="snackbarColor" :timeout="3000">
@@ -196,3 +202,42 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  color: #1e3a8a;
+}
+
+@media (max-width: 1024px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

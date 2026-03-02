@@ -1,182 +1,182 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <div class="d-flex align-center justify-space-between mb-4">
-          <h1 class="text-h4">User Management</h1>
-          <v-btn color="primary" prepend-icon="mdi-account-plus" @click="showInviteModal = true">
-            Invite User
-          </v-btn>
-        </div>
-      </v-col>
-    </v-row>
+  <v-container fluid class="wf-content-padding">
+    <!-- Page Header -->
+    <div class="wf-page-header">
+      <h1>User Management</h1>
+    </div>
+    <p class="wf-page-subtitle">Manage team members and their roles</p>
+
+    <!-- Toolbar -->
+    <div class="wf-toolbar mb-6">
+      <v-btn color="primary" prepend-icon="mdi-account-plus" @click="showInviteModal = true">
+        Invite User
+      </v-btn>
+      <div class="wf-search-box">
+        <v-icon class="search-icon">mdi-magnify</v-icon>
+        <input
+          v-model="search"
+          type="text"
+          class="search-input"
+          placeholder="Search users..."
+        />
+      </div>
+    </div>
 
     <!-- Stats Cards -->
-    <v-row>
+    <v-row class="wf-section-gap">
       <v-col cols="12" sm="6" md="3">
-        <v-card>
+        <v-card class="wf-stat-card">
           <v-card-text>
-            <div class="d-flex align-center justify-space-between">
-              <div>
-                <div class="text-caption text-medium-emphasis">Total Users</div>
-                <div class="text-h4">{{ usersStore.totalUsers }}</div>
-              </div>
-              <v-icon size="48" color="primary">mdi-account-group</v-icon>
-            </div>
+            <div class="wf-stat-value">{{ usersStore.totalUsers }}</div>
+            <div class="wf-stat-label">Total Users</div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="3">
-        <v-card>
+        <v-card class="wf-stat-card">
           <v-card-text>
-            <div class="d-flex align-center justify-space-between">
-              <div>
-                <div class="text-caption text-medium-emphasis">Active Users</div>
-                <div class="text-h4">{{ usersStore.activeUsers.length }}</div>
-              </div>
-              <v-icon size="48" color="success">mdi-account-check</v-icon>
-            </div>
+            <div class="wf-stat-value">{{ usersStore.activeUsers.length }}</div>
+            <div class="wf-stat-label">Active Users</div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="3">
-        <v-card>
+        <v-card class="wf-stat-card">
           <v-card-text>
-            <div class="d-flex align-center justify-space-between">
-              <div>
-                <div class="text-caption text-medium-emphasis">Loan Officers</div>
-                <div class="text-h4">{{ usersStore.usersByRole('tenant_officer').length }}</div>
-              </div>
-              <v-icon size="48" color="blue">mdi-account-tie</v-icon>
-            </div>
+            <div class="wf-stat-value">{{ usersStore.usersByRole('tenant_officer').length }}</div>
+            <div class="wf-stat-label">Loan Officers</div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="3">
-        <v-card>
+        <v-card class="wf-stat-card">
           <v-card-text>
-            <div class="d-flex align-center justify-space-between">
-              <div>
-                <div class="text-caption text-medium-emphasis">Approvers</div>
-                <div class="text-h4">{{ usersStore.usersByRole('tenant_approver').length }}</div>
-              </div>
-              <v-icon size="48" color="amber">mdi-check-decagram</v-icon>
-            </div>
+            <div class="wf-stat-value">{{ usersStore.usersByRole('tenant_approver').length }}</div>
+            <div class="wf-stat-label">Approvers</div>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- Users Table -->
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-text-field
-              v-model="search"
-              prepend-inner-icon="mdi-magnify"
-              label="Search users"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-              class="ma-2"
-            />
-          </v-card-title>
-
-          <v-data-table
-            :headers="headers"
-            :items="usersStore.users"
-            :search="search"
-            :loading="usersStore.loading"
-            :items-per-page="10"
-            class="elevation-1"
+    <!-- Table Card -->
+    <v-card class="wf-section-card">
+      <v-table class="wf-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="user in filteredUsers"
+            :key="user.id"
           >
-            <template #item.name="{ item }">
-              <div class="font-weight-medium">{{ item.firstName }} {{ item.lastName }}</div>
-              <div class="text-caption text-medium-emphasis">{{ item.email }}</div>
-            </template>
-
-            <template #item.role="{ item }">
-              <SharedRoleBadge :role="item.role" />
-            </template>
-
-            <template #item.applicationsCount="{ item }">
-              <v-chip size="small" variant="tonal" color="primary">
-                {{ item.applicationsCount || 0 }} applications
-              </v-chip>
-            </template>
-
-            <template #item.isActive="{ item }">
-              <v-chip :color="item.isActive ? 'success' : 'error'" size="small">
-                {{ item.isActive ? 'Active' : 'Inactive' }}
-              </v-chip>
-            </template>
-
-            <template #item.createdAt="{ item }">
-              {{ formatDate(item.createdAt) }}
-            </template>
-
-            <template #item.actions="{ item }">
-              <div class="d-flex gap-2">
-                <v-menu>
-                  <template #activator="{ props }">
-                    <v-btn
-                      icon="mdi-dots-vertical"
-                      size="small"
-                      variant="text"
-                      v-bind="props"
-                    >
-                      <v-icon>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
-
-                  <v-list density="compact">
-                    <v-list-item @click="handleEditRole(item)">
-                      <v-list-item-title>
-                        <v-icon start size="small">mdi-account-edit</v-icon>
-                        Change Role
-                      </v-list-item-title>
-                    </v-list-item>
-
-                    <v-list-item
-                      v-if="item.isActive"
-                      @click="handleDeactivate(item)"
-                    >
-                      <v-list-item-title>
-                        <v-icon start size="small">mdi-account-off</v-icon>
-                        Deactivate
-                      </v-list-item-title>
-                    </v-list-item>
-
-                    <v-list-item
-                      v-else
-                      @click="handleActivate(item)"
-                    >
-                      <v-list-item-title>
-                        <v-icon start size="small">mdi-account-check</v-icon>
-                        Activate
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
+            <td>
+              <div>
+                <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+                <div class="wf-table-subtext">{{ user.email }}</div>
               </div>
-            </template>
+            </td>
+            <td>
+              <span
+                class="wf-role-badge"
+                :class="getRoleClass(user.role)"
+              >
+                {{ formatRole(user.role) }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="wf-status-badge"
+                :class="user.isActive ? 'active' : 'inactive'"
+              >
+                <span class="wf-status-dot"></span>
+                {{ user.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>{{ formatDate(user.createdAt) }}</td>
+            <td>
+              <v-menu>
+                <template #activator="{ props }">
+                  <v-btn
+                    icon="mdi-dots-vertical"
+                    size="small"
+                    variant="text"
+                    v-bind="props"
+                  />
+                </template>
 
-            <template #no-data>
-              <div class="text-center pa-4">
-                <v-icon size="64" color="grey-lighten-1">mdi-account-off</v-icon>
-                <div class="text-body-1 mt-2">No users found</div>
-                <div class="text-caption text-medium-emphasis">Click "Invite User" to add your first user</div>
+                <v-list density="compact">
+                  <v-list-item @click="handleEditRole(user)">
+                    <v-list-item-title>
+                      <v-icon start size="small">mdi-account-edit</v-icon>
+                      Change Role
+                    </v-list-item-title>
+                  </v-list-item>
+
+                  <v-list-item
+                    v-if="user.isActive"
+                    @click="handleDeactivate(user)"
+                  >
+                    <v-list-item-title>
+                      <v-icon start size="small">mdi-account-off</v-icon>
+                      Deactivate
+                    </v-list-item-title>
+                  </v-list-item>
+
+                  <v-list-item
+                    v-else
+                    @click="handleActivate(user)"
+                  >
+                    <v-list-item-title>
+                      <v-icon start size="small">mdi-account-check</v-icon>
+                      Activate
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </td>
+          </tr>
+          <tr v-if="filteredUsers.length === 0">
+            <td colspan="5" class="text-center pa-8">
+              <div class="wf-empty-state">
+                <v-icon class="empty-icon">mdi-account-off</v-icon>
+                <div class="empty-title">No users found</div>
+                <div class="empty-message">Click "Invite User" to add your first user</div>
               </div>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+
+      <!-- Pagination -->
+      <div class="wf-pagination" v-if="filteredUsers.length > 0">
+        <button
+          class="wf-pagination-btn"
+          :disabled="currentPage === 1"
+          @click="currentPage--"
+        >
+          ← Previous
+        </button>
+        <span class="wf-pagination-info">
+          Page {{ currentPage }} of {{ totalPages }} ({{ filteredUsers.length }} total)
+        </span>
+        <button
+          class="wf-pagination-btn"
+          :disabled="currentPage === totalPages"
+          @click="currentPage++"
+        >
+          Next →
+        </button>
+      </div>
+    </v-card>
 
     <!-- Invite User Modal -->
     <AdminTenantUserFormModal
@@ -237,16 +237,27 @@ const newRole = ref('')
 const showSnackbar = ref(false)
 const snackbarMessage = ref('')
 const snackbarColor = ref('success')
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
-// Table headers
-const headers = [
-  { title: 'Name', key: 'name', sortable: true },
-  { title: 'Role', key: 'role', sortable: true },
-  { title: 'Applications', key: 'applicationsCount', sortable: true },
-  { title: 'Status', key: 'isActive', sortable: true },
-  { title: 'Joined', key: 'createdAt', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
-]
+// Filtered users based on search
+const filteredUsers = computed(() => {
+  if (!search.value) {
+    return usersStore.users
+  }
+
+  const searchLower = search.value.toLowerCase()
+  return usersStore.users.filter((user: TenantUser) =>
+    user.firstName.toLowerCase().includes(searchLower) ||
+    user.lastName.toLowerCase().includes(searchLower) ||
+    user.email.toLowerCase().includes(searchLower)
+  )
+})
+
+// Total pages for pagination
+const totalPages = computed(() => {
+  return Math.ceil(filteredUsers.value.length / itemsPerPage.value)
+})
 
 // Role options
 const roleOptions = [
@@ -262,6 +273,28 @@ const formatDate = (date: Date | string) => {
     month: 'short',
     day: 'numeric',
   })
+}
+
+// Format role
+const formatRole = (role: string) => {
+  const roleLabels: Record<string, string> = {
+    system_admin: 'Admin',
+    tenant_admin: 'Admin',
+    tenant_officer: 'Officer',
+    tenant_approver: 'Approver',
+  }
+  return roleLabels[role] || role
+}
+
+// Get role class
+const getRoleClass = (role: string) => {
+  const roleClasses: Record<string, string> = {
+    system_admin: 'admin',
+    tenant_admin: 'admin',
+    tenant_officer: 'officer',
+    tenant_approver: 'approver',
+  }
+  return roleClasses[role] || ''
 }
 
 // Handle user created
@@ -337,7 +370,27 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.gap-2 {
-  gap: 8px;
+.wf-stat-card {
+  text-align: center;
+  padding: 24px;
+}
+
+.wf-stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.wf-stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.wf-table-subtext {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
 }
 </style>
