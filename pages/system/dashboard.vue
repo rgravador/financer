@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import StatCard from '~/components/shared/StatCard.vue'
 import { useAuth } from '~/composables/useAuth'
+import { useRouter } from 'vue-router'
 
 definePageMeta({
   layout: 'default',
@@ -11,22 +11,30 @@ definePageMeta({
 
 interface SystemStats {
   totalTenants: number
-  activeTenants: number
-  suspendedTenants: number
   totalUsers: number
-  totalApplications: number
-  applicationsByStatus: Record<string, number>
+  activeLoans: number
+  systemUptime: string
   recentTenants: Array<{
     id: string
     name: string
-    slug: string
     isActive: boolean
+    userCount: number
     createdAt: Date
-    applicationCount: number
   }>
+  systemHealth: {
+    database: 'OK' | 'ERROR'
+    api: 'OK' | 'ERROR'
+    storage: 'OK' | 'ERROR'
+  }
+  resourceUsage: {
+    cpu: number
+    memory: number
+    disk: number
+  }
 }
 
 const { authenticatedFetch } = useAuth()
+const router = useRouter()
 const stats = ref<SystemStats | null>(null)
 const loading = ref(false)
 
@@ -40,7 +48,6 @@ const fetchStats = async () => {
     const data = await authenticatedFetch<SystemStats>('/api/system/stats', {
       method: 'GET',
     })
-
     stats.value = data
   } catch (error) {
     console.error('Failed to fetch system stats:', error)
@@ -57,290 +64,233 @@ const formatDate = (dateString: Date) => {
   })
 }
 
-const getStatusColor = (isActive: boolean) => {
-  return isActive ? '#10b981' : '#6b7280'
+const navigateToTenant = (tenantId: string) => {
+  router.push(`/system/tenants/${tenantId}`)
 }
 </script>
 
 <template>
-  <div class="system-dashboard">
-    <div class="page-header">
-      <h1>System Dashboard</h1>
-      <p class="subtitle">Platform-wide overview and metrics</p>
+  <v-container fluid class="wf-content-padding">
+    <!-- Page Header -->
+    <div class="wf-page-header">
+      <h1>System Admin Dashboard</h1>
+      <p class="wf-page-subtitle">Complete oversight of all tenants and system activity</p>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <div class="spinner" />
-      <p>Loading dashboard...</p>
-    </div>
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      color="primary"
+      class="mx-auto d-block my-16"
+    />
 
     <!-- Dashboard Content -->
-    <div v-else-if="stats" class="dashboard-content">
-      <!-- Stat Cards -->
-      <div class="stats-grid">
-        <StatCard
-          label="Total Tenants"
-          :value="stats.totalTenants"
-          :subtext="`${stats.activeTenants} active`"
-          color="#3b82f6"
-          icon="🏢"
-        />
+    <template v-else-if="stats">
+      <!-- Stat Cards Grid -->
+      <v-row class="wf-section-gap">
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="wf-stat-card">
+            <v-card-text>
+              <div class="wf-stat-value">{{ stats.totalTenants }}</div>
+              <div class="wf-stat-label">Total Tenants</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-        <StatCard
-          label="Active Tenants"
-          :value="stats.activeTenants"
-          :subtext="`${stats.suspendedTenants} suspended`"
-          color="#10b981"
-          icon="✓"
-        />
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="wf-stat-card">
+            <v-card-text>
+              <div class="wf-stat-value">{{ stats.totalUsers }}</div>
+              <div class="wf-stat-label">Total Users</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-        <StatCard
-          label="Total Users"
-          :value="stats.totalUsers"
-          subtext="Across all tenants"
-          color="#f59e0b"
-          icon="👥"
-        />
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="wf-stat-card">
+            <v-card-text>
+              <div class="wf-stat-value">{{ stats.activeLoans }}</div>
+              <div class="wf-stat-label">Active Loans</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-        <StatCard
-          label="Total Applications"
-          :value="stats.totalApplications"
-          subtext="All time"
-          color="#8b5cf6"
-          icon="📄"
-        />
-      </div>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="wf-stat-card">
+            <v-card-text>
+              <div class="wf-stat-value">{{ stats.systemUptime }}</div>
+              <div class="wf-stat-label">System Uptime</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
 
-      <!-- Applications by Status -->
-      <div class="section-card">
-        <h2>Applications by Status</h2>
-        <div class="status-grid">
-          <div
-            v-for="(count, status) in stats.applicationsByStatus"
-            :key="status"
-            class="status-item"
-          >
-            <span class="status-label">{{ status }}</span>
-            <span class="status-count">{{ count }}</span>
+      <!-- Recent Tenant Activity -->
+      <v-card class="wf-section-card wf-section-gap">
+        <v-card-title class="wf-section-title">
+          Recent Tenant Activity
+        </v-card-title>
+
+        <v-table class="wf-table">
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>Status</th>
+              <th>Users</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="tenant in stats.recentTenants"
+              :key="tenant.id"
+              @click="navigateToTenant(tenant.id)"
+            >
+              <td><strong>{{ tenant.name }}</strong></td>
+              <td>
+                <span
+                  class="wf-status-badge"
+                  :class="tenant.isActive ? 'active' : 'pending'"
+                >
+                  <span class="wf-status-dot" />
+                  {{ tenant.isActive ? 'Active' : 'Pending' }}
+                </span>
+              </td>
+              <td>{{ tenant.userCount }}</td>
+              <td>{{ formatDate(tenant.createdAt) }}</td>
+              <td>
+                <a
+                  :href="`/system/tenants/${tenant.id}`"
+                  class="wf-action-btn"
+                  @click.stop
+                >
+                  View →
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+
+        <div v-if="stats.recentTenants.length === 0" class="wf-empty-state">
+          <div class="empty-icon">
+            <v-icon size="48" color="grey-lighten-2">mdi-domain</v-icon>
           </div>
+          <div class="empty-title">No Tenants Yet</div>
+          <div class="empty-message">Tenants will appear here once they're created</div>
         </div>
-      </div>
+      </v-card>
 
-      <!-- Recent Tenants -->
-      <div class="section-card">
-        <h2>Recent Tenants</h2>
-        <div v-if="stats.recentTenants.length > 0" class="table-container">
-          <table class="tenants-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Slug</th>
-                <th>Status</th>
-                <th>Applications</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="tenant in stats.recentTenants" :key="tenant.id">
-                <td class="tenant-name">{{ tenant.name }}</td>
-                <td class="tenant-slug">{{ tenant.slug }}</td>
-                <td>
+      <!-- System Info Grid -->
+      <v-row class="wf-section-gap">
+        <!-- System Health -->
+        <v-col cols="12" md="6">
+          <v-card class="wf-card">
+            <v-card-title class="wf-info-title">System Health</v-card-title>
+            <v-card-text>
+              <div class="wf-info-row">
+                <span class="wf-info-label">
                   <span
-                    class="status-badge"
-                    :style="{ backgroundColor: getStatusColor(tenant.isActive) }"
-                  >
-                    {{ tenant.isActive ? 'Active' : 'Suspended' }}
-                  </span>
-                </td>
-                <td class="application-count">{{ tenant.applicationCount }}</td>
-                <td class="date-cell">{{ formatDate(tenant.createdAt) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else class="empty-state">
-          No tenants yet
-        </div>
-      </div>
-    </div>
-  </div>
+                    class="wf-health-indicator"
+                    :class="stats.systemHealth.database === 'OK' ? 'health-ok' : ''"
+                  />
+                  Database
+                </span>
+                <span class="wf-info-value">{{ stats.systemHealth.database }}</span>
+              </div>
+              <div class="wf-info-row">
+                <span class="wf-info-label">
+                  <span
+                    class="wf-health-indicator"
+                    :class="stats.systemHealth.api === 'OK' ? 'health-ok' : ''"
+                  />
+                  API
+                </span>
+                <span class="wf-info-value">{{ stats.systemHealth.api }}</span>
+              </div>
+              <div class="wf-info-row">
+                <span class="wf-info-label">
+                  <span
+                    class="wf-health-indicator"
+                    :class="stats.systemHealth.storage === 'OK' ? 'health-ok' : ''"
+                  />
+                  Storage
+                </span>
+                <span class="wf-info-value">{{ stats.systemHealth.storage }}</span>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Resource Usage -->
+        <v-col cols="12" md="6">
+          <v-card class="wf-card">
+            <v-card-title class="wf-info-title">Resource Usage</v-card-title>
+            <v-card-text>
+              <div class="wf-info-row">
+                <span class="wf-info-label">CPU</span>
+                <span class="wf-info-value">{{ stats.resourceUsage.cpu }}%</span>
+              </div>
+              <div class="wf-info-row">
+                <span class="wf-info-label">Memory</span>
+                <span class="wf-info-value">{{ stats.resourceUsage.memory }}%</span>
+              </div>
+              <div class="wf-info-row">
+                <span class="wf-info-label">Disk</span>
+                <span class="wf-info-value">{{ stats.resourceUsage.disk }}%</span>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
+  </v-container>
 </template>
 
 <style scoped>
-.system-dashboard {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 16px;
-  color: #6b7280;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: #6b7280;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-}
-
-.section-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+.wf-stat-card {
+  text-align: center;
   padding: 24px;
 }
 
-.section-card h2 {
-  margin: 0 0 20px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
+.wf-stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 8px;
 }
 
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
-}
-
-.status-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  background: #f9fafb;
-  border-radius: 6px;
-}
-
-.status-label {
-  font-size: 13px;
+.wf-stat-label {
+  font-size: 14px;
   color: #6b7280;
-  text-transform: capitalize;
   font-weight: 500;
 }
 
-.status-count {
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.tenants-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tenants-table thead {
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.tenants-table th {
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.tenants-table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.tenants-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.tenants-table td {
-  padding: 16px;
-  font-size: 14px;
-  color: #111827;
-}
-
-.tenant-name {
-  font-weight: 600;
-}
-
-.tenant-slug {
-  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.status-badge {
+.wf-health-indicator {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
 }
 
-.application-count {
-  font-weight: 600;
-  text-align: center;
+.wf-health-indicator.health-ok {
+  background: #10b981;
 }
 
-.date-cell {
-  color: #6b7280;
+.wf-action-btn {
+  color: #1e3a8a;
+  text-decoration: none;
+  font-weight: 500;
   font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: inline-block;
 }
 
-.empty-state {
-  padding: 40px 20px;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 14px;
+.wf-action-btn:hover {
+  background: #f0f4ff;
 }
 </style>

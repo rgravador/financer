@@ -10,65 +10,61 @@ export default defineEventHandler(async (event) => {
   // Get total tenants
   const totalTenants = await Tenant.countDocuments()
 
-  // Get active tenants
-  const activeTenants = await Tenant.countDocuments({ isActive: true })
-
-  // Get suspended tenants
-  const suspendedTenants = await Tenant.countDocuments({ isActive: false })
-
   // Get total users
   const totalUsers = await User.countDocuments()
 
-  // Get total applications
-  const totalApplications = await LoanApplication.countDocuments()
+  // Get active loans (approved or in-review)
+  const activeLoans = await LoanApplication.countDocuments({
+    status: { $in: ['approved', 'in_review'] },
+  })
 
-  // Get applications by status (grouped)
-  const applicationsByStatus = await LoanApplication.aggregate([
-    {
-      $group: {
-        _id: '$status',
-        count: { $sum: 1 },
-      },
-    },
-  ])
+  // Calculate system uptime (mock for now - would use actual system metrics)
+  const systemUptime = '98.5%'
 
-  // Format applications by status
-  const statusCounts = applicationsByStatus.reduce((acc, item) => {
-    acc[item._id] = item.count
-    return acc
-  }, {} as Record<string, number>)
-
-  // Get recent tenants (last 5)
+  // Get recent tenants (last 4 for table display)
   const recentTenants = await Tenant.find()
     .sort({ createdAt: -1 })
-    .limit(5)
+    .limit(4)
     .lean()
 
-  // For each tenant, get their application count
+  // For each tenant, get their user count
   const tenantsWithCounts = await Promise.all(
     recentTenants.map(async (tenant) => {
-      const applicationCount = await LoanApplication.countDocuments({
+      const userCount = await User.countDocuments({
         tenantId: tenant._id,
       })
 
       return {
         id: tenant._id.toString(),
         name: tenant.name,
-        slug: tenant.slug,
         isActive: tenant.isActive,
+        userCount,
         createdAt: tenant.createdAt,
-        applicationCount,
       }
     })
   )
 
+  // System health (mock - would connect to actual health checks)
+  const systemHealth = {
+    database: 'OK' as const,
+    api: 'OK' as const,
+    storage: 'OK' as const,
+  }
+
+  // Resource usage (mock - would connect to actual system metrics)
+  const resourceUsage = {
+    cpu: 45,
+    memory: 62,
+    disk: 38,
+  }
+
   return {
     totalTenants,
-    activeTenants,
-    suspendedTenants,
     totalUsers,
-    totalApplications,
-    applicationsByStatus: statusCounts,
+    activeLoans,
+    systemUptime,
     recentTenants: tenantsWithCounts,
+    systemHealth,
+    resourceUsage,
   }
 })
