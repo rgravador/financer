@@ -158,7 +158,7 @@ import DocumentUploader from '~/components/DocumentUploader.vue'
 import StatusTimeline from '~/components/StatusTimeline.vue'
 
 definePageMeta({
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
   layout: 'default',
 })
 

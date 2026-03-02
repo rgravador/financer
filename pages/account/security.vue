@@ -234,7 +234,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 definePageMeta({
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
 })
 
 const { authenticatedFetch, logout, logoutAllDevices } = useAuth()

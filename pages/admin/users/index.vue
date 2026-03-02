@@ -223,7 +223,7 @@ import { ref, onMounted } from 'vue'
 import type { TenantUser } from '~/stores/users'
 
 definePageMeta({
-  middleware: ['auth', 'role'],
+  middleware: ['role'],
   role: ['tenant_admin'],
 })
 

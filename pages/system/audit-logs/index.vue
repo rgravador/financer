@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 
 definePageMeta({
   layout: 'default',
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
 })
 
 interface AuditLogEntry {

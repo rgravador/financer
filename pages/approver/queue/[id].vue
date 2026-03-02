@@ -7,7 +7,7 @@ import RequestDocumentsModal from '~/components/approver/RequestDocumentsModal.v
 
 definePageMeta({
   layout: 'default',
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
 })
 
 const route = useRoute()

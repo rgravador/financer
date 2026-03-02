@@ -169,7 +169,7 @@ import { useLoanTypesStore } from '~/stores/loanTypes'
 import type { LoanType } from '~/types'
 
 definePageMeta({
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
   layout: 'default',
 })
 

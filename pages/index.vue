@@ -3,7 +3,7 @@ import { useAuthStore } from '~/stores/auth'
 
 // Redirect to role-specific dashboard
 definePageMeta({
-  middleware: 'auth',
+  // Auth is handled by auth.global.ts middleware
 })
 
 const authStore = useAuthStore()

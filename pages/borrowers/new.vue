@@ -124,7 +124,7 @@ import { useBorrowersStore } from '~/stores/borrowers'
 import type { Dayjs } from 'dayjs'
 
 definePageMeta({
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
   layout: 'default',
 })
 

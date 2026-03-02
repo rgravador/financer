@@ -90,7 +90,7 @@ import { PlusOutlined } from '@ant-design/icons-vue'
 import { useBorrowersStore } from '~/stores/borrowers'
 
 definePageMeta({
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
   layout: 'default',
 })
 

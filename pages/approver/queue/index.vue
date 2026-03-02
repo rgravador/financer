@@ -5,7 +5,7 @@ import type { LoanApplication } from '~/types'
 
 definePageMeta({
   layout: 'default',
-  middleware: 'auth',
+  // Auth handled by auth.global.ts middleware
 })
 
 const loansStore = useLoansStore()

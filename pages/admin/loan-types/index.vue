@@ -226,7 +226,7 @@ import { ref, computed, onMounted } from 'vue'
 import type { LoanType } from '~/types'
 
 definePageMeta({
-  middleware: ['auth', 'role'],
+  middleware: ['role'],
   role: ['tenant_admin'],
 })
 

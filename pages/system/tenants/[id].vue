@@ -1,178 +1,155 @@
 <template>
-  <v-container fluid>
-    <v-row v-if="systemStore.loading && !tenant">
-      <v-col cols="12" class="text-center pa-8">
-        <v-progress-circular indeterminate color="primary" size="64" />
-        <div class="text-h6 mt-4">Loading tenant details...</div>
-      </v-col>
-    </v-row>
+  <v-container fluid class="wf-content-padding">
+    <!-- Loading State -->
+    <div v-if="systemStore.loading && !tenant" class="text-center pa-8">
+      <v-progress-circular indeterminate color="primary" size="64" />
+      <div class="text-h6 mt-4">Loading tenant details...</div>
+    </div>
 
+    <!-- Main Content -->
     <template v-else-if="tenant">
-      <!-- Header -->
-      <v-row>
-        <v-col cols="12">
-          <div class="d-flex align-center justify-space-between mb-4">
-            <div>
-              <v-btn
-                icon="mdi-arrow-left"
-                variant="text"
-                :to="'/system/tenants'"
-                class="mr-2"
-              >
-                <v-icon>mdi-arrow-left</v-icon>
-              </v-btn>
-              <span class="text-h4">{{ tenant.name }}</span>
-              <v-chip
-                :color="tenant.isActive ? 'success' : 'warning'"
-                size="small"
-                class="ml-2"
-              >
-                {{ tenant.isActive ? 'Active' : 'Suspended' }}
-              </v-chip>
-            </div>
+      <!-- Back Button -->
+      <NuxtLink to="/system/tenants" class="back-btn">
+        ← Back to Tenants
+      </NuxtLink>
 
-            <div class="d-flex gap-2">
-              <v-btn
-                :color="tenant.isActive ? 'warning' : 'success'"
-                variant="outlined"
-                :prepend-icon="tenant.isActive ? 'mdi-pause' : 'mdi-play'"
-                @click="handleToggleStatus"
-              >
-                {{ tenant.isActive ? 'Suspend' : 'Activate' }}
-              </v-btn>
-            </div>
+      <!-- Page Header -->
+      <div class="wf-page-header">
+        <h1>{{ tenant.name }}</h1>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="details-grid">
+        <!-- Tenant Information Card -->
+        <v-card class="wf-card">
+          <div class="card-title">Tenant Information</div>
+          <div class="wf-info-row">
+            <span class="wf-info-label">Name</span>
+            <span class="wf-info-value">{{ tenant.name }}</span>
           </div>
-        </v-col>
-      </v-row>
+          <div class="wf-info-row">
+            <span class="wf-info-label">Status</span>
+            <span class="wf-info-value">
+              <span
+                class="wf-status-badge"
+                :class="tenant.isActive ? 'active' : 'inactive'"
+              >
+                <span class="wf-status-dot"></span>
+                {{ tenant.isActive ? 'Active' : 'Suspended' }}
+              </span>
+            </span>
+          </div>
+          <div class="wf-info-row">
+            <span class="wf-info-label">Created</span>
+            <span class="wf-info-value">{{ formatDateLong(tenant.createdAt) }}</span>
+          </div>
+          <div class="wf-info-row">
+            <span class="wf-info-label">Total Users</span>
+            <span class="wf-info-value">{{ tenant.userCount || 0 }}</span>
+          </div>
+          <div class="wf-info-row">
+            <span class="wf-info-label">Slug</span>
+            <span class="wf-info-value">{{ tenant.slug }}</span>
+          </div>
+          <div class="wf-info-row">
+            <span class="wf-info-label">Active Loans</span>
+            <span class="wf-info-value">{{ tenant.activeLoansCount || 0 }}</span>
+          </div>
+        </v-card>
 
-      <!-- Tenant Info Cards -->
-      <v-row>
-        <v-col cols="12" md="4">
-          <v-card>
-            <v-card-title>
-              <v-icon start>mdi-information</v-icon>
-              Tenant Information
-            </v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item>
-                  <v-list-item-title class="text-caption text-medium-emphasis">Name</v-list-item-title>
-                  <v-list-item-subtitle class="text-body-1">{{ tenant.name }}</v-list-item-subtitle>
-                </v-list-item>
-
-                <v-list-item>
-                  <v-list-item-title class="text-caption text-medium-emphasis">Slug</v-list-item-title>
-                  <v-list-item-subtitle class="text-body-1">{{ tenant.slug }}</v-list-item-subtitle>
-                </v-list-item>
-
-                <v-list-item>
-                  <v-list-item-title class="text-caption text-medium-emphasis">Created</v-list-item-title>
-                  <v-list-item-subtitle class="text-body-1">{{ formatDate(tenant.createdAt) }}</v-list-item-subtitle>
-                </v-list-item>
-
-                <v-list-item>
-                  <v-list-item-title class="text-caption text-medium-emphasis">Last Updated</v-list-item-title>
-                  <v-list-item-subtitle class="text-body-1">{{ formatDate(tenant.updatedAt) }}</v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-
-        <v-col cols="12" md="8">
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-card>
-                <v-card-text>
-                  <div class="d-flex align-center justify-space-between">
-                    <div>
-                      <div class="text-caption text-medium-emphasis">Total Users</div>
-                      <div class="text-h4">{{ tenant.userCount || 0 }}</div>
-                    </div>
-                    <v-icon size="48" color="info">mdi-account-group</v-icon>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-
-            <v-col cols="12" sm="6">
-              <v-card>
-                <v-card-text>
-                  <div class="d-flex align-center justify-space-between">
-                    <div>
-                      <div class="text-caption text-medium-emphasis">Active Loans</div>
-                      <div class="text-h4">{{ tenant.activeLoansCount || 0 }}</div>
-                    </div>
-                    <v-icon size="48" color="primary">mdi-file-document-multiple</v-icon>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-
-      <!-- Users Table -->
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>
-              <div class="d-flex align-center justify-space-between w-100">
-                <span>Users</span>
-                <v-chip size="small" variant="tonal">
-                  {{ tenant.users?.length || 0 }} users
-                </v-chip>
-              </div>
-            </v-card-title>
-
-            <v-data-table
-              :headers="userHeaders"
-              :items="tenant.users || []"
-              :items-per-page="10"
-              class="elevation-1"
+        <!-- Quick Actions Card -->
+        <v-card class="wf-card">
+          <div class="card-title">Quick Actions</div>
+          <div class="actions-list">
+            <v-btn
+              color="primary"
+              block
+              @click="handleToggleStatus"
             >
-              <template #item.name="{ item }">
-                <div class="font-weight-medium">{{ item.firstName }} {{ item.lastName }}</div>
-                <div class="text-caption text-medium-emphasis">{{ item.email }}</div>
-              </template>
+              {{ tenant.isActive ? 'Suspend Tenant' : 'Activate Tenant' }}
+            </v-btn>
+            <v-btn
+              variant="outlined"
+              block
+              :to="`/admin/users?tenant=${tenant.id}`"
+            >
+              View Users
+            </v-btn>
+            <v-btn
+              variant="outlined"
+              block
+              :to="`/loans/applications?tenant=${tenant.id}`"
+            >
+              View Loans
+            </v-btn>
+            <v-btn
+              variant="outlined"
+              block
+              :to="`/system/audit-logs?tenant=${tenant.id}`"
+            >
+              View Audit Logs
+            </v-btn>
+          </div>
+        </v-card>
+      </div>
 
-              <template #item.role="{ item }">
-                <v-chip :color="getRoleColor(item.role)" size="small">
-                  {{ formatRole(item.role) }}
-                </v-chip>
-              </template>
-
-              <template #item.isActive="{ item }">
-                <v-chip :color="item.isActive ? 'success' : 'error'" size="small">
-                  {{ item.isActive ? 'Active' : 'Inactive' }}
-                </v-chip>
-              </template>
-
-              <template #item.createdAt="{ item }">
-                {{ formatDate(item.createdAt) }}
-              </template>
-
-              <template #no-data>
-                <div class="text-center pa-4">
-                  <v-icon size="64" color="grey-lighten-1">mdi-account-off</v-icon>
-                  <div class="text-body-1 mt-2">No users in this tenant</div>
+      <!-- Recent Activity Table -->
+      <v-card class="wf-card mt-6">
+        <div class="card-title">Users</div>
+        <v-table class="wf-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in tenant.users" :key="user.id">
+              <td>
+                <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span
+                  class="wf-role-badge"
+                  :class="getRoleClass(user.role)"
+                >
+                  {{ formatRole(user.role) }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="wf-status-badge"
+                  :class="user.isActive ? 'active' : 'inactive'"
+                >
+                  <span class="wf-status-dot"></span>
+                  {{ user.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>{{ formatDate(user.createdAt) }}</td>
+            </tr>
+            <tr v-if="!tenant.users || tenant.users.length === 0">
+              <td colspan="5" class="text-center pa-8">
+                <div class="wf-empty-state">
+                  <v-icon class="empty-icon">mdi-account-off</v-icon>
+                  <div class="empty-title">No users in this tenant</div>
+                  <div class="empty-message">Users will appear here once they are added</div>
                 </div>
-              </template>
-            </v-data-table>
-          </v-card>
-        </v-col>
-      </v-row>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-card>
     </template>
 
     <!-- Error State -->
-    <v-row v-else-if="systemStore.error">
-      <v-col cols="12">
-        <v-alert type="error" variant="tonal" prominent>
-          <v-alert-title>Error Loading Tenant</v-alert-title>
-          <div>{{ systemStore.error }}</div>
-        </v-alert>
-      </v-col>
-    </v-row>
+    <v-alert v-else-if="systemStore.error" type="error" variant="tonal" prominent>
+      <v-alert-title>Error Loading Tenant</v-alert-title>
+      <div>{{ systemStore.error }}</div>
+    </v-alert>
 
     <!-- Success Snackbar -->
     <v-snackbar v-model="showSnackbar" :color="snackbarColor" :timeout="3000">
@@ -185,12 +162,11 @@
 import { ref, computed, onMounted } from 'vue'
 
 definePageMeta({
-  middleware: ['auth', 'role'],
+  middleware: ['role'],
   role: ['system_admin'],
 })
 
 const route = useRoute()
-const router = useRouter()
 const systemStore = useSystemStore()
 
 const showSnackbar = ref(false)
@@ -199,14 +175,6 @@ const snackbarColor = ref('success')
 
 const tenantId = computed(() => route.params.id as string)
 const tenant = computed(() => systemStore.selectedTenant)
-
-// User table headers
-const userHeaders = [
-  { title: 'User', key: 'name', sortable: true },
-  { title: 'Role', key: 'role', sortable: true },
-  { title: 'Status', key: 'isActive', sortable: true },
-  { title: 'Joined', key: 'createdAt', sortable: true },
-]
 
 // Format date
 const formatDate = (date: Date | string | undefined) => {
@@ -218,26 +186,36 @@ const formatDate = (date: Date | string | undefined) => {
   })
 }
 
+// Format date long
+const formatDateLong = (date: Date | string | undefined) => {
+  if (!date) return 'N/A'
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
 // Format role
 const formatRole = (role: string) => {
   const roleLabels: Record<string, string> = {
-    system_admin: 'System Admin',
-    tenant_admin: 'Tenant Admin',
-    tenant_officer: 'Loan Officer',
+    system_admin: 'Admin',
+    tenant_admin: 'Admin',
+    tenant_officer: 'Officer',
     tenant_approver: 'Approver',
   }
   return roleLabels[role] || role
 }
 
-// Get role color
-const getRoleColor = (role: string) => {
-  const roleColors: Record<string, string> = {
-    system_admin: 'purple',
-    tenant_admin: 'indigo',
-    tenant_officer: 'blue',
-    tenant_approver: 'amber',
+// Get role class
+const getRoleClass = (role: string) => {
+  const roleClasses: Record<string, string> = {
+    system_admin: 'admin',
+    tenant_admin: 'admin',
+    tenant_officer: 'officer',
+    tenant_approver: 'approver',
   }
-  return roleColors[role] || 'grey'
+  return roleClasses[role] || ''
 }
 
 // Handle toggle status
@@ -272,11 +250,46 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.gap-2 {
+.details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.actions-list {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.w-100 {
-  width: 100%;
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  color: #1e3a8a;
+}
+
+@media (max-width: 1024px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
