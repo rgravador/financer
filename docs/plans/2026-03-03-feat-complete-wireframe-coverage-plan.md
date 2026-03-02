@@ -873,14 +873,14 @@ Use this checklist to track progress during implementation:
 - [x] Write components/README.md
 
 ### Phase 2: Officer Role (8 wireframes)
-- [ ] officer/dashboard.html
-- [ ] officer/borrowers-list.html
-- [ ] officer/borrower-create.html
-- [ ] officer/borrower-edit.html
-- [ ] officer/borrower-profile.html
-- [ ] officer/loan-application-create.html (wizard)
-- [ ] officer/loan-application-detail.html
-- [ ] officer/document-upload.html
+- [x] officer/dashboard.html
+- [x] officer/borrowers-list.html
+- [x] officer/borrower-create.html
+- [x] officer/borrower-edit.html
+- [x] officer/borrower-profile.html
+- [x] officer/loan-application-create.html (wizard)
+- [x] officer/loan-application-detail.html
+- [x] officer/document-upload.html
 
 ### Phase 3: Approver Role (5 wireframes)
 - [ ] approver/dashboard.html

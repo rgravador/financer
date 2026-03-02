@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Loan Application - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .wizard-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .wizard-header {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .wizard-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 24px;
+    }
+
+    .wizard-steps {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .wizard-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+
+    .wizard-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #9ca3af;
+      margin-bottom: 8px;
+      transition: all 0.3s;
+    }
+
+    .wizard-step.active .step-circle {
+      background: #1e3a8a;
+      border-color: #1e3a8a;
+      color: white;
+    }
+
+    .wizard-step.completed .step-circle {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+
+    .step-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .wizard-step.active .step-label {
+      color: #1e3a8a;
+    }
+
+    .wizard-step.completed .step-label {
+      color: #10b981;
+    }
+
+    .wizard-content {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 32px;
+      margin-bottom: 24px;
+      min-height: 400px;
+    }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .step-description {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .borrower-search {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #9ca3af;
+    }
+
+    .borrower-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .borrower-card {
+      padding: 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .borrower-card:hover {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+    }
+
+    .borrower-card.selected {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .borrower-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .borrower-info {
+      flex: 1;
+    }
+
+    .borrower-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+
+    .borrower-details {
+      font-size: 13px;
+      color: #6b7280;
+      display: flex;
+      gap: 16px;
+    }
+
+    .borrower-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: #d1fae5;
+      color: #065f46;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .loan-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .loan-type-card {
+      padding: 24px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .loan-type-card:hover {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+    }
+
+    .loan-type-card.selected {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .loan-type-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .loan-type-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .loan-type-description {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-label.required::after {
+      content: " *";
+      color: #ef4444;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .wizard-actions {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wizard-progress-text {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .wizard-nav-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .create-new-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e3a8a;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .create-new-link:hover {
+      background: #f0f4ff;
+    }
+
+    .helper-card {
+      background: #f0f4ff;
+      border-left: 4px solid #1e3a8a;
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 24px;
+    }
+
+    .helper-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .helper-text {
+      font-size: 13px;
+      color: #1e40af;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Loan Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="borrowers-list.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">New Application</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Documents</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">New Loan Application</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">3</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Dashboard</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">Applications</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">New Application</span>
+          </div>
+        </div>
+
+        <!-- Wizard Container -->
+        <div class="wizard-container">
+          <!-- Wizard Header with Steps -->
+          <div class="wizard-header">
+            <h1 class="wizard-title">Create Loan Application</h1>
+
+            <div class="wizard-steps">
+              <div class="wizard-step active">
+                <div class="step-circle">1</div>
+                <div class="step-label">Select Borrower</div>
+              </div>
+              <div class="wizard-step">
+                <div class="step-circle">2</div>
+                <div class="step-label">Loan Type</div>
+              </div>
+              <div class="wizard-step">
+                <div class="step-circle">3</div>
+                <div class="step-label">Loan Details</div>
+              </div>
+              <div class="wizard-step">
+                <div class="step-circle">4</div>
+                <div class="step-label">Documents</div>
+              </div>
+              <div class="wizard-step">
+                <div class="step-circle">5</div>
+                <div class="step-label">Review</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step Content -->
+          <div class="wizard-content">
+            <!-- STEP 1: Select Borrower (Active) -->
+            <div class="step-content step-1">
+              <h2 class="step-title">Select Borrower</h2>
+              <p class="step-description">Choose an existing borrower or create a new one to start the loan application.</p>
+
+              <!-- Search Borrowers -->
+              <div class="borrower-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search by name, email, or phone...">
+              </div>
+
+              <!-- Borrower List -->
+              <div class="borrower-list">
+                <div class="borrower-card selected">
+                  <div class="borrower-avatar">SJ</div>
+                  <div class="borrower-info">
+                    <div class="borrower-name">Sarah Johnson</div>
+                    <div class="borrower-details">
+                      <span>sarah.johnson@email.com</span>
+                      <span>•</span>
+                      <span>+1 (555) 123-4567</span>
+                    </div>
+                  </div>
+                  <div class="borrower-badge">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                    Active
+                  </div>
+                </div>
+
+                <div class="borrower-card">
+                  <div class="borrower-avatar">MC</div>
+                  <div class="borrower-info">
+                    <div class="borrower-name">Michael Chen</div>
+                    <div class="borrower-details">
+                      <span>michael.chen@email.com</span>
+                      <span>•</span>
+                      <span>+1 (555) 234-5678</span>
+                    </div>
+                  </div>
+                  <div class="borrower-badge">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                    Active
+                  </div>
+                </div>
+
+                <div class="borrower-card">
+                  <div class="borrower-avatar">ED</div>
+                  <div class="borrower-info">
+                    <div class="borrower-name">Emily Davis</div>
+                    <div class="borrower-details">
+                      <span>emily.davis@email.com</span>
+                      <span>•</span>
+                      <span>+1 (555) 345-6789</span>
+                    </div>
+                  </div>
+                  <div class="borrower-badge">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                    Active
+                  </div>
+                </div>
+              </div>
+
+              <!-- Create New Borrower Link -->
+              <div class="helper-card">
+                <div class="helper-title">Don't see the borrower?</div>
+                <div class="helper-text">
+                  <a href="borrower-create.html" class="create-new-link">
+                    <span>+</span>
+                    Create New Borrower Profile
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2: Loan Type (Hidden - shown when active) -->
+            <!--
+            <div class="step-content step-2" style="display: none;">
+              <h2 class="step-title">Select Loan Type</h2>
+              <p class="step-description">Choose the type of loan for this application.</p>
+
+              <div class="loan-type-grid">
+                <div class="loan-type-card selected">
+                  <div class="loan-type-icon">💰</div>
+                  <div class="loan-type-name">Personal Loan</div>
+                  <div class="loan-type-description">General purpose financing for personal expenses</div>
+                </div>
+
+                <div class="loan-type-card">
+                  <div class="loan-type-icon">🏢</div>
+                  <div class="loan-type-name">Business Loan</div>
+                  <div class="loan-type-description">Funding for business operations and growth</div>
+                </div>
+
+                <div class="loan-type-card">
+                  <div class="loan-type-icon">🏠</div>
+                  <div class="loan-type-name">Home Improvement</div>
+                  <div class="loan-type-description">Financing for home repairs and renovations</div>
+                </div>
+
+                <div class="loan-type-card">
+                  <div class="loan-type-icon">🚗</div>
+                  <div class="loan-type-name">Auto Loan</div>
+                  <div class="loan-type-description">Vehicle purchase financing</div>
+                </div>
+
+                <div class="loan-type-card">
+                  <div class="loan-type-icon">🎓</div>
+                  <div class="loan-type-name">Education Loan</div>
+                  <div class="loan-type-description">Funding for educational expenses</div>
+                </div>
+
+                <div class="loan-type-card">
+                  <div class="loan-type-icon">💳</div>
+                  <div class="loan-type-name">Debt Consolidation</div>
+                  <div class="loan-type-description">Combine multiple debts into one payment</div>
+                </div>
+              </div>
+            </div>
+            -->
+
+            <!-- STEP 3: Loan Details (Hidden - shown when active) -->
+            <!--
+            <div class="step-content step-3" style="display: none;">
+              <h2 class="step-title">Loan Details</h2>
+              <p class="step-description">Enter the specific details for this loan application.</p>
+
+              <form>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label required">Requested Amount</label>
+                    <input type="number" class="form-input" placeholder="0.00" step="0.01" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required">Loan Term (months)</label>
+                    <select class="form-input" required>
+                      <option value="">Select term</option>
+                      <option value="12">12 months</option>
+                      <option value="24">24 months</option>
+                      <option value="36">36 months</option>
+                      <option value="48">48 months</option>
+                      <option value="60">60 months</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label required">Interest Rate (%)</label>
+                    <input type="number" class="form-input" placeholder="0.00" step="0.01" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required">Purpose of Loan</label>
+                    <select class="form-input" required>
+                      <option value="">Select purpose</option>
+                      <option value="debt">Debt Consolidation</option>
+                      <option value="home">Home Improvement</option>
+                      <option value="medical">Medical Expenses</option>
+                      <option value="education">Education</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Additional Notes</label>
+                  <textarea class="form-input" rows="4" placeholder="Enter any additional information about this loan application..."></textarea>
+                </div>
+              </form>
+            </div>
+            -->
+
+            <!-- STEP 4: Upload Documents (Hidden - shown when active) -->
+            <!--
+            <div class="step-content step-4" style="display: none;">
+              <h2 class="step-title">Upload Documents</h2>
+              <p class="step-description">Upload required documents for the loan application.</p>
+
+              <div class="document-upload-area" style="border: 2px dashed #d1d5db; border-radius: 12px; padding: 48px; text-align: center; cursor: pointer;">
+                <div style="font-size: 48px; margin-bottom: 16px;">📁</div>
+                <div style="font-size: 16px; font-weight: 600; color: #1e3a8a; margin-bottom: 8px;">
+                  Drag and drop files here
+                </div>
+                <div style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">
+                  or click to browse
+                </div>
+                <button class="btn btn-secondary">Choose Files</button>
+              </div>
+
+              <div class="helper-card">
+                <div class="helper-title">Required Documents:</div>
+                <ul style="margin: 8px 0 0 20px; padding: 0; font-size: 13px; color: #1e40af;">
+                  <li>Proof of Income (W-2, pay stubs, tax returns)</li>
+                  <li>Government-issued ID</li>
+                  <li>Bank statements (last 3 months)</li>
+                  <li>Proof of address</li>
+                </ul>
+              </div>
+            </div>
+            -->
+
+            <!-- STEP 5: Review & Submit (Hidden - shown when active) -->
+            <!--
+            <div class="step-content step-5" style="display: none;">
+              <h2 class="step-title">Review Application</h2>
+              <p class="step-description">Review all details before submitting the loan application.</p>
+
+              <div style="background: #f9fafb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #1e3a8a; margin-bottom: 16px;">Borrower Information</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                  <div><span style="color: #6b7280;">Name:</span> <strong>Sarah Johnson</strong></div>
+                  <div><span style="color: #6b7280;">Email:</span> <strong>sarah.johnson@email.com</strong></div>
+                  <div><span style="color: #6b7280;">Phone:</span> <strong>+1 (555) 123-4567</strong></div>
+                </div>
+              </div>
+
+              <div style="background: #f9fafb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #1e3a8a; margin-bottom: 16px;">Loan Details</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                  <div><span style="color: #6b7280;">Type:</span> <strong>Personal Loan</strong></div>
+                  <div><span style="color: #6b7280;">Amount:</span> <strong>$15,000</strong></div>
+                  <div><span style="color: #6b7280;">Term:</span> <strong>36 months</strong></div>
+                  <div><span style="color: #6b7280;">Interest Rate:</span> <strong>8.5%</strong></div>
+                  <div><span style="color: #6b7280;">Purpose:</span> <strong>Debt Consolidation</strong></div>
+                </div>
+              </div>
+
+              <div style="background: #f9fafb; border-radius: 12px; padding: 24px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #1e3a8a; margin-bottom: 16px;">Documents Uploaded</h3>
+                <ul style="margin: 0; padding: 0; list-style: none;">
+                  <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">✅ Proof of Income - W2_2025.pdf</li>
+                  <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">✅ Government ID - DriversLicense.pdf</li>
+                  <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">✅ Bank Statement - Dec2025.pdf</li>
+                </ul>
+              </div>
+            </div>
+            -->
+          </div>
+
+          <!-- Wizard Actions -->
+          <div class="wizard-actions">
+            <div class="wizard-progress-text">Step 1 of 5</div>
+            <div class="wizard-nav-buttons">
+              <button class="btn btn-secondary" disabled>Previous</button>
+              <button class="btn btn-primary">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note: In actual implementation, JavaScript would handle:
+       - Step navigation (Previous/Next buttons)
+       - Form validation per step
+       - Dynamic content switching between steps
+       - Progress bar updates
+       - Data persistence across steps
+       - Final submission to API
+  -->
+</body>
+</html>

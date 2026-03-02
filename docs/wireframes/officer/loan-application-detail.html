@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Application Detail - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .app-header {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .app-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .app-id {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .app-amount {
+      font-size: 48px;
+      font-weight: 700;
+      color: #1e3a8a;
+      font-family: 'SF Mono', Consolas, monospace;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .app-borrower {
+      font-size: 18px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .status-review {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-approved {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .timeline-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .timeline-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 32px;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 48px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 32px;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -48px;
+      top: 4px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 1;
+    }
+
+    .timeline-item.completed .timeline-dot {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .timeline-item.active .timeline-dot {
+      background: #1e3a8a;
+      border-color: #1e3a8a;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(30, 58, 138, 0);
+      }
+    }
+
+    .timeline-content {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .timeline-status {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .timeline-date {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    .timeline-description {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .timeline-user {
+      font-size: 13px;
+      color: #1e3a8a;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .info-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 15px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .document-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .document-item:hover {
+      background: #f9fafb;
+      border-color: #1e3a8a;
+    }
+
+    .document-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f4ff;
+      border-radius: 8px;
+    }
+
+    .document-info {
+      flex: 1;
+    }
+
+    .document-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 2px;
+    }
+
+    .document-meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .activity-item {
+      padding: 16px 0;
+      border-bottom: 1px solid #f3f4f6;
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-item::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 24px;
+      width: 2px;
+      height: calc(100% - 8px);
+      background: #e5e7eb;
+    }
+
+    .activity-item:last-child::before {
+      display: none;
+    }
+
+    .activity-dot {
+      position: absolute;
+      left: 0;
+      top: 20px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1e3a8a;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #e5e7eb;
+    }
+
+    .activity-content {
+      font-size: 14px;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+
+    .activity-time {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      padding: 24px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 88px;
+    }
+
+    .quick-action-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e3a8a;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .quick-action-btn:hover {
+      background: #f0f4ff;
+      border-color: #1e3a8a;
+    }
+
+    .stats-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-mini {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-mini-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .stat-mini-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Loan Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="borrowers-list.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="loan-application-create.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">New Application</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Documents</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Application Detail</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">3</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Dashboard</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">My Applications</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">APP-2024-001</span>
+          </div>
+        </div>
+
+        <!-- Application Header -->
+        <div class="app-header">
+          <div class="app-header-top">
+            <div>
+              <div class="app-id">APP-2024-001</div>
+              <div class="app-amount">$15,000</div>
+              <div class="app-borrower">Sarah Johnson</div>
+            </div>
+            <div class="status-badge status-review">
+              <span class="status-dot"></span>
+              Under Review
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-success" style="background: #10b981; flex: 1;">
+              ✓ Approve Application
+            </button>
+            <button class="btn btn-secondary" style="flex: 1;">
+              📄 Request More Info
+            </button>
+            <button class="btn btn-danger" style="flex: 1;">
+              ✕ Reject Application
+            </button>
+          </div>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="timeline-container">
+          <h2 class="timeline-title">Application Timeline</h2>
+
+          <div class="timeline">
+            <div class="timeline-item completed">
+              <div class="timeline-dot">✓</div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-status">Application Submitted</div>
+                  <div class="timeline-date">Jan 20, 2026 at 9:30 AM</div>
+                </div>
+                <div class="timeline-description">
+                  Loan application was successfully submitted by the borrower. All required documents were uploaded.
+                </div>
+                <div class="timeline-user">by Sarah Johnson</div>
+              </div>
+            </div>
+
+            <div class="timeline-item completed">
+              <div class="timeline-dot">✓</div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-status">Documents Verified</div>
+                  <div class="timeline-date">Jan 20, 2026 at 2:15 PM</div>
+                </div>
+                <div class="timeline-description">
+                  All submitted documents have been verified and validated. Proof of income, ID, and bank statements are complete.
+                </div>
+                <div class="timeline-user">by John Doe (Loan Officer)</div>
+              </div>
+            </div>
+
+            <div class="timeline-item active">
+              <div class="timeline-dot">⏳</div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-status">Under Review</div>
+                  <div class="timeline-date">Jan 21, 2026 at 10:00 AM</div>
+                </div>
+                <div class="timeline-description">
+                  Application is currently under review by the credit team. Credit score checked and income verification in progress.
+                </div>
+                <div class="timeline-user">by Credit Team</div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot">⊙</div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-status">Pending Approval</div>
+                  <div class="timeline-date">Pending</div>
+                </div>
+                <div class="timeline-description">
+                  Awaiting final approval from authorized approver.
+                </div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot">⊙</div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-status">Disbursement</div>
+                  <div class="timeline-date">Pending</div>
+                </div>
+                <div class="timeline-description">
+                  Funds will be disbursed to borrower's account once approved.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Grid -->
+        <div class="detail-grid">
+          <!-- Main Column -->
+          <div class="detail-main">
+            <!-- Loan Details Card -->
+            <div class="card">
+              <h2 class="card-title">Loan Details</h2>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Loan Type</div>
+                  <div class="info-value">Personal Loan</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Loan Amount</div>
+                  <div class="info-value">$15,000</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Loan Term</div>
+                  <div class="info-value">36 months</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Interest Rate</div>
+                  <div class="info-value">8.5% APR</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Monthly Payment</div>
+                  <div class="info-value">$473.25</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Total Interest</div>
+                  <div class="info-value">$2,037</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Purpose</div>
+                  <div class="info-value">Debt Consolidation</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Application Date</div>
+                  <div class="info-value">January 20, 2026</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Borrower Information Card -->
+            <div class="card">
+              <h2 class="card-title">Borrower Information</h2>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Full Name</div>
+                  <div class="info-value">Sarah Johnson</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Email</div>
+                  <div class="info-value">sarah.johnson@email.com</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Phone</div>
+                  <div class="info-value">+1 (555) 123-4567</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Annual Income</div>
+                  <div class="info-value">$125,000</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Employment</div>
+                  <div class="info-value">Senior Software Engineer</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Employer</div>
+                  <div class="info-value">Tech Innovations Inc.</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Credit Score</div>
+                  <div class="info-value">742 (Good)</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Debt-to-Income</div>
+                  <div class="info-value">28%</div>
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="margin-top: 16px; width: 100%;" onclick="window.location.href='borrower-profile.html'">
+                View Full Profile
+              </button>
+            </div>
+
+            <!-- Documents Card -->
+            <div class="card">
+              <h2 class="card-title">Submitted Documents</h2>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Proof of Income - W2_2025.pdf</div>
+                  <div class="document-meta">Uploaded Jan 20, 2026 • 1.2 MB • Verified ✓</div>
+                </div>
+              </div>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Government ID - DriversLicense.pdf</div>
+                  <div class="document-meta">Uploaded Jan 20, 2026 • 856 KB • Verified ✓</div>
+                </div>
+              </div>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Bank Statement - December 2025.pdf</div>
+                  <div class="document-meta">Uploaded Jan 20, 2026 • 2.1 MB • Verified ✓</div>
+                </div>
+              </div>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Proof of Address - Utility Bill.pdf</div>
+                  <div class="document-meta">Uploaded Jan 20, 2026 • 523 KB • Verified ✓</div>
+                </div>
+              </div>
+
+              <button class="btn btn-secondary" style="margin-top: 12px; width: 100%;">
+                Request Additional Documents
+              </button>
+            </div>
+          </div>
+
+          <!-- Sidebar Column -->
+          <aside class="detail-sidebar">
+            <!-- Quick Stats Card -->
+            <div class="card">
+              <h3 class="card-title">Quick Stats</h3>
+              <div class="stats-mini-grid">
+                <div class="stat-mini">
+                  <div class="stat-mini-value">36</div>
+                  <div class="stat-mini-label">Term (Months)</div>
+                </div>
+                <div class="stat-mini">
+                  <div class="stat-mini-value">8.5%</div>
+                  <div class="stat-mini-label">APR</div>
+                </div>
+                <div class="stat-mini">
+                  <div class="stat-mini-value">$473</div>
+                  <div class="stat-mini-label">Monthly</div>
+                </div>
+                <div class="stat-mini">
+                  <div class="stat-mini-value">28%</div>
+                  <div class="stat-mini-label">DTI Ratio</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+              <h3 class="card-title">Quick Actions</h3>
+              <a href="borrower-profile.html" class="quick-action-btn">
+                👤 View Borrower Profile
+              </a>
+              <a href="#" class="quick-action-btn">
+                📧 Email Borrower
+              </a>
+              <a href="#" class="quick-action-btn">
+                📞 Call Borrower
+              </a>
+              <a href="document-upload.html" class="quick-action-btn">
+                📁 Upload Document
+              </a>
+              <a href="#" class="quick-action-btn">
+                📊 Run Credit Report
+              </a>
+              <a href="#" class="quick-action-btn">
+                💬 Add Note
+              </a>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="card">
+              <h3 class="card-title">Recent Activity</h3>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Application moved to Under Review
+                </div>
+                <div class="activity-time">Jan 21, 2026 at 10:00 AM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  All documents verified by John Doe
+                </div>
+                <div class="activity-time">Jan 20, 2026 at 2:15 PM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Proof of Address uploaded
+                </div>
+                <div class="activity-time">Jan 20, 2026 at 9:45 AM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Bank Statement uploaded
+                </div>
+                <div class="activity-time">Jan 20, 2026 at 9:42 AM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Application submitted
+                </div>
+                <div class="activity-time">Jan 20, 2026 at 9:30 AM</div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

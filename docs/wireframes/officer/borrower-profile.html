@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borrower Profile - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: white;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .profile-email {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .profile-phone {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .profile-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .info-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 15px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .loan-item {
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .loan-item:hover {
+      border-color: #1e3a8a;
+      box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
+    }
+
+    .loan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .loan-id {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    .loan-amount {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e3a8a;
+      font-family: 'SF Mono', Consolas, monospace;
+    }
+
+    .loan-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .loan-detail-label {
+      color: #6b7280;
+    }
+
+    .loan-detail-value {
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-completed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .document-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .document-item:hover {
+      background: #f9fafb;
+      border-color: #1e3a8a;
+    }
+
+    .document-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f4ff;
+      border-radius: 8px;
+    }
+
+    .document-info {
+      flex: 1;
+    }
+
+    .document-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 2px;
+    }
+
+    .document-meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .activity-item {
+      padding: 16px 0;
+      border-bottom: 1px solid #f3f4f6;
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-item::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 24px;
+      width: 2px;
+      height: calc(100% - 8px);
+      background: #e5e7eb;
+    }
+
+    .activity-item:last-child::before {
+      display: none;
+    }
+
+    .activity-dot {
+      position: absolute;
+      left: 0;
+      top: 20px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1e3a8a;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #e5e7eb;
+    }
+
+    .activity-content {
+      font-size: 14px;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+
+    .activity-time {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .quick-action-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e3a8a;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .quick-action-btn:hover {
+      background: #f0f4ff;
+      border-color: #1e3a8a;
+    }
+
+    .stats-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-mini {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-mini-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .stat-mini-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Loan Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="borrowers-list.html" class="nav-item active">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="loan-application-create.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">New Application</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Documents</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Borrower Profile</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">3</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Dashboard</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">Borrowers</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Sarah Johnson</span>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='borrower-edit.html'">
+              <span class="btn-icon">✏️</span>
+              Edit Profile
+            </button>
+            <button class="btn btn-primary" onclick="window.location.href='loan-application-create.html'">
+              <span class="btn-icon">+</span>
+              New Loan Application
+            </button>
+          </div>
+        </div>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-avatar">SJ</div>
+          <div class="profile-info">
+            <div class="profile-name">Sarah Johnson</div>
+            <div class="profile-email">sarah.johnson@email.com</div>
+            <div class="profile-phone">+1 (555) 123-4567</div>
+          </div>
+          <div class="profile-status">
+            <span class="status-dot"></span>
+            Active
+          </div>
+        </div>
+
+        <!-- Profile Grid -->
+        <div class="profile-grid">
+          <!-- Main Column -->
+          <div class="profile-main">
+            <!-- Personal Information Card -->
+            <div class="card">
+              <h2 class="card-title">Personal Information</h2>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Full Name</div>
+                  <div class="info-value">Sarah Johnson</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Date of Birth</div>
+                  <div class="info-value">March 15, 1985</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Email Address</div>
+                  <div class="info-value">sarah.johnson@email.com</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Phone Number</div>
+                  <div class="info-value">+1 (555) 123-4567</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">SSN</div>
+                  <div class="info-value">***-**-5678</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Member Since</div>
+                  <div class="info-value">January 15, 2024</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Address Card -->
+            <div class="card">
+              <h2 class="card-title">Contact Information</h2>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Street Address</div>
+                  <div class="info-value">123 Main Street, Apt 4B</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">City</div>
+                  <div class="info-value">San Francisco</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">State</div>
+                  <div class="info-value">California</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">ZIP Code</div>
+                  <div class="info-value">94102</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Employment Card -->
+            <div class="card">
+              <h2 class="card-title">Employment Information</h2>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Employer</div>
+                  <div class="info-value">Tech Innovations Inc.</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Job Title</div>
+                  <div class="info-value">Senior Software Engineer</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Employment Type</div>
+                  <div class="info-value">Full-time</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Annual Income</div>
+                  <div class="info-value">$125,000</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loan History Card -->
+            <div class="card">
+              <h2 class="card-title">Loan History</h2>
+
+              <div class="loan-item" onclick="window.location.href='loan-application-detail.html'">
+                <div class="loan-header">
+                  <span class="loan-id">LOAN-2024-001</span>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </div>
+                <div class="loan-amount">$15,000</div>
+                <div class="loan-details">
+                  <div>
+                    <div class="loan-detail-label">Type</div>
+                    <div class="loan-detail-value">Personal Loan</div>
+                  </div>
+                  <div>
+                    <div class="loan-detail-label">Disbursed</div>
+                    <div class="loan-detail-value">Jan 20, 2026</div>
+                  </div>
+                  <div>
+                    <div class="loan-detail-label">Balance</div>
+                    <div class="loan-detail-value">$12,450</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="loan-item">
+                <div class="loan-header">
+                  <span class="loan-id">LOAN-2023-142</span>
+                  <span class="status-badge status-completed">
+                    <span class="status-dot"></span>
+                    Completed
+                  </span>
+                </div>
+                <div class="loan-amount">$8,500</div>
+                <div class="loan-details">
+                  <div>
+                    <div class="loan-detail-label">Type</div>
+                    <div class="loan-detail-value">Auto Loan</div>
+                  </div>
+                  <div>
+                    <div class="loan-detail-label">Disbursed</div>
+                    <div class="loan-detail-value">Jun 10, 2023</div>
+                  </div>
+                  <div>
+                    <div class="loan-detail-label">Paid Off</div>
+                    <div class="loan-detail-value">Dec 15, 2025</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="loan-item">
+                <div class="loan-header">
+                  <span class="loan-id">LOAN-2022-089</span>
+                  <span class="status-badge status-completed">
+                    <span class="status-dot"></span>
+                    Completed
+                  </span>
+                </div>
+                <div class="loan-amount">$25,000</div>
+                <div class="loan-details">
+                  <div>
+                    <div class="loan-detail-label">Type</div>
+                    <div class="loan-detail-value">Home Improvement</div>
+                  </div>
+                  <div>
+                    <div class="loan-detail-label">Disbursed</div>
+                    <div class="loan-detail-value">Mar 5, 2022</div>
+                  </div>
+                  <div>
+                    <div class="loan-detail-label">Paid Off</div>
+                    <div class="loan-detail-value">Aug 20, 2023</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documents Card -->
+            <div class="card">
+              <h2 class="card-title">Documents</h2>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Proof of Income - 2026.pdf</div>
+                  <div class="document-meta">Uploaded Feb 15, 2026 • 1.2 MB</div>
+                </div>
+              </div>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">W-2 Form 2025.pdf</div>
+                  <div class="document-meta">Uploaded Jan 30, 2026 • 856 KB</div>
+                </div>
+              </div>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Government ID - Driver License.pdf</div>
+                  <div class="document-meta">Uploaded Jan 15, 2024 • 523 KB</div>
+                </div>
+              </div>
+
+              <div class="document-item">
+                <div class="document-icon">📄</div>
+                <div class="document-info">
+                  <div class="document-name">Bank Statement - December 2025.pdf</div>
+                  <div class="document-meta">Uploaded Jan 5, 2026 • 2.1 MB</div>
+                </div>
+              </div>
+
+              <button class="btn btn-secondary" style="margin-top: 12px; width: 100%;" onclick="window.location.href='document-upload.html'">
+                Upload New Document
+              </button>
+            </div>
+          </div>
+
+          <!-- Sidebar Column -->
+          <aside class="profile-sidebar">
+            <!-- Quick Stats Card -->
+            <div class="card">
+              <h3 class="card-title">Quick Stats</h3>
+              <div class="stats-mini-grid">
+                <div class="stat-mini">
+                  <div class="stat-mini-value">3</div>
+                  <div class="stat-mini-label">Total Loans</div>
+                </div>
+                <div class="stat-mini">
+                  <div class="stat-mini-value">1</div>
+                  <div class="stat-mini-label">Active</div>
+                </div>
+                <div class="stat-mini">
+                  <div class="stat-mini-value">$48.5K</div>
+                  <div class="stat-mini-label">Total Borrowed</div>
+                </div>
+                <div class="stat-mini">
+                  <div class="stat-mini-value">$12.5K</div>
+                  <div class="stat-mini-label">Balance</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+              <h3 class="card-title">Quick Actions</h3>
+              <a href="loan-application-create.html" class="quick-action-btn">
+                📄 New Loan Application
+              </a>
+              <a href="borrower-edit.html" class="quick-action-btn">
+                ✏️ Edit Profile
+              </a>
+              <a href="document-upload.html" class="quick-action-btn">
+                📁 Upload Document
+              </a>
+              <a href="#" class="quick-action-btn">
+                📧 Send Message
+              </a>
+              <a href="#" class="quick-action-btn">
+                📊 View Credit Report
+              </a>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="card">
+              <h3 class="card-title">Recent Activity</h3>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Profile updated by John Doe
+                </div>
+                <div class="activity-time">Feb 28, 2026 at 2:30 PM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Payment received - $550
+                </div>
+                <div class="activity-time">Feb 15, 2026 at 10:15 AM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Document uploaded: Proof of Income
+                </div>
+                <div class="activity-time">Feb 15, 2026 at 9:45 AM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Document uploaded: W-2 Form 2025
+                </div>
+                <div class="activity-time">Jan 30, 2026 at 3:20 PM</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  Loan application approved
+                </div>
+                <div class="activity-time">Jan 20, 2026 at 11:00 AM</div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

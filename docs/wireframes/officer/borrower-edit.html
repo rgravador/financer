@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Borrower - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .form-section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-label.required::after {
+      content: " *";
+      color: #ef4444;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .help-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+
+    .help-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 12px;
+    }
+
+    .help-list li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .help-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .info-box {
+      background: #f0f4ff;
+      border-left: 4px solid #1e3a8a;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #1e40af;
+    }
+
+    .meta-info {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .meta-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .meta-item:last-child {
+      border-bottom: none;
+    }
+
+    .meta-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .meta-value {
+      color: #1f2937;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Loan Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="borrowers-list.html" class="nav-item active">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="loan-application-create.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">New Application</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Documents</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Edit Borrower</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">3</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Dashboard</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">Borrowers</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Edit Borrower</span>
+          </div>
+          <h1 class="page-title">Edit Borrower Profile</h1>
+        </div>
+
+        <!-- Form Layout -->
+        <div class="form-grid">
+          <!-- Main Form -->
+          <div class="form-main">
+            <div class="card">
+              <h2 class="card-title">Borrower Information</h2>
+
+              <form>
+                <!-- Personal Information -->
+                <div class="form-section">
+                  <h3 class="section-title">Personal Information</h3>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label required">First Name</label>
+                      <input type="text" class="form-input" value="Sarah" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label required">Last Name</label>
+                      <input type="text" class="form-input" value="Johnson" required>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label required">Email</label>
+                      <input type="email" class="form-input" value="sarah.johnson@email.com" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label required">Phone</label>
+                      <input type="tel" class="form-input" value="+1 (555) 123-4567" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-input" value="1985-03-15">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Social Security Number</label>
+                    <input type="text" class="form-input" value="***-**-5678" disabled>
+                    <small style="color: #6b7280; font-size: 13px; display: block; margin-top: 4px;">
+                      SSN cannot be edited for security reasons
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                  <h3 class="section-title">Contact Information</h3>
+
+                  <div class="form-group">
+                    <label class="form-label required">Street Address</label>
+                    <input type="text" class="form-input" value="123 Main Street, Apt 4B" required>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label required">City</label>
+                      <input type="text" class="form-input" value="San Francisco" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label required">State</label>
+                      <select class="form-input" required>
+                        <option value="">Select state</option>
+                        <option value="CA" selected>California</option>
+                        <option value="NY">New York</option>
+                        <option value="TX">Texas</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">ZIP Code</label>
+                    <input type="text" class="form-input" value="94102" required>
+                  </div>
+                </div>
+
+                <!-- Employment Information -->
+                <div class="form-section">
+                  <h3 class="section-title">Employment Information</h3>
+
+                  <div class="form-group">
+                    <label class="form-label">Employer Name</label>
+                    <input type="text" class="form-input" value="Tech Innovations Inc.">
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Job Title</label>
+                      <input type="text" class="form-input" value="Senior Software Engineer">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Employment Type</label>
+                      <select class="form-input">
+                        <option value="">Select type</option>
+                        <option value="full-time" selected>Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="self-employed">Self-employed</option>
+                        <option value="unemployed">Unemployed</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Annual Income</label>
+                    <input type="number" class="form-input" value="125000.00" step="0.01">
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                  <button type="button" class="btn btn-secondary" onclick="window.location.href='borrowers-list.html'">Cancel</button>
+                  <button type="button" class="btn btn-danger" style="margin-left: auto;">Delete Borrower</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <aside class="form-sidebar">
+            <!-- Metadata Card -->
+            <div class="card">
+              <h3 class="card-title">Profile Metadata</h3>
+              <div class="meta-info">
+                <div class="meta-item">
+                  <span class="meta-label">Status</span>
+                  <span class="meta-value" style="color: #10b981;">Active</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Created</span>
+                  <span class="meta-value">Jan 15, 2024</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Last Updated</span>
+                  <span class="meta-value">Feb 28, 2026</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Total Loans</span>
+                  <span class="meta-value">3</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Created By</span>
+                  <span class="meta-value">John Doe</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card">
+              <h3 class="card-title">Help & Tips</h3>
+              <p class="help-text">
+                Update the borrower's information as needed. Changes will be saved to their profile immediately.
+              </p>
+              <ul class="help-list">
+                <li>Email must remain unique</li>
+                <li>SSN cannot be modified for security</li>
+                <li>All active loans will reflect updated info</li>
+                <li>Changes are logged in audit trail</li>
+              </ul>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+              <h3 class="card-title">Quick Actions</h3>
+              <div class="info-box">
+                Related actions:
+                <ul style="margin: 12px 0 0 20px; padding: 0;">
+                  <li><a href="borrower-profile.html" style="color: #1e3a8a;">View Full Profile</a></li>
+                  <li><a href="loan-application-create.html" style="color: #1e3a8a;">Start New Loan Application</a></li>
+                  <li><a href="document-upload.html" style="color: #1e3a8a;">Upload Documents</a></li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borrowers List - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 300px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 16px;
+      color: #9ca3af;
+    }
+
+    .search-box input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px 0 36px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .filter-select {
+      height: 40px;
+      padding: 0 32px 0 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #f9fafb;
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .table tr:hover {
+      background: rgba(30, 58, 138, 0.04);
+    }
+
+    .sort-icon {
+      margin-left: 4px;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-active .status-dot {
+      background: #10b981;
+    }
+
+    .btn-icon {
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: #f3f4f6;
+    }
+
+    .pagination {
+      padding: 20px 24px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: #f3f4f6;
+      border-color: #1e3a8a;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .phone-number {
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .loan-count {
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar (using officer navigation) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Loan Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="loan-application-create.html" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">New Application</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Documents</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Borrowers</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">3</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Dashboard</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Borrowers</span>
+          </div>
+          <h1 class="page-title">Borrower Management</h1>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="window.location.href='borrower-create.html'">
+              <span class="btn-icon">+</span>
+              Add Borrower
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-container">
+          <!-- Table Toolbar -->
+          <div class="table-toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="Search by name, email, or phone...">
+            </div>
+
+            <select class="filter-select">
+              <option>All Statuses</option>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+
+            <div class="table-actions">
+              <button class="btn btn-secondary">Export CSV</button>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th>
+                  Name
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>
+                  Email
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>Phone</th>
+                <th>
+                  Total Loans
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sarah Johnson</td>
+                <td>sarah.johnson@email.com</td>
+                <td><span class="phone-number">+1 (555) 123-4567</span></td>
+                <td><span class="loan-count">3</span></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile" onclick="window.location.href='borrower-profile.html'">👁️</button>
+                  <button class="btn-icon" title="Edit" onclick="window.location.href='borrower-edit.html'">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Michael Chen</td>
+                <td>michael.chen@email.com</td>
+                <td><span class="phone-number">+1 (555) 234-5678</span></td>
+                <td><span class="loan-count">1</span></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile">👁️</button>
+                  <button class="btn-icon" title="Edit">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Emily Davis</td>
+                <td>emily.davis@email.com</td>
+                <td><span class="phone-number">+1 (555) 345-6789</span></td>
+                <td><span class="loan-count">2</span></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile">👁️</button>
+                  <button class="btn-icon" title="Edit">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Robert Wilson</td>
+                <td>robert.wilson@email.com</td>
+                <td><span class="phone-number">+1 (555) 456-7890</span></td>
+                <td><span class="loan-count">4</span></td>
+                <td>
+                  <span class="status-badge status-inactive">
+                    <span class="status-dot"></span>
+                    Inactive
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile">👁️</button>
+                  <button class="btn-icon" title="Edit">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Lisa Martinez</td>
+                <td>lisa.martinez@email.com</td>
+                <td><span class="phone-number">+1 (555) 567-8901</span></td>
+                <td><span class="loan-count">1</span></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile">👁️</button>
+                  <button class="btn-icon" title="Edit">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>James Anderson</td>
+                <td>james.anderson@email.com</td>
+                <td><span class="phone-number">+1 (555) 678-9012</span></td>
+                <td><span class="loan-count">2</span></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile">👁️</button>
+                  <button class="btn-icon" title="Edit">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Maria Garcia</td>
+                <td>maria.garcia@email.com</td>
+                <td><span class="phone-number">+1 (555) 789-0123</span></td>
+                <td><span class="loan-count">5</span></td>
+                <td>
+                  <span class="status-badge status-active">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" title="View Profile">👁️</button>
+                  <button class="btn-icon" title="Edit">✏️</button>
+                  <button class="btn-icon" title="Delete">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="pagination-btn" disabled>← Previous</button>
+            <span class="pagination-info">Page 1 of 5 • 35 total borrowers</span>
+            <button class="pagination-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
