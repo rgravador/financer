@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Application - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .review-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .review-main {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .review-sidebar {
+      position: sticky;
+      top: 88px;
+      align-self: flex-start;
+    }
+
+    .app-summary {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: white;
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .app-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .app-summary-id {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .app-summary-amount {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .app-summary-type {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .app-summary-status {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .app-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .app-summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-summary-label {
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    .app-summary-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+    }
+
+    .info-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 32px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .score-value {
+      font-size: 72px;
+      font-weight: 700;
+      color: #1e3a8a;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .score-label {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .score-range {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .metric-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .metric-status.good {
+      color: #10b981;
+    }
+
+    .metric-status.warning {
+      color: #f59e0b;
+    }
+
+    .metric-status.poor {
+      color: #ef4444;
+    }
+
+    .document-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .document-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .document-item:last-child {
+      border-bottom: none;
+    }
+
+    .document-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .document-icon {
+      font-size: 24px;
+    }
+
+    .document-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e3a8a;
+    }
+
+    .document-meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .document-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .document-status.uploaded {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .document-status.missing {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .document-status.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .document-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .risk-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .risk-item:last-child {
+      border-bottom: none;
+    }
+
+    .risk-label {
+      font-size: 14px;
+      color: #1e3a8a;
+      font-weight: 500;
+    }
+
+    .risk-score {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .risk-value {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .risk-badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .risk-badge.low {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .risk-badge.medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .risk-badge.high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .decision-panel {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      position: sticky;
+      top: 88px;
+    }
+
+    .decision-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+    }
+
+    .decision-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .decision-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .decision-option:hover {
+      border-color: #1e3a8a;
+      background: #f9fafb;
+    }
+
+    .decision-option.selected {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+    }
+
+    .decision-option input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #1e3a8a;
+    }
+
+    .decision-option-label {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .decision-option-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .decision-option-desc {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .decision-section {
+      margin-bottom: 20px;
+    }
+
+    .decision-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .decision-fields {
+      display: none;
+    }
+
+    .decision-fields.active {
+      display: block;
+    }
+
+    .approval-history {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .history-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f3f4f6;
+      position: relative;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #1e3a8a;
+      margin-top: 6px;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .history-item::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 18px;
+      bottom: -16px;
+      width: 2px;
+      background: #e5e7eb;
+    }
+
+    .history-item:last-child::before {
+      display: none;
+    }
+
+    .history-content {
+      flex: 1;
+    }
+
+    .history-action {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .history-user {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+
+    .history-date {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .history-note {
+      font-size: 13px;
+      color: #4b5563;
+      margin-top: 8px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border-left: 3px solid #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">Jane Doe</div>
+          <div class="user-role">Approver</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="approval-queue.html" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Approval Queue</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Review Application</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Review Application</div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search applications...">
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">5</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Application Summary -->
+        <div class="app-summary">
+          <div class="app-summary-header">
+            <div>
+              <div class="app-summary-id">Application ID: APP-2024-015</div>
+              <div class="app-summary-amount">$50,000</div>
+              <div class="app-summary-type">Business Loan</div>
+            </div>
+            <div class="app-summary-status">⏳ Pending Review</div>
+          </div>
+
+          <div class="app-summary-grid">
+            <div class="app-summary-item">
+              <div class="app-summary-label">Borrower</div>
+              <div class="app-summary-value">Michael Chen</div>
+            </div>
+            <div class="app-summary-item">
+              <div class="app-summary-label">Requested Rate</div>
+              <div class="app-summary-value">6.5% APR</div>
+            </div>
+            <div class="app-summary-item">
+              <div class="app-summary-label">Loan Term</div>
+              <div class="app-summary-value">60 months</div>
+            </div>
+            <div class="app-summary-item">
+              <div class="app-summary-label">Submitted</div>
+              <div class="app-summary-value">Jan 15, 2026</div>
+            </div>
+            <div class="app-summary-item">
+              <div class="app-summary-label">Days Pending</div>
+              <div class="app-summary-value" style="color: #fbbf24;">45 days</div>
+            </div>
+            <div class="app-summary-item">
+              <div class="app-summary-label">Officer</div>
+              <div class="app-summary-value">John Smith</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-grid">
+          <!-- Main Column -->
+          <div class="review-main">
+            <!-- Credit Score Card -->
+            <div class="info-card">
+              <h3 class="info-card-title">💳 Credit Score</h3>
+              <div class="score-display">
+                <div class="score-value">720</div>
+                <div class="score-label">FICO Score</div>
+                <div class="score-range">
+                  <span>300</span>
+                  <span style="font-weight: 600; color: #10b981;">Good</span>
+                  <span>850</span>
+                </div>
+              </div>
+              <div class="metric-grid">
+                <div class="metric-item">
+                  <span class="metric-label">Payment History</span>
+                  <span class="metric-value">98%</span>
+                  <span class="metric-status good">✓ Excellent</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Credit Utilization</span>
+                  <span class="metric-value">32%</span>
+                  <span class="metric-status good">✓ Good</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Credit Age</span>
+                  <span class="metric-value">12 years</span>
+                  <span class="metric-status good">✓ Excellent</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Recent Inquiries</span>
+                  <span class="metric-value">2</span>
+                  <span class="metric-status good">✓ Low</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Metrics Card -->
+            <div class="info-card">
+              <h3 class="info-card-title">💰 Financial Metrics</h3>
+              <div class="metric-grid">
+                <div class="metric-item">
+                  <span class="metric-label">Annual Income</span>
+                  <span class="metric-value">$125,000</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Monthly Debt</span>
+                  <span class="metric-value">$2,800</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Debt-to-Income Ratio</span>
+                  <span class="metric-value">26.9%</span>
+                  <span class="metric-status good">✓ Good</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Available Assets</span>
+                  <span class="metric-value">$85,000</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Employment Status</span>
+                  <span class="metric-value">Employed</span>
+                  <span class="metric-status good">✓ Stable</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Years at Job</span>
+                  <span class="metric-value">8 years</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documents Card -->
+            <div class="info-card">
+              <h3 class="info-card-title">📄 Documents</h3>
+              <ul class="document-list">
+                <li class="document-item">
+                  <div class="document-info">
+                    <div class="document-icon">📄</div>
+                    <div>
+                      <div class="document-name">W2 Form - 2025</div>
+                      <div class="document-meta">Uploaded Jan 15, 2026 • 1.2 MB</div>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <span class="document-status uploaded">✓ Uploaded</span>
+                    <button class="btn-icon" title="View">👁️</button>
+                  </div>
+                </li>
+                <li class="document-item">
+                  <div class="document-info">
+                    <div class="document-icon">📄</div>
+                    <div>
+                      <div class="document-name">Business License</div>
+                      <div class="document-meta">Uploaded Jan 15, 2026 • 0.8 MB</div>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <span class="document-status uploaded">✓ Uploaded</span>
+                    <button class="btn-icon" title="View">👁️</button>
+                  </div>
+                </li>
+                <li class="document-item">
+                  <div class="document-info">
+                    <div class="document-icon">📄</div>
+                    <div>
+                      <div class="document-name">Bank Statements (3 months)</div>
+                      <div class="document-meta">Uploaded Jan 15, 2026 • 2.4 MB</div>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <span class="document-status uploaded">✓ Uploaded</span>
+                    <button class="btn-icon" title="View">👁️</button>
+                  </div>
+                </li>
+                <li class="document-item">
+                  <div class="document-info">
+                    <div class="document-icon">📄</div>
+                    <div>
+                      <div class="document-name">Business Tax Return - 2025</div>
+                      <div class="document-meta">Uploaded Jan 16, 2026 • 1.8 MB</div>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <span class="document-status uploaded">✓ Uploaded</span>
+                    <button class="btn-icon" title="View">👁️</button>
+                  </div>
+                </li>
+                <li class="document-item">
+                  <div class="document-info">
+                    <div class="document-icon">⚠️</div>
+                    <div>
+                      <div class="document-name">Proof of Collateral</div>
+                      <div class="document-meta">Required for loan approval</div>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <span class="document-status missing">✕ Missing</span>
+                    <button class="btn-secondary btn-sm" onclick="window.location.href='request-documents-modal.html'">Request</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Risk Assessment Card -->
+            <div class="info-card">
+              <h3 class="info-card-title">⚠️ Risk Assessment</h3>
+              <div style="margin-bottom: 20px;">
+                <div class="risk-item">
+                  <span class="risk-label">Overall Risk Score</span>
+                  <div class="risk-score">
+                    <span class="risk-value">4.2/10</span>
+                    <span class="risk-badge low">Low Risk</span>
+                  </div>
+                </div>
+                <div class="risk-item">
+                  <span class="risk-label">Credit Risk</span>
+                  <div class="risk-score">
+                    <span class="risk-value">3.8/10</span>
+                    <span class="risk-badge low">Low</span>
+                  </div>
+                </div>
+                <div class="risk-item">
+                  <span class="risk-label">Default Probability</span>
+                  <div class="risk-score">
+                    <span class="risk-value">8.5%</span>
+                    <span class="risk-badge low">Low</span>
+                  </div>
+                </div>
+                <div class="risk-item">
+                  <span class="risk-label">Income Stability</span>
+                  <div class="risk-score">
+                    <span class="risk-value">9.2/10</span>
+                    <span class="risk-badge low">Excellent</span>
+                  </div>
+                </div>
+                <div class="risk-item">
+                  <span class="risk-label">Collateral Coverage</span>
+                  <div class="risk-score">
+                    <span class="risk-value">N/A</span>
+                    <span class="risk-badge medium">Pending Docs</span>
+                  </div>
+                </div>
+              </div>
+              <div style="padding: 16px; background: #fef3c7; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                <div style="font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 4px;">⚠️ Note</div>
+                <div style="font-size: 13px; color: #78350f;">Missing collateral documentation. Request additional documents before final approval.</div>
+              </div>
+            </div>
+
+            <!-- Approval History -->
+            <div class="approval-history">
+              <h3 class="info-card-title">📋 Approval History</h3>
+              <div class="history-item">
+                <div class="history-dot"></div>
+                <div class="history-content">
+                  <div class="history-action">Application Submitted</div>
+                  <div class="history-user">by Michael Chen (Borrower)</div>
+                  <div class="history-date">Jan 15, 2026 at 9:30 AM</div>
+                </div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot"></div>
+                <div class="history-content">
+                  <div class="history-action">Initial Review Completed</div>
+                  <div class="history-user">by John Smith (Officer)</div>
+                  <div class="history-date">Jan 16, 2026 at 2:15 PM</div>
+                  <div class="history-note">All required documents verified except proof of collateral. Forwarded to approval queue.</div>
+                </div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot"></div>
+                <div class="history-content">
+                  <div class="history-action">Assigned to Approver</div>
+                  <div class="history-user">Auto-assigned to Jane Doe</div>
+                  <div class="history-date">Jan 17, 2026 at 10:00 AM</div>
+                </div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot" style="background: #f59e0b;"></div>
+                <div class="history-content">
+                  <div class="history-action" style="color: #f59e0b;">⏳ Awaiting Final Decision</div>
+                  <div class="history-user">Assigned to Jane Doe (Approver)</div>
+                  <div class="history-date">Pending for 45 days</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Decision Panel (Sidebar) -->
+          <div class="review-sidebar">
+            <div class="decision-panel">
+              <h3 class="decision-title">Make Decision</h3>
+
+              <div class="decision-options">
+                <label class="decision-option">
+                  <input type="radio" name="decision" value="approve">
+                  <div class="decision-option-label">
+                    <div class="decision-option-title">✓ Approve</div>
+                    <div class="decision-option-desc">Approve this loan application</div>
+                  </div>
+                </label>
+
+                <label class="decision-option">
+                  <input type="radio" name="decision" value="reject">
+                  <div class="decision-option-label">
+                    <div class="decision-option-title">✕ Reject</div>
+                    <div class="decision-option-desc">Reject this application</div>
+                  </div>
+                </label>
+
+                <label class="decision-option">
+                  <input type="radio" name="decision" value="info">
+                  <div class="decision-option-label">
+                    <div class="decision-option-title">📄 Request More Info</div>
+                    <div class="decision-option-desc">Request additional documents</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Approve Fields -->
+              <div class="decision-fields" id="approve-fields">
+                <div class="decision-section">
+                  <label class="decision-section-title">Final Loan Terms</label>
+                  <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 13px;">Approved Amount</label>
+                    <input type="text" class="form-input" value="$50,000" placeholder="$0">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 13px;">Interest Rate (APR)</label>
+                    <input type="text" class="form-input" value="6.5%" placeholder="0%">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 13px;">Loan Term</label>
+                    <select class="form-input">
+                      <option>60 months</option>
+                      <option>48 months</option>
+                      <option>36 months</option>
+                      <option>24 months</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="decision-section">
+                  <label class="decision-section-title">Approval Conditions</label>
+                  <textarea class="form-input" rows="3" placeholder="Any special conditions or requirements..."></textarea>
+                </div>
+
+                <div class="decision-section">
+                  <label class="decision-section-title">Internal Notes</label>
+                  <textarea class="form-input" rows="3" placeholder="Internal notes (not visible to borrower)..."></textarea>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; background: #10b981;">
+                  ✓ Submit Approval
+                </button>
+              </div>
+
+              <!-- Reject Fields -->
+              <div class="decision-fields" id="reject-fields">
+                <div class="decision-section">
+                  <label class="decision-section-title">Rejection Reason <span style="color: #ef4444;">*</span></label>
+                  <select class="form-input" style="margin-bottom: 12px;">
+                    <option value="">Select a reason...</option>
+                    <option>Insufficient credit score</option>
+                    <option>High debt-to-income ratio</option>
+                    <option>Incomplete documentation</option>
+                    <option>Employment verification failed</option>
+                    <option>Other</option>
+                  </select>
+                  <textarea class="form-input" rows="4" placeholder="Detailed explanation (required)..." required></textarea>
+                </div>
+
+                <div class="decision-section">
+                  <label class="decision-section-title">Internal Notes</label>
+                  <textarea class="form-input" rows="3" placeholder="Internal notes (not visible to borrower)..."></textarea>
+                </div>
+
+                <button class="btn btn-danger" style="width: 100%;">
+                  ✕ Submit Rejection
+                </button>
+              </div>
+
+              <!-- Request Info Fields -->
+              <div class="decision-fields" id="info-fields">
+                <div class="decision-section">
+                  <label class="decision-section-title">Required Documents</label>
+                  <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+                      <input type="checkbox"> Proof of Collateral
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+                      <input type="checkbox"> Updated Bank Statements
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+                      <input type="checkbox"> Business Financial Statements
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+                      <input type="checkbox"> Other (specify below)
+                    </label>
+                  </div>
+                </div>
+
+                <div class="decision-section">
+                  <label class="decision-section-title">Additional Instructions</label>
+                  <textarea class="form-input" rows="4" placeholder="Specify what documents are needed and why..."></textarea>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="window.location.href='request-documents-modal.html'">
+                  📄 Request Documents
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Handle decision option selection
+    const decisionOptions = document.querySelectorAll('.decision-option input[type="radio"]');
+    const approveFields = document.getElementById('approve-fields');
+    const rejectFields = document.getElementById('reject-fields');
+    const infoFields = document.getElementById('info-fields');
+
+    decisionOptions.forEach(option => {
+      option.addEventListener('change', () => {
+        // Remove active class from all options
+        document.querySelectorAll('.decision-option').forEach(opt => {
+          opt.classList.remove('selected');
+        });
+
+        // Add active class to selected option
+        option.closest('.decision-option').classList.add('selected');
+
+        // Hide all decision fields
+        approveFields.classList.remove('active');
+        rejectFields.classList.remove('active');
+        infoFields.classList.remove('active');
+
+        // Show relevant fields
+        if (option.value === 'approve') {
+          approveFields.classList.add('active');
+        } else if (option.value === 'reject') {
+          rejectFields.classList.add('active');
+        } else if (option.value === 'info') {
+          infoFields.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

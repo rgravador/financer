@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approval Queue - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: white;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 4px;
+      margin-bottom: 0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab:hover {
+      background: #f3f4f6;
+      color: #1e3a8a;
+    }
+
+    .tab.active {
+      background: #1e3a8a;
+      color: white;
+    }
+
+    .tab-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tab.active .tab-badge {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 300px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 16px;
+      color: #9ca3af;
+    }
+
+    .search-box input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px 0 36px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .filter-select {
+      height: 40px;
+      padding: 0 32px 0 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    .batch-actions {
+      display: flex;
+      gap: 12px;
+      padding: 16px 24px;
+      background: #f0f4ff;
+      border-bottom: 1px solid #dbeafe;
+    }
+
+    .batch-info {
+      font-size: 14px;
+      color: #1e3a8a;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: #f9fafb;
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .table th input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .table td input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .table tr:hover {
+      background: rgba(30, 58, 138, 0.04);
+    }
+
+    .sort-icon {
+      margin-left: 4px;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .app-id {
+      font-family: 'SF Mono', Consolas, monospace;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .amount {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-flagged {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-assigned {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .priority-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .priority-high {
+      background: #ef4444;
+    }
+
+    .priority-medium {
+      background: #f59e0b;
+    }
+
+    .priority-low {
+      background: #10b981;
+    }
+
+    .days-pending {
+      font-weight: 600;
+    }
+
+    .days-pending.urgent {
+      color: #ef4444;
+    }
+
+    .days-pending.warning {
+      color: #f59e0b;
+    }
+
+    .pagination {
+      padding: 20px 24px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: #f3f4f6;
+      border-color: #1e3a8a;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .action-button {
+      padding: 6px 12px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .action-button:hover {
+      background: #f3f4f6;
+      border-color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JD</div>
+        <div>
+          <div class="user-name">Jane Doe</div>
+          <div class="user-role">Approver</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Approval Queue</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Approval Queue</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+            <span class="badge">5</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Dashboard</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Approval Queue</span>
+          </div>
+          <h1 class="page-title">Application Approvals</h1>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active">
+            Pending
+            <span class="tab-badge">12</span>
+          </button>
+          <button class="tab">
+            Approved by Me
+            <span class="tab-badge">45</span>
+          </button>
+          <button class="tab">
+            Rejected by Me
+            <span class="tab-badge">8</span>
+          </button>
+          <button class="tab">
+            All
+            <span class="tab-badge">65</span>
+          </button>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-container">
+          <!-- Table Toolbar -->
+          <div class="table-toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="Search by borrower, app ID, or loan type...">
+            </div>
+
+            <select class="filter-select">
+              <option>All Loan Types</option>
+              <option>Personal Loan</option>
+              <option>Business Loan</option>
+              <option>Auto Loan</option>
+              <option>Home Improvement</option>
+            </select>
+
+            <select class="filter-select">
+              <option>All Amounts</option>
+              <option>Under $10K</option>
+              <option>$10K - $25K</option>
+              <option>$25K - $50K</option>
+              <option>Over $50K</option>
+            </select>
+
+            <select class="filter-select">
+              <option>All Days Pending</option>
+              <option>0-7 days</option>
+              <option>8-14 days</option>
+              <option>15-30 days</option>
+              <option>Over 30 days</option>
+            </select>
+
+            <div class="table-actions">
+              <button class="btn btn-secondary">Export CSV</button>
+            </div>
+          </div>
+
+          <!-- Batch Actions Bar (shown when items selected) -->
+          <div class="batch-actions" style="display: none;">
+            <div class="batch-info">
+              <span>3 selected</span>
+            </div>
+            <button class="btn btn-primary">Assign to Me</button>
+            <button class="btn btn-secondary">Flag for Review</button>
+            <button class="btn btn-secondary">Clear Selection</button>
+          </div>
+
+          <!-- Table -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>
+                  Application ID
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>
+                  Borrower
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>Loan Type</th>
+                <th>
+                  Amount
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>
+                  Submitted
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>
+                  Days Pending
+                  <span class="sort-icon">↕</span>
+                </th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-high"></span>
+                  <span class="app-id">APP-2024-015</span>
+                </td>
+                <td>Michael Chen</td>
+                <td>Business Loan</td>
+                <td><span class="amount">$50,000</span></td>
+                <td>Jan 19, 2026</td>
+                <td><span class="days-pending urgent">45 days</span></td>
+                <td><span class="status-badge status-flagged">⚠️ Flagged</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-high"></span>
+                  <span class="app-id">APP-2024-018</span>
+                </td>
+                <td>Sarah Johnson</td>
+                <td>Personal Loan</td>
+                <td><span class="amount">$15,000</span></td>
+                <td>Jan 26, 2026</td>
+                <td><span class="days-pending urgent">38 days</span></td>
+                <td><span class="status-badge status-assigned">Assigned to Me</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-high"></span>
+                  <span class="app-id">APP-2024-021</span>
+                </td>
+                <td>Robert Wilson</td>
+                <td>Auto Loan</td>
+                <td><span class="amount">$35,000</span></td>
+                <td>Feb 5, 2026</td>
+                <td><span class="days-pending warning">28 days</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-medium"></span>
+                  <span class="app-id">APP-2024-022</span>
+                </td>
+                <td>Emily Davis</td>
+                <td>Home Improvement</td>
+                <td><span class="amount">$25,000</span></td>
+                <td>Feb 18, 2026</td>
+                <td><span class="days-pending">15 days</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-medium"></span>
+                  <span class="app-id">APP-2024-023</span>
+                </td>
+                <td>James Anderson</td>
+                <td>Personal Loan</td>
+                <td><span class="amount">$20,000</span></td>
+                <td>Feb 20, 2026</td>
+                <td><span class="days-pending">13 days</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-low"></span>
+                  <span class="app-id">APP-2024-024</span>
+                </td>
+                <td>Maria Garcia</td>
+                <td>Personal Loan</td>
+                <td><span class="amount">$18,500</span></td>
+                <td>Feb 24, 2026</td>
+                <td><span class="days-pending">9 days</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                  <span class="priority-indicator priority-low"></span>
+                  <span class="app-id">APP-2024-025</span>
+                </td>
+                <td>Lisa Martinez</td>
+                <td>Personal Loan</td>
+                <td><span class="amount">$10,000</span></td>
+                <td>Feb 28, 2026</td>
+                <td><span class="days-pending">5 days</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>
+                  <button class="action-button" onclick="window.location.href='application-review.html'">Review</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="pagination-btn" disabled>← Previous</button>
+            <span class="pagination-info">Page 1 of 2 • 12 pending applications</span>
+            <button class="pagination-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note: In actual implementation, JavaScript would handle:
+       - Tab switching to show different filtered views
+       - Checkbox selection and batch actions bar visibility
+       - Sorting when clicking column headers
+       - Filter dropdowns changing table data
+       - Search functionality
+       - Pagination navigation
+  -->
+</body>
+</html>

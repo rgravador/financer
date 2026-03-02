@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approve/Reject Form - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: #f3f4f6;
+      transform: scale(1.1);
+    }
+
+    .modal-body {
+      padding: 32px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .app-summary-bar {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-summary-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-summary-id {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .app-summary-borrower {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .app-summary-amount {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e3a8a;
+      font-family: 'SF Mono', Consolas, monospace;
+    }
+
+    .decision-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .decision-tab {
+      flex: 1;
+      padding: 16px 24px;
+      background: none;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .decision-tab:hover {
+      color: #1e3a8a;
+      background: #f9fafb;
+    }
+
+    .decision-tab.active {
+      color: #1e3a8a;
+    }
+
+    .decision-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #1e3a8a;
+    }
+
+    .decision-tab.approve-tab.active {
+      color: #10b981;
+    }
+
+    .decision-tab.approve-tab.active::after {
+      background: #10b981;
+    }
+
+    .decision-tab.reject-tab.active {
+      color: #ef4444;
+    }
+
+    .decision-tab.reject-tab.active::after {
+      background: #ef4444;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 16px;
+    }
+
+    .form-grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .info-box {
+      background: #f0f4ff;
+      border-left: 4px solid #1e3a8a;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .info-box-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .info-box-content {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .warning-box {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .warning-box-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .warning-box-content {
+      font-size: 13px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+
+    .modal-footer {
+      padding: 24px 32px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: #f9fafb;
+    }
+
+    .btn-approve {
+      background: #10b981;
+      color: white;
+      padding: 12px 32px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-approve:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-reject {
+      background: #ef4444;
+      color: white;
+      padding: 12px 32px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-reject:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: #1e3a8a;
+      cursor: pointer;
+    }
+
+    .checkbox-label {
+      font-size: 14px;
+      color: #1e3a8a;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-description {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .character-count {
+      font-size: 12px;
+      color: #6b7280;
+      text-align: right;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span>📋</span>
+          Loan Decision Form
+        </h2>
+        <button class="modal-close" onclick="window.location.href='application-review.html'">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Application Summary -->
+        <div class="app-summary-bar">
+          <div class="app-summary-info">
+            <div class="app-summary-id">APP-2024-015</div>
+            <div class="app-summary-borrower">Michael Chen</div>
+          </div>
+          <div class="app-summary-amount">$50,000</div>
+        </div>
+
+        <!-- Decision Tabs -->
+        <div class="decision-tabs">
+          <button class="decision-tab approve-tab active" data-tab="approve">
+            ✓ Approve
+          </button>
+          <button class="decision-tab reject-tab" data-tab="reject">
+            ✕ Reject
+          </button>
+        </div>
+
+        <!-- Approve Tab Content -->
+        <div class="tab-content active" id="approve-content">
+          <div class="info-box">
+            <div class="info-box-title">✓ Approving this loan application</div>
+            <div class="info-box-content">
+              You are about to approve this loan application. Please review and confirm the final loan terms before submitting your decision. This action cannot be undone.
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Final Loan Terms</h3>
+            <div class="form-grid-two">
+              <div class="form-group">
+                <label class="form-label required">Approved Amount</label>
+                <input type="text" class="form-input" value="$50,000" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">Interest Rate (APR)</label>
+                <input type="text" class="form-input" value="6.5%" required>
+              </div>
+            </div>
+            <div class="form-grid-two">
+              <div class="form-group">
+                <label class="form-label required">Loan Term</label>
+                <select class="form-input" required>
+                  <option value="60">60 months</option>
+                  <option value="48">48 months</option>
+                  <option value="36">36 months</option>
+                  <option value="24">24 months</option>
+                  <option value="12">12 months</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Origination Fee</label>
+                <input type="text" class="form-input" value="2.0%" placeholder="0%">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Approval Conditions</h3>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Proof of collateral required before disbursement</div>
+                  <div class="checkbox-description">Borrower must provide collateral documentation</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Employment verification required</div>
+                  <div class="checkbox-description">HR contact verification within 30 days</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Annual financial statement review</div>
+                  <div class="checkbox-description">Borrower must submit yearly financial updates</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Debt-to-income ratio monitoring</div>
+                  <div class="checkbox-description">Maintain DTI below 35% throughout loan term</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Special Conditions (Optional)</h3>
+            <textarea class="form-input" rows="4" placeholder="Enter any special conditions, requirements, or notes..."></textarea>
+            <div class="character-count">0 / 500 characters</div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Internal Notes</h3>
+            <textarea class="form-input" rows="4" placeholder="Internal notes (not visible to borrower)..."></textarea>
+            <div class="character-count">0 / 1000 characters</div>
+          </div>
+        </div>
+
+        <!-- Reject Tab Content -->
+        <div class="tab-content" id="reject-content">
+          <div class="warning-box">
+            <div class="warning-box-title">⚠️ Rejecting this loan application</div>
+            <div class="warning-box-content">
+              You are about to reject this loan application. Please provide a clear reason for rejection. The borrower will be notified of this decision and the reason provided.
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Rejection Reason</h3>
+            <div class="form-group">
+              <label class="form-label required">Primary Reason</label>
+              <select class="form-input" required>
+                <option value="">Select a reason...</option>
+                <option value="credit">Insufficient credit score</option>
+                <option value="dti">High debt-to-income ratio</option>
+                <option value="income">Insufficient or unstable income</option>
+                <option value="docs">Incomplete or missing documentation</option>
+                <option value="employment">Employment verification failed</option>
+                <option value="collateral">Insufficient collateral</option>
+                <option value="history">Negative credit history</option>
+                <option value="capacity">Lack of repayment capacity</option>
+                <option value="policy">Does not meet policy requirements</option>
+                <option value="other">Other (specify below)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Contributing Factors</h3>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Credit score below minimum threshold</div>
+                  <div class="checkbox-description">Required: 680+ | Actual: 620</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Debt-to-income ratio too high</div>
+                  <div class="checkbox-description">Required: <36% | Actual: 45%</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Recent payment delinquencies</div>
+                  <div class="checkbox-description">3 late payments in last 6 months</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Insufficient documentation</div>
+                  <div class="checkbox-description">Missing required documents</div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox">
+                <div>
+                  <div class="checkbox-label">Employment instability</div>
+                  <div class="checkbox-description">Less than 2 years at current employer</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Detailed Explanation</h3>
+            <div class="form-group">
+              <label class="form-label required">Explain the rejection decision</label>
+              <textarea class="form-input" rows="6" placeholder="Provide a clear, professional explanation that will be sent to the borrower..." required></textarea>
+              <div class="character-count">0 / 1000 characters</div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Recommendations (Optional)</h3>
+            <textarea class="form-input" rows="4" placeholder="Suggestions for improving future applications (e.g., 'Improve credit score', 'Reduce debt', etc.)..."></textarea>
+            <div class="character-count">0 / 500 characters</div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Internal Notes</h3>
+            <textarea class="form-input" rows="4" placeholder="Internal notes (not visible to borrower)..."></textarea>
+            <div class="character-count">0 / 1000 characters</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.location.href='application-review.html'">
+          Cancel
+        </button>
+        <button class="btn-approve" id="submit-approve">
+          ✓ Submit Approval
+        </button>
+        <button class="btn-reject" id="submit-reject" style="display: none;">
+          ✕ Submit Rejection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching logic
+    const tabs = document.querySelectorAll('.decision-tab');
+    const approveContent = document.getElementById('approve-content');
+    const rejectContent = document.getElementById('reject-content');
+    const submitApprove = document.getElementById('submit-approve');
+    const submitReject = document.getElementById('submit-reject');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+
+        // Add active class to clicked tab
+        tab.classList.add('active');
+
+        // Switch content
+        const tabName = tab.dataset.tab;
+        if (tabName === 'approve') {
+          approveContent.classList.add('active');
+          rejectContent.classList.remove('active');
+          submitApprove.style.display = 'block';
+          submitReject.style.display = 'none';
+        } else {
+          rejectContent.classList.add('active');
+          approveContent.classList.remove('active');
+          submitReject.style.display = 'block';
+          submitApprove.style.display = 'none';
+        }
+      });
+    });
+
+    // Character count for textareas
+    const textareas = document.querySelectorAll('textarea.form-input');
+    textareas.forEach(textarea => {
+      const charCount = textarea.parentElement.querySelector('.character-count') ||
+                       textarea.nextElementSibling;
+
+      if (charCount && charCount.classList.contains('character-count')) {
+        textarea.addEventListener('input', () => {
+          const maxLength = charCount.textContent.match(/\d+$/)[0];
+          const currentLength = textarea.value.length;
+          charCount.textContent = `${currentLength} / ${maxLength} characters`;
+
+          if (currentLength > maxLength * 0.9) {
+            charCount.style.color = '#ef4444';
+          } else {
+            charCount.style.color = '#6b7280';
+          }
+        });
+      }
+    });
+
+    // Form submission (would normally send to backend)
+    submitApprove.addEventListener('click', () => {
+      alert('Approval submitted! (This is a wireframe - no actual submission)');
+      window.location.href = 'approval-queue.html';
+    });
+
+    submitReject.addEventListener('click', () => {
+      alert('Rejection submitted! (This is a wireframe - no actual submission)');
+      window.location.href = 'approval-queue.html';
+    });
+  </script>
+</body>
+</html>

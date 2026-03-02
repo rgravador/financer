@@ -439,61 +439,61 @@ Each component is a self-contained HTML snippet that can be included/adapted int
 **Priority:** HIGH - Core approval workflow
 
 ##### approver/dashboard.html
-- [ ] Stat cards: pending reviews, approved today, rejected today, avg approval time
-- [ ] Pending queue preview (top 5)
-- [ ] Recent decisions table (last 10 approvals/rejections)
-- [ ] Quick filters (high priority, over 30 days, flagged)
-- [ ] States: normal, empty (no pending reviews)
+- [x] Stat cards: pending reviews, approved today, rejected today, avg approval time
+- [x] Pending queue preview (top 5)
+- [x] Recent decisions table (last 10 approvals/rejections)
+- [x] Quick filters (high priority, over 30 days, flagged)
+- [x] States: normal, empty (no pending reviews)
 
 ##### approver/approval-queue.html
-- [ ] Tabbed view: Pending | Approved (by me) | Rejected (by me) | All
-- [ ] Data table: app ID, borrower name, loan type, amount, submitted date, days pending, priority flag
-- [ ] Filter by loan type, amount range, days pending
-- [ ] Sort by priority, date, amount
-- [ ] Batch actions (assign to me, flag for review)
-- [ ] Pagination
-- [ ] States: normal, empty, loading, error
+- [x] Tabbed view: Pending | Approved (by me) | Rejected (by me) | All
+- [x] Data table: app ID, borrower name, loan type, amount, submitted date, days pending, priority flag
+- [x] Filter by loan type, amount range, days pending
+- [x] Sort by priority, date, amount
+- [x] Batch actions (assign to me, flag for review)
+- [x] Pagination
+- [x] States: normal, empty, loading, error
 
 ##### approver/application-review.html
-- [ ] Two-column layout (application details + decision panel)
-- [ ] Left column:
+- [x] Two-column layout (application details + decision panel)
+- [x] Left column:
   - Application summary (borrower, loan details, requested amount/rate)
   - Credit score card (if available)
   - Debt-to-income ratio card
   - Document viewer/checklist (with document status: uploaded, missing, pending)
   - Risk assessment card (auto-calculated risk scores)
-- [ ] Right column (decision panel):
+- [x] Right column (decision panel):
   - Decision radio buttons: Approve / Reject / Request More Info
   - Comment/notes field (required for reject)
   - Approval conditions (if approve: final rate, terms)
   - Submit decision button
-- [ ] Approval history timeline (previous decisions, who approved, when)
-- [ ] States: loading, normal, submitting decision, success (decision saved), error (submission failed)
+- [x] Approval history timeline (previous decisions, who approved, when)
+- [x] States: loading, normal, submitting decision, success (decision saved), error (submission failed)
 
 ##### approver/approve-reject-form.html (Modal)
-- [ ] Modal header: "Review Decision"
-- [ ] Radio buttons: Approve / Reject
-- [ ] If approve:
+- [x] Modal header: "Review Decision"
+- [x] Radio buttons: Approve / Reject
+- [x] If approve:
   - Final interest rate field (with min/max from loan type)
   - Terms and conditions textarea
   - Conditions checkboxes
-- [ ] If reject:
+- [x] If reject:
   - Rejection reason dropdown (insufficient documentation, credit score, debt ratio, other)
   - Additional notes textarea (required)
-- [ ] Comment field (optional for approve, required for reject)
-- [ ] Confirmation checkboxes ("I have reviewed all documents")
-- [ ] Modal footer: Cancel, Confirm buttons
-- [ ] States: normal, submitting, success (modal closes, redirects to queue), error (validation)
+- [x] Comment field (optional for approve, required for reject)
+- [x] Confirmation checkboxes ("I have reviewed all documents")
+- [x] Modal footer: Cancel, Confirm buttons
+- [x] States: normal, submitting, success (modal closes, redirects to queue), error (validation)
 
 ##### approver/request-documents-modal.html
-- [ ] Modal header: "Request Additional Documents"
-- [ ] Checklist of standard document types (proof of income, bank statements, credit report, etc.)
-- [ ] Custom document request field (free text for non-standard docs)
-- [ ] Deadline date selector (calendar picker)
-- [ ] Email notification toggle (send notification to borrower)
-- [ ] Comment field for request context
-- [ ] Modal footer: Cancel, Request Documents buttons
-- [ ] States: normal, submitting, success (modal closes, notification sent)
+- [x] Modal header: "Request Additional Documents"
+- [x] Checklist of standard document types (proof of income, bank statements, credit report, etc.)
+- [x] Custom document request field (free text for non-standard docs)
+- [x] Deadline date selector (calendar picker)
+- [x] Email notification toggle (send notification to borrower)
+- [x] Comment field for request context
+- [x] Modal footer: Cancel, Request Documents buttons
+- [x] States: normal, submitting, success (modal closes, notification sent)
 
 **Success Criteria:**
 - All 5 approver wireframes created

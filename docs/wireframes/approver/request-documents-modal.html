@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Documents - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: #f3f4f6;
+      transform: scale(1.1);
+    }
+
+    .modal-body {
+      padding: 32px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .app-summary-bar {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-summary-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-summary-id {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .app-summary-borrower {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .app-summary-email {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .info-box {
+      background: #f0f4ff;
+      border-left: 4px solid #1e3a8a;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+
+    .info-box-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .info-box-content {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 16px;
+    }
+
+    .document-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .category-section {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .category-header {
+      background: #f9fafb;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .category-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-count {
+      font-size: 12px;
+      color: #6b7280;
+      background: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .category-body {
+      padding: 16px 20px;
+    }
+
+    .document-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .document-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .document-item:hover {
+      background: #f9fafb;
+    }
+
+    .document-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: #1e3a8a;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .document-info {
+      flex: 1;
+    }
+
+    .document-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .document-description {
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .document-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .document-status.missing {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .document-status.optional {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .custom-request-section {
+      margin-bottom: 32px;
+    }
+
+    .custom-document-field {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .add-custom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: white;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      color: #1e3a8a;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .add-custom-btn:hover {
+      border-color: #1e3a8a;
+      background: #f0f4ff;
+    }
+
+    .deadline-section {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+
+    .deadline-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .deadline-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .selected-count {
+      background: #1e3a8a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-footer {
+      padding: 24px 32px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9fafb;
+    }
+
+    .footer-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .character-count {
+      font-size: 12px;
+      color: #6b7280;
+      text-align: right;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span>📄</span>
+          Request Additional Documents
+        </h2>
+        <button class="modal-close" onclick="window.location.href='application-review.html'">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Application Summary -->
+        <div class="app-summary-bar">
+          <div class="app-summary-info">
+            <div class="app-summary-id">APP-2024-015</div>
+            <div class="app-summary-borrower">Michael Chen</div>
+            <div class="app-summary-email">michael.chen@email.com</div>
+          </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <div class="info-box-title">📋 About Document Requests</div>
+          <div class="info-box-content">
+            Select the documents you need from the borrower. They will receive an email notification with a link to upload the requested documents. You can track the status of document requests in the application review page.
+          </div>
+        </div>
+
+        <!-- Selected Count -->
+        <div class="selected-count" id="selected-count">
+          0 documents selected
+        </div>
+
+        <!-- Document Categories -->
+        <div class="document-categories">
+          <!-- Financial Documents -->
+          <div class="category-section">
+            <div class="category-header">
+              <div class="category-title">
+                <span>💰</span>
+                Financial Documents
+              </div>
+              <div class="category-count">0 selected</div>
+            </div>
+            <div class="category-body">
+              <div class="document-list">
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="financial">
+                  <div class="document-info">
+                    <div class="document-name">Bank Statements (Last 3 Months)</div>
+                    <div class="document-description">Current checking and savings account statements showing transaction history</div>
+                    <span class="document-status missing">✕ Missing</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="financial">
+                  <div class="document-info">
+                    <div class="document-name">Business Financial Statements</div>
+                    <div class="document-description">Profit & Loss, Balance Sheet, Cash Flow for last fiscal year</div>
+                    <span class="document-status missing">✕ Missing</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="financial">
+                  <div class="document-info">
+                    <div class="document-name">Tax Returns (Last 2 Years)</div>
+                    <div class="document-description">Personal and business tax returns with all schedules</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="financial">
+                  <div class="document-info">
+                    <div class="document-name">Investment Account Statements</div>
+                    <div class="document-description">Brokerage, retirement accounts, or other investment portfolios</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collateral Documents -->
+          <div class="category-section">
+            <div class="category-header">
+              <div class="category-title">
+                <span>🏢</span>
+                Collateral & Assets
+              </div>
+              <div class="category-count">0 selected</div>
+            </div>
+            <div class="category-body">
+              <div class="document-list">
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="collateral">
+                  <div class="document-info">
+                    <div class="document-name">Proof of Collateral Ownership</div>
+                    <div class="document-description">Property deed, vehicle title, or ownership certificates</div>
+                    <span class="document-status missing">✕ Missing</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="collateral">
+                  <div class="document-info">
+                    <div class="document-name">Collateral Appraisal Report</div>
+                    <div class="document-description">Professional appraisal from certified appraiser (within 6 months)</div>
+                    <span class="document-status missing">✕ Missing</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="collateral">
+                  <div class="document-info">
+                    <div class="document-name">Insurance Documentation</div>
+                    <div class="document-description">Proof of adequate insurance coverage for collateral</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Employment & Income -->
+          <div class="category-section">
+            <div class="category-header">
+              <div class="category-title">
+                <span>💼</span>
+                Employment & Income
+              </div>
+              <div class="category-count">0 selected</div>
+            </div>
+            <div class="category-body">
+              <div class="document-list">
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="employment">
+                  <div class="document-info">
+                    <div class="document-name">Recent Pay Stubs (Last 2 Months)</div>
+                    <div class="document-description">Most recent pay stubs showing year-to-date earnings</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="employment">
+                  <div class="document-info">
+                    <div class="document-name">Employment Verification Letter</div>
+                    <div class="document-description">Letter from employer confirming position, salary, and tenure</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="employment">
+                  <div class="document-info">
+                    <div class="document-name">Business License or Registration</div>
+                    <div class="document-description">Valid business license if self-employed</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal & Identity -->
+          <div class="category-section">
+            <div class="category-header">
+              <div class="category-title">
+                <span>🆔</span>
+                Legal & Identity
+              </div>
+              <div class="category-count">0 selected</div>
+            </div>
+            <div class="category-body">
+              <div class="document-list">
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="legal">
+                  <div class="document-info">
+                    <div class="document-name">Government-Issued ID</div>
+                    <div class="document-description">Driver's license, passport, or state ID (both sides)</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="legal">
+                  <div class="document-info">
+                    <div class="document-name">Proof of Residence</div>
+                    <div class="document-description">Utility bill, lease agreement, or mortgage statement</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+
+                <label class="document-item">
+                  <input type="checkbox" class="document-checkbox" data-category="legal">
+                  <div class="document-info">
+                    <div class="document-name">Legal Agreements or Contracts</div>
+                    <div class="document-description">Any relevant business contracts or partnership agreements</div>
+                    <span class="document-status optional">Optional</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Document Request -->
+        <div class="custom-request-section">
+          <h3 class="section-title">Custom Document Request</h3>
+          <div class="form-group">
+            <label class="form-label">Request specific documents not listed above</label>
+            <textarea class="form-input" rows="3" placeholder="Specify any additional documents needed (e.g., 'Updated business plan with 3-year projections')..."></textarea>
+            <div class="character-count">0 / 500 characters</div>
+          </div>
+        </div>
+
+        <!-- Deadline Section -->
+        <div class="deadline-section">
+          <div class="deadline-title">
+            <span>⏰</span>
+            Document Submission Deadline
+          </div>
+          <div class="deadline-grid">
+            <div class="form-group">
+              <label class="form-label">Due Date</label>
+              <input type="date" class="form-input" value="2026-04-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select class="form-input">
+                <option>Standard (14 days)</option>
+                <option>Urgent (7 days)</option>
+                <option>Critical (3 days)</option>
+                <option>Custom</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message to Borrower -->
+        <div class="form-section">
+          <h3 class="section-title">Message to Borrower</h3>
+          <div class="form-group">
+            <label class="form-label">Additional instructions or context (optional)</label>
+            <textarea class="form-input" rows="4" placeholder="Provide any additional context or instructions for the borrower..."></textarea>
+            <div class="character-count">0 / 1000 characters</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <div class="footer-info">
+          Borrower will receive an email notification
+        </div>
+        <div class="footer-actions">
+          <button class="btn btn-secondary" onclick="window.location.href='application-review.html'">
+            Cancel
+          </button>
+          <button class="btn btn-primary" id="submit-request">
+            📄 Send Document Request
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Track selected documents
+    const checkboxes = document.querySelectorAll('.document-checkbox');
+    const selectedCount = document.getElementById('selected-count');
+    const categoryHeaders = document.querySelectorAll('.category-count');
+
+    function updateCounts() {
+      // Update total count
+      const totalSelected = document.querySelectorAll('.document-checkbox:checked').length;
+      selectedCount.textContent = `${totalSelected} document${totalSelected !== 1 ? 's' : ''} selected`;
+
+      // Update category counts
+      const categories = ['financial', 'collateral', 'employment', 'legal'];
+      categories.forEach((category, index) => {
+        const categoryCheckboxes = document.querySelectorAll(`.document-checkbox[data-category="${category}"]`);
+        const categorySelected = Array.from(categoryCheckboxes).filter(cb => cb.checked).length;
+        categoryHeaders[index].textContent = `${categorySelected} selected`;
+      });
+    }
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateCounts);
+    });
+
+    // Character count for textareas
+    const textareas = document.querySelectorAll('textarea.form-input');
+    textareas.forEach(textarea => {
+      const charCount = textarea.parentElement.querySelector('.character-count');
+      if (charCount) {
+        textarea.addEventListener('input', () => {
+          const maxLength = charCount.textContent.match(/\d+$/)[0];
+          const currentLength = textarea.value.length;
+          charCount.textContent = `${currentLength} / ${maxLength} characters`;
+
+          if (currentLength > maxLength * 0.9) {
+            charCount.style.color = '#ef4444';
+          } else {
+            charCount.style.color = '#6b7280';
+          }
+        });
+      }
+    });
+
+    // Form submission
+    document.getElementById('submit-request').addEventListener('click', () => {
+      const totalSelected = document.querySelectorAll('.document-checkbox:checked').length;
+      if (totalSelected === 0) {
+        alert('Please select at least one document to request.');
+        return;
+      }
+      alert(`Document request submitted! (This is a wireframe - no actual submission)\n${totalSelected} documents requested.`);
+      window.location.href = 'application-review.html';
+    });
+  </script>
+</body>
+</html>
