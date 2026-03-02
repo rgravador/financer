@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .profile-container {
+      max-width: 1000px;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+      margin: -32px -32px 24px -32px;
+      padding: 24px 32px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .photo-upload-section {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-upload-info {
+      flex: 1;
+    }
+
+    .photo-upload-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .photo-upload-description {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .photo-upload-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .form-input:disabled,
+    .form-select:disabled {
+      background: #f9fafb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .form-hint {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    .notification-preferences {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .preference-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .preference-info {
+      flex: 1;
+    }
+
+    .preference-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .preference-description {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background: #e5e7eb;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .toggle-switch.active {
+      background: #1e3a8a;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .toggle-switch.active::after {
+      left: 27px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .alert.visible {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .alert-icon {
+      font-size: 20px;
+    }
+
+    .alert-content {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .alert-message {
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JS</div>
+        <div>
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="../officer/dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </a>
+        <a href="account-security.html" class="nav-item">
+          <span class="nav-icon">🔒</span>
+          <span class="nav-label">Security</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">User Profile</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content profile-container">
+        <!-- Success Alert -->
+        <div class="alert success" id="success-alert">
+          <span class="alert-icon">✓</span>
+          <div class="alert-content">
+            <div class="alert-title">Profile updated successfully</div>
+            <div class="alert-message">Your changes have been saved.</div>
+          </div>
+        </div>
+
+        <div class="page-header">
+          <h1>User Profile</h1>
+          <p class="page-subtitle">Manage your personal information and preferences</p>
+        </div>
+
+        <!-- Profile Photo Card -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h2 class="card-title">Profile Photo</h2>
+            <p class="card-subtitle">Update your profile picture</p>
+          </div>
+
+          <div class="photo-upload-section">
+            <div class="profile-photo" id="profile-photo">
+              JS
+            </div>
+            <div class="photo-upload-info">
+              <div class="photo-upload-title">Upload a new photo</div>
+              <div class="photo-upload-description">
+                JPG, PNG or GIF. Max size 5MB. Recommended size 400x400px.
+              </div>
+              <div class="photo-upload-actions">
+                <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                <button class="btn btn-primary" onclick="document.getElementById('photo-upload').click()">
+                  Upload Photo
+                </button>
+                <button class="btn btn-outline" onclick="removePhoto()">
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Card -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h2 class="card-title">Personal Information</h2>
+            <p class="card-subtitle">Update your personal details</p>
+          </div>
+
+          <form id="profile-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-input" value="John" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-input" value="Smith" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" value="john.smith@ascendent.com" required>
+                <div class="form-hint">This is your primary email for notifications</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-input" value="+1 (555) 123-4567">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Job Title</label>
+                <input type="text" class="form-input" value="Loan Officer" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Department</label>
+                <select class="form-select">
+                  <option>Lending Operations</option>
+                  <option>Underwriting</option>
+                  <option>Compliance</option>
+                  <option>Risk Management</option>
+                  <option>Customer Service</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Employee ID</label>
+                <input type="text" class="form-input" value="EMP-2024-001" disabled>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Role</label>
+                <input type="text" class="form-input" value="Officer" disabled>
+                <div class="form-hint">Contact your administrator to change your role</div>
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Bio</label>
+              <textarea class="form-textarea" placeholder="Tell us about yourself...">Experienced loan officer with 8+ years in the financial services industry. Specializing in residential mortgages and commercial lending.</textarea>
+            </div>
+          </form>
+        </div>
+
+        <!-- Notification Preferences Card -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h2 class="card-title">Notification Preferences</h2>
+            <p class="card-subtitle">Choose how you want to be notified</p>
+          </div>
+
+          <div class="notification-preferences">
+            <div class="preference-item">
+              <div class="preference-info">
+                <div class="preference-label">Email Notifications</div>
+                <div class="preference-description">Receive email notifications for important updates</div>
+              </div>
+              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-info">
+                <div class="preference-label">SMS Notifications</div>
+                <div class="preference-description">Receive text messages for urgent alerts</div>
+              </div>
+              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-info">
+                <div class="preference-label">Application Updates</div>
+                <div class="preference-description">Get notified when applications are submitted or updated</div>
+              </div>
+              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-info">
+                <div class="preference-label">Document Requests</div>
+                <div class="preference-description">Notifications when documents are uploaded or requested</div>
+              </div>
+              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-info">
+                <div class="preference-label">System Announcements</div>
+                <div class="preference-description">Important system updates and maintenance notifications</div>
+              </div>
+              <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-info">
+                <div class="preference-label">Weekly Digest</div>
+                <div class="preference-description">Receive a weekly summary of your activity</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Regional Settings Card -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h2 class="card-title">Regional Settings</h2>
+            <p class="card-subtitle">Customize your timezone and date formats</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Timezone</label>
+              <select class="form-select">
+                <option>Pacific Time (PT) - UTC-8</option>
+                <option>Mountain Time (MT) - UTC-7</option>
+                <option>Central Time (CT) - UTC-6</option>
+                <option>Eastern Time (ET) - UTC-5</option>
+              </select>
+              <div class="form-hint">Current time: Mar 3, 2026 8:30 AM PT</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Language</label>
+              <select class="form-select">
+                <option>English (US)</option>
+                <option>English (UK)</option>
+                <option>Spanish</option>
+                <option>French</option>
+                <option>German</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date Format</label>
+              <select class="form-select">
+                <option>MM/DD/YYYY (03/03/2026)</option>
+                <option>DD/MM/YYYY (03/03/2026)</option>
+                <option>YYYY-MM-DD (2026-03-03)</option>
+                <option>Month DD, YYYY (March 03, 2026)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Time Format</label>
+              <select class="form-select">
+                <option>12-hour (8:30 AM)</option>
+                <option>24-hour (08:30)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Currency</label>
+              <select class="form-select">
+                <option>USD ($) - US Dollar</option>
+                <option>EUR (€) - Euro</option>
+                <option>GBP (£) - British Pound</option>
+                <option>CAD ($) - Canadian Dollar</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Number Format</label>
+              <select class="form-select">
+                <option>1,234.56 (US)</option>
+                <option>1.234,56 (European)</option>
+                <option>1 234,56 (French)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="resetForm()">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" onclick="saveProfile()">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const photoElement = document.getElementById('profile-photo');
+          photoElement.innerHTML = `<img src="${e.target.result}" alt="Profile photo">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removePhoto() {
+      if (confirm('Are you sure you want to remove your profile photo?')) {
+        const photoElement = document.getElementById('profile-photo');
+        photoElement.innerHTML = 'JS';
+      }
+    }
+
+    function saveProfile() {
+      const submitBtn = event.target;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      // Simulate API call
+      setTimeout(() => {
+        // Show success alert
+        document.getElementById('success-alert').classList.add('visible');
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+
+        // Hide alert after 5 seconds
+        setTimeout(() => {
+          document.getElementById('success-alert').classList.remove('visible');
+        }, 5000);
+      }, 1500);
+    }
+
+    function resetForm() {
+      if (confirm('Are you sure you want to discard your changes?')) {
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .filters-bar {
+      background: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-tab:hover {
+      border-color: #1e3a8a;
+      color: #1e3a8a;
+    }
+
+    .filter-tab.active {
+      background: #1e3a8a;
+      color: white;
+      border-color: #1e3a8a;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .action-link {
+      color: #1e3a8a;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
+    }
+
+    .notifications-container {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .notifications-header {
+      padding: 24px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .notifications-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .notifications-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .notification-list {
+      list-style: none;
+    }
+
+    .notification-item {
+      padding: 20px 24px;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      position: relative;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .notification-item:hover {
+      background: #f9fafb;
+    }
+
+    .notification-item.unread {
+      background: #f0f4ff;
+    }
+
+    .notification-item.unread::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #1e3a8a;
+    }
+
+    .notification-icon {
+      font-size: 24px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .notification-icon.system {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    }
+
+    .notification-icon.application {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    }
+
+    .notification-icon.approval {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    }
+
+    .notification-icon.document {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    .notification-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notification-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .notification-message {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .notification-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #f9fafb;
+      border-color: #1e3a8a;
+      color: #1e3a8a;
+    }
+
+    .action-btn.danger:hover {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .pagination {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: #1e3a8a;
+      color: white;
+      border-color: #1e3a8a;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .empty-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 12px;
+    }
+
+    .empty-message {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .loading-state {
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 64px;
+      height: 64px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #1e3a8a;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 24px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      color: #6b7280;
+    }
+
+    .error-state {
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .error-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .error-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ef4444;
+      margin-bottom: 12px;
+    }
+
+    .error-message {
+      font-size: 15px;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JS</div>
+        <div>
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="../officer/dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="../officer/borrowers-list.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">🔔</span>
+          <span class="nav-label">Notifications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Notifications</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="page-header">
+          <h1>Notifications</h1>
+          <p class="page-subtitle">Manage all your notifications in one place</p>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+          <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All (24)</button>
+            <button class="filter-tab" data-filter="system">System (3)</button>
+            <button class="filter-tab" data-filter="application">Applications (12)</button>
+            <button class="filter-tab" data-filter="approval">Approvals (6)</button>
+            <button class="filter-tab" data-filter="document">Documents (3)</button>
+          </div>
+          <div class="filter-actions">
+            <a href="#" class="action-link" id="mark-all-read">Mark all as read</a>
+            <a href="#" class="action-link" id="delete-read">Delete read</a>
+          </div>
+        </div>
+
+        <!-- Normal State: Notifications List -->
+        <div class="notifications-container" id="normal-state">
+          <div class="notifications-header">
+            <h2>Recent Activity</h2>
+            <p class="notifications-subtitle">5 unread notifications</p>
+          </div>
+
+          <ul class="notification-list">
+            <li class="notification-item unread" data-type="application">
+              <div class="notification-icon application">📝</div>
+              <div class="notification-content">
+                <div class="notification-title">New loan application submitted</div>
+                <div class="notification-message">Sarah Johnson submitted a personal loan application for $15,000. The application includes all required documents and is ready for review.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-018</span>
+                  <span>•</span>
+                  <span>5 minutes ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsRead(this)">Mark read</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item unread" data-type="document">
+              <div class="notification-icon document">📄</div>
+              <div class="notification-content">
+                <div class="notification-title">Document uploaded</div>
+                <div class="notification-message">Michael Chen uploaded W2 Form for application APP-2024-015. The document is now available for review.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-015</span>
+                  <span>•</span>
+                  <span>28 minutes ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsRead(this)">Mark read</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item unread" data-type="approval">
+              <div class="notification-icon approval">✓</div>
+              <div class="notification-content">
+                <div class="notification-title">Application approved</div>
+                <div class="notification-message">APP-2024-012 for Jessica Williams ($25,000 business loan) has been approved by Jane Doe (Senior Approver).</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-012</span>
+                  <span>•</span>
+                  <span>1 hour ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsRead(this)">Mark read</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item unread" data-type="document">
+              <div class="notification-icon document">📄</div>
+              <div class="notification-content">
+                <div class="notification-title">Document request sent</div>
+                <div class="notification-message">You requested proof of collateral from Michael Chen for APP-2024-015. The borrower has been notified via email.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-015</span>
+                  <span>•</span>
+                  <span>2 hours ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsRead(this)">Mark read</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item unread" data-type="application">
+              <div class="notification-icon application">📋</div>
+              <div class="notification-content">
+                <div class="notification-title">Application status updated</div>
+                <div class="notification-message">APP-2024-010 for Robert Brown moved from "Pending Review" to "Under Review" status by you.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-010</span>
+                  <span>•</span>
+                  <span>3 hours ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsRead(this)">Mark read</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item" data-type="system">
+              <div class="notification-icon system">⚙️</div>
+              <div class="notification-content">
+                <div class="notification-title">System maintenance scheduled</div>
+                <div class="notification-message">The system will be down for scheduled maintenance on March 5, 2026 from 2:00 AM to 4:00 AM EST. Please plan accordingly.</div>
+                <div class="notification-meta">
+                  <span>⚙️ System Admin</span>
+                  <span>•</span>
+                  <span>Yesterday</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsUnread(this)">Mark unread</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item" data-type="approval">
+              <div class="notification-icon approval">✓</div>
+              <div class="notification-content">
+                <div class="notification-title">Bulk approval completed</div>
+                <div class="notification-message">3 applications were approved in batch process: APP-2024-007, APP-2024-008, APP-2024-009.</div>
+                <div class="notification-meta">
+                  <span>✓ Batch Process</span>
+                  <span>•</span>
+                  <span>2 days ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsUnread(this)">Mark unread</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item" data-type="document">
+              <div class="notification-icon document">📄</div>
+              <div class="notification-content">
+                <div class="notification-title">Missing documents reminder</div>
+                <div class="notification-message">APP-2024-008 for Emily Davis is still missing proof of income document. The document request was sent 7 days ago and is now overdue.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-008</span>
+                  <span>•</span>
+                  <span>3 days ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsUnread(this)">Mark unread</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item" data-type="application">
+              <div class="notification-icon application">📝</div>
+              <div class="notification-content">
+                <div class="notification-title">New application assigned</div>
+                <div class="notification-message">A new application (APP-2024-006) has been assigned to you by your manager. Borrower: David Martinez, Amount: $30,000.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-006</span>
+                  <span>•</span>
+                  <span>5 days ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsUnread(this)">Mark unread</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+
+            <li class="notification-item" data-type="approval">
+              <div class="notification-icon approval">❌</div>
+              <div class="notification-content">
+                <div class="notification-title">Application rejected</div>
+                <div class="notification-message">APP-2024-005 has been rejected by approver. Reason: Insufficient collateral. The borrower has been notified.</div>
+                <div class="notification-meta">
+                  <span>📋 APP-2024-005</span>
+                  <span>•</span>
+                  <span>1 week ago</span>
+                </div>
+              </div>
+              <div class="notification-actions">
+                <button class="action-btn" onclick="markAsUnread(this)">Mark unread</button>
+                <button class="action-btn danger" onclick="deleteNotification(this)">Delete</button>
+              </div>
+            </li>
+          </ul>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <div class="pagination-info">Showing 1-10 of 24 notifications</div>
+            <div class="pagination-buttons">
+              <button class="pagination-btn" disabled>Previous</button>
+              <button class="pagination-btn">1</button>
+              <button class="pagination-btn">2</button>
+              <button class="pagination-btn">3</button>
+              <button class="pagination-btn">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div class="notifications-container" style="display: none;" id="empty-state">
+          <div class="empty-state">
+            <div class="empty-icon">🔔</div>
+            <div class="empty-title">No notifications</div>
+            <div class="empty-message">You're all caught up! Check back later for new notifications.</div>
+          </div>
+        </div>
+
+        <!-- Loading State (hidden by default) -->
+        <div class="notifications-container" style="display: none;" id="loading-state">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading notifications...</div>
+          </div>
+        </div>
+
+        <!-- Error State (hidden by default) -->
+        <div class="notifications-container" style="display: none;" id="error-state">
+          <div class="error-state">
+            <div class="error-icon">⚠️</div>
+            <div class="error-title">Failed to load notifications</div>
+            <div class="error-message">There was an error loading your notifications. Please try again.</div>
+            <button class="btn btn-primary" onclick="location.reload()">Retry</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Filter functionality
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const notificationItems = document.querySelectorAll('.notification-item');
+
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Filter notifications
+        const filterType = tab.getAttribute('data-filter');
+        notificationItems.forEach(item => {
+          if (filterType === 'all' || item.getAttribute('data-type') === filterType) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Mark as read/unread
+    function markAsRead(button) {
+      const item = button.closest('.notification-item');
+      item.classList.remove('unread');
+      button.textContent = 'Mark unread';
+      button.setAttribute('onclick', 'markAsUnread(this)');
+    }
+
+    function markAsUnread(button) {
+      const item = button.closest('.notification-item');
+      item.classList.add('unread');
+      button.textContent = 'Mark read';
+      button.setAttribute('onclick', 'markAsRead(this)');
+    }
+
+    // Delete notification
+    function deleteNotification(button) {
+      const item = button.closest('.notification-item');
+      item.style.transition = 'all 0.3s';
+      item.style.opacity = '0';
+      item.style.transform = 'translateX(20px)';
+      setTimeout(() => {
+        item.remove();
+      }, 300);
+    }
+
+    // Mark all as read
+    document.getElementById('mark-all-read').addEventListener('click', (e) => {
+      e.preventDefault();
+      notificationItems.forEach(item => {
+        item.classList.remove('unread');
+      });
+    });
+
+    // Delete read notifications
+    document.getElementById('delete-read').addEventListener('click', (e) => {
+      e.preventDefault();
+      const readItems = document.querySelectorAll('.notification-item:not(.unread)');
+      readItems.forEach(item => {
+        item.style.transition = 'all 0.3s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(20px)';
+        setTimeout(() => {
+          item.remove();
+        }, 300);
+      });
+    });
+  </script>
+</body>
+</html>

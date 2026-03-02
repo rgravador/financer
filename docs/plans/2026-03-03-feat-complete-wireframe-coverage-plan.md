@@ -509,74 +509,74 @@ Each component is a self-contained HTML snippet that can be included/adapted int
 **Priority:** MEDIUM - Supporting features
 
 ##### shared/notifications-panel.html (Topbar Dropdown)
-- [ ] Notification list (last 10 notifications)
-- [ ] Unread indicator badges (blue dot or count)
-- [ ] Notification types: system, application status change, approval decision, document request
-- [ ] Mark as read action (per notification)
-- [ ] "View all" link at bottom
-- [ ] States: loading, normal (with notifications), empty (no notifications)
+- [x] Notification list (last 10 notifications)
+- [x] Unread indicator badges (blue dot or count)
+- [x] Notification types: system, application status change, approval decision, document request
+- [x] Mark as read action (per notification)
+- [x] "View all" link at bottom
+- [x] States: loading, normal (with notifications), empty (no notifications)
 
 ##### shared/notifications-page.html
-- [ ] All notifications list (paginated)
-- [ ] Filter by type (system, application, approval, document)
-- [ ] Filter by read/unread status
-- [ ] Mark all as read button
-- [ ] Individual mark as read/delete actions
-- [ ] Pagination
-- [ ] States: loading, normal, empty
+- [x] All notifications list (paginated)
+- [x] Filter by type (system, application, approval, document)
+- [x] Filter by read/unread status
+- [x] Mark all as read button
+- [x] Individual mark as read/delete actions
+- [x] Pagination
+- [x] States: loading, normal, empty
 
 ##### shared/account-security.html
-- [ ] Page header: "Account Security"
-- [ ] Change password card (link to change-password.html or inline form)
-- [ ] Active sessions list (table with device, browser, IP, location, last active)
-- [ ] Two-factor authentication toggle (on/off switch)
-- [ ] Security log table (recent security events: password changed, login from new device, etc.)
-- [ ] States: normal, loading, success (password changed), error
+- [x] Page header: "Account Security"
+- [x] Change password card (link to change-password.html or inline form)
+- [x] Active sessions list (table with device, browser, IP, location, last active)
+- [x] Two-factor authentication toggle (on/off switch)
+- [x] Security log table (recent security events: password changed, login from new device, etc.)
+- [x] States: normal, loading, success (password changed), error
 
 ##### shared/change-password.html
-- [ ] Current password field (with show/hide toggle)
-- [ ] New password field (with strength meter: weak, medium, strong)
-- [ ] Confirm new password field
-- [ ] Password requirements display (8+ chars, uppercase, lowercase, number, special char)
-- [ ] Validation rules (real-time as user types)
-- [ ] Submit button
-- [ ] States: normal, submitting, success (password changed, redirect to dashboard), error (wrong current password, passwords don't match)
+- [x] Current password field (with show/hide toggle)
+- [x] New password field (with strength meter: weak, medium, strong)
+- [x] Confirm new password field
+- [x] Password requirements display (8+ chars, uppercase, lowercase, number, special char)
+- [x] Validation rules (real-time as user types)
+- [x] Submit button
+- [x] States: normal, submitting, success (password changed, redirect to dashboard), error (wrong current password, passwords don't match)
 
 ##### shared/active-sessions.html
-- [ ] Table columns: device, browser, IP address, location (city/country), last active, current session indicator
-- [ ] Revoke session action (per row)
-- [ ] Current session highlighted (cannot revoke)
-- [ ] "Logout all other devices" button
-- [ ] Confirmation modal before revoking sessions
-- [ ] States: loading, normal, revoking session, success (session revoked)
+- [x] Table columns: device, browser, IP address, location (city/country), last active, current session indicator
+- [x] Revoke session action (per row)
+- [x] Current session highlighted (cannot revoke)
+- [x] "Logout all other devices" button
+- [x] Confirmation modal before revoking sessions
+- [x] States: loading, normal, revoking session, success (session revoked)
 
 ##### shared/user-profile.html
-- [ ] Profile photo upload (with crop/resize preview)
-- [ ] Personal info form: first name, last name, email (read-only), phone
-- [ ] Notification preferences: email notifications (on/off), in-app notifications (on/off), notification types (application updates, system alerts, etc.)
-- [ ] Display preferences: timezone selector, date format (MM/DD/YYYY vs DD/MM/YYYY)
-- [ ] Save/Cancel buttons
-- [ ] States: loading, normal, saving, success (saved), error
+- [x] Profile photo upload (with crop/resize preview)
+- [x] Personal info form: first name, last name, email (read-only), phone
+- [x] Notification preferences: email notifications (on/off), in-app notifications (on/off), notification types (application updates, system alerts, etc.)
+- [x] Display preferences: timezone selector, date format (MM/DD/YYYY vs DD/MM/YYYY)
+- [x] Save/Cancel buttons
+- [x] States: loading, normal, saving, success (saved), error
 
 ##### shared/forgot-password.html
-- [ ] Email input field
-- [ ] Submit button
-- [ ] Back to login link
-- [ ] States: normal, submitting, success (check email message with instructions), error (email not found)
+- [x] Email input field
+- [x] Submit button
+- [x] Back to login link
+- [x] States: normal, submitting, success (check email message with instructions), error (email not found)
 
 ##### shared/reset-password.html
-- [ ] New password field (with strength meter)
-- [ ] Confirm password field
-- [ ] Token validation indicator (valid token vs expired token)
-- [ ] Submit button
-- [ ] States: validating token, normal, submitting, success (password reset, redirect to login), error (expired token, passwords don't match)
+- [x] New password field (with strength meter)
+- [x] Confirm password field
+- [x] Token validation indicator (valid token vs expired token)
+- [x] Submit button
+- [x] States: validating token, normal, submitting, success (password reset, redirect to login), error (expired token, passwords don't match)
 
 ##### shared/unauthorized.html (403 Error Page)
-- [ ] Large icon (lock or shield)
-- [ ] Error message: "You don't have permission to access this page"
-- [ ] Reason explanation (based on role): "This page requires [system_admin] role"
-- [ ] Back to dashboard button
-- [ ] Contact support link
+- [x] Large icon (lock or shield)
+- [x] Error message: "You don't have permission to access this page"
+- [x] Reason explanation (based on role): "This page requires [system_admin] role"
+- [x] Back to dashboard button
+- [x] Contact support link
 
 **Success Criteria:**
 - All 9 shared wireframes created

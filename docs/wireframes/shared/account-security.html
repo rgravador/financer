@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Security - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .security-container {
+      max-width: 1200px;
+    }
+
+    .security-card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+      margin: -32px -32px 24px -32px;
+      padding: 24px 32px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .security-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .security-item:last-child {
+      border-bottom: none;
+    }
+
+    .security-info {
+      flex: 1;
+    }
+
+    .security-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .security-description {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .security-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    .security-status.enabled {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .security-status.disabled {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background: #e5e7eb;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .toggle-switch.active {
+      background: #1e3a8a;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .toggle-switch.active::after {
+      left: 27px;
+    }
+
+    .sessions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .sessions-table th {
+      background: #f9fafb;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .sessions-table td {
+      padding: 16px;
+      font-size: 14px;
+      color: #374151;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .sessions-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .device-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .device-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-radius: 8px;
+    }
+
+    .device-details {
+      flex: 1;
+    }
+
+    .device-name {
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 2px;
+    }
+
+    .device-browser {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .session-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #10b981;
+      color: white;
+    }
+
+    .session-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #6b7280;
+    }
+
+    .revoke-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      color: #ef4444;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .revoke-btn:hover {
+      background: #fef2f2;
+      border-color: #ef4444;
+    }
+
+    .logout-all-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-all-btn:hover {
+      background: #dc2626;
+    }
+
+    .security-log-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .security-log-table th {
+      background: #f9fafb;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .security-log-table td {
+      padding: 16px;
+      font-size: 14px;
+      color: #374151;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .log-event {
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .log-timestamp {
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .log-ip {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .log-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .log-status.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .log-status.failed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .log-status.warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JS</div>
+        <div>
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="../officer/dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="user-profile.html" class="nav-item">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="nav-icon">🔒</span>
+          <span class="nav-label">Security</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Account Security</div>
+        <div class="topbar-actions">
+          <button class="icon-btn">
+            🔔
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content security-container">
+        <div class="page-header">
+          <h1>Account Security</h1>
+          <p class="page-subtitle">Manage your password, sessions, and security settings</p>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="security-card">
+          <div class="card-header">
+            <h2 class="card-title">Password</h2>
+            <p class="card-subtitle">Update your password to keep your account secure</p>
+          </div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <div class="security-label">Current Password</div>
+              <div class="security-description">Last changed 45 days ago</div>
+            </div>
+            <a href="change-password.html" class="btn btn-outline">Change Password</a>
+          </div>
+        </div>
+
+        <!-- Two-Factor Authentication Card -->
+        <div class="security-card">
+          <div class="card-header">
+            <h2 class="card-title">Two-Factor Authentication (2FA)</h2>
+            <p class="card-subtitle">Add an extra layer of security to your account</p>
+          </div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <div class="security-label">Authentication App</div>
+              <div class="security-description">Use an authenticator app to generate verification codes</div>
+              <span class="security-status disabled">⚠️ Not enabled</span>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+          </div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <div class="security-label">SMS Authentication</div>
+              <div class="security-description">Receive verification codes via text message to +1 (555) 123-4567</div>
+              <span class="security-status enabled">✓ Enabled</span>
+            </div>
+            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+          </div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <div class="security-label">Email Authentication</div>
+              <div class="security-description">Receive verification codes via email to j***@example.com</div>
+              <span class="security-status disabled">⚠️ Not enabled</span>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+          </div>
+        </div>
+
+        <!-- Active Sessions Card -->
+        <div class="security-card">
+          <div class="card-header">
+            <h2 class="card-title">Active Sessions</h2>
+            <p class="card-subtitle">Manage devices where you're currently signed in</p>
+          </div>
+
+          <table class="sessions-table">
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>Location</th>
+                <th>IP Address</th>
+                <th>Last Active</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="device-info">
+                    <div class="device-icon">💻</div>
+                    <div class="device-details">
+                      <div class="device-name">MacBook Pro</div>
+                      <div class="device-browser">Chrome 122 on macOS Sonoma</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-ip">192.168.1.100</td>
+                <td>
+                  <span class="session-badge">Current</span>
+                  <div class="log-timestamp">Active now</div>
+                </td>
+                <td>
+                  <button class="revoke-btn" disabled>Current Session</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="device-info">
+                    <div class="device-icon">📱</div>
+                    <div class="device-details">
+                      <div class="device-name">iPhone 15 Pro</div>
+                      <div class="device-browser">Safari on iOS 17.3</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-ip">192.168.1.105</td>
+                <td>
+                  <div class="log-timestamp">2 hours ago</div>
+                </td>
+                <td>
+                  <button class="revoke-btn" onclick="revokeSession(this)">Revoke</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="device-info">
+                    <div class="device-icon">💻</div>
+                    <div class="device-details">
+                      <div class="device-name">Windows Desktop</div>
+                      <div class="device-browser">Edge 122 on Windows 11</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Jose, CA</span>
+                  </div>
+                </td>
+                <td class="log-ip">10.0.0.45</td>
+                <td>
+                  <div class="log-timestamp">Yesterday</div>
+                </td>
+                <td>
+                  <button class="revoke-btn" onclick="revokeSession(this)">Revoke</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="device-info">
+                    <div class="device-icon">📱</div>
+                    <div class="device-details">
+                      <div class="device-name">iPad Air</div>
+                      <div class="device-browser">Safari on iPadOS 17.2</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>Oakland, CA</span>
+                  </div>
+                </td>
+                <td class="log-ip">192.168.2.20</td>
+                <td>
+                  <div class="log-timestamp">3 days ago</div>
+                </td>
+                <td>
+                  <button class="revoke-btn" onclick="revokeSession(this)">Revoke</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button class="logout-all-btn" onclick="logoutAll()">Logout from all devices</button>
+        </div>
+
+        <!-- Security Log Card -->
+        <div class="security-card">
+          <div class="card-header">
+            <h2 class="card-title">Security Log</h2>
+            <p class="card-subtitle">Recent security events for your account</p>
+          </div>
+
+          <table class="security-log-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>IP Address</th>
+                <th>Location</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="log-event">Login successful</td>
+                <td class="log-ip">192.168.1.100</td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-timestamp">Mar 3, 2026 8:30 AM</td>
+                <td><span class="log-status success">Success</span></td>
+              </tr>
+              <tr>
+                <td class="log-event">2FA code sent via SMS</td>
+                <td class="log-ip">192.168.1.100</td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-timestamp">Mar 3, 2026 8:29 AM</td>
+                <td><span class="log-status success">Success</span></td>
+              </tr>
+              <tr>
+                <td class="log-event">Failed login attempt</td>
+                <td class="log-ip">103.45.67.89</td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>Unknown Location</span>
+                  </div>
+                </td>
+                <td class="log-timestamp">Mar 2, 2026 11:45 PM</td>
+                <td><span class="log-status failed">Failed</span></td>
+              </tr>
+              <tr>
+                <td class="log-event">Session expired</td>
+                <td class="log-ip">192.168.1.105</td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-timestamp">Mar 2, 2026 6:00 PM</td>
+                <td><span class="log-status warning">Warning</span></td>
+              </tr>
+              <tr>
+                <td class="log-event">Password changed</td>
+                <td class="log-ip">192.168.1.100</td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-timestamp">Feb 28, 2026 2:15 PM</td>
+                <td><span class="log-status success">Success</span></td>
+              </tr>
+              <tr>
+                <td class="log-event">2FA enabled (SMS)</td>
+                <td class="log-ip">192.168.1.100</td>
+                <td>
+                  <div class="session-location">
+                    <span>📍</span>
+                    <span>San Francisco, CA</span>
+                  </div>
+                </td>
+                <td class="log-timestamp">Feb 25, 2026 10:30 AM</td>
+                <td><span class="log-status success">Success</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function revokeSession(button) {
+      if (confirm('Are you sure you want to revoke this session? The device will be logged out immediately.')) {
+        const row = button.closest('tr');
+        row.style.transition = 'all 0.3s';
+        row.style.opacity = '0';
+        setTimeout(() => {
+          row.remove();
+        }, 300);
+      }
+    }
+
+    function logoutAll() {
+      if (confirm('Are you sure you want to logout from all devices? You will need to sign in again on all devices including this one.')) {
+        alert('All sessions have been revoked. You will be logged out in 5 seconds.');
+        setTimeout(() => {
+          window.location.href = '../login.html';
+        }, 5000);
+      }
+    }
+  </script>
+</body>
+</html>

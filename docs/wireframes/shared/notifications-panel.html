@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications Panel - Ascendent Wireframe</title>
+  <link rel="stylesheet" href="../common-styles.css">
+  <style>
+    .layout-with-dropdown {
+      position: relative;
+    }
+
+    .notifications-dropdown {
+      position: absolute;
+      top: 64px;
+      right: 96px;
+      width: 420px;
+      max-height: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .dropdown-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%);
+    }
+
+    .dropdown-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+
+    .mark-all-read {
+      font-size: 13px;
+      color: #1e3a8a;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mark-all-read:hover {
+      text-decoration: underline;
+    }
+
+    .notifications-list {
+      overflow-y: auto;
+      max-height: 480px;
+    }
+
+    .notification-item {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .notification-item:hover {
+      background: #f9fafb;
+    }
+
+    .notification-item.unread {
+      background: #f0f4ff;
+    }
+
+    .notification-item.unread::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #1e3a8a;
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .notification-icon {
+      font-size: 20px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .notification-icon.system {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    }
+
+    .notification-icon.application {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    }
+
+    .notification-icon.approval {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    }
+
+    .notification-icon.document {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .notification-message {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .notification-time {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .unread-badge {
+      width: 8px;
+      height: 8px;
+      background: #1e3a8a;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .dropdown-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      background: #f9fafb;
+    }
+
+    .view-all-link {
+      color: #1e3a8a;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .view-all-link:hover {
+      text-decoration: underline;
+    }
+
+    .empty-notifications {
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+
+    .empty-message {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .loading-notifications {
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #1e3a8a;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    /* For demo: highlight the notification bell button */
+    .icon-btn.active {
+      background: #f0f4ff;
+    }
+
+    .icon-btn.active .badge {
+      background: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="layout layout-with-dropdown">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">ASCENDENT</div>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-avatar">JS</div>
+        <div>
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Officer</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="../officer/dashboard.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="../officer/borrowers-list.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Borrowers</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">My Applications</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Documents</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Reports</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="page-title">Notifications Panel Demo</div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search...">
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn active" id="notif-btn">
+            🔔
+            <span class="badge">5</span>
+          </button>
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="page-header">
+          <h1>Notifications Panel Dropdown</h1>
+          <p class="page-subtitle">Topbar notification dropdown with unread indicators</p>
+        </div>
+
+        <div style="padding: 24px; background: #f0f4ff; border-radius: 12px; margin-bottom: 24px;">
+          <p style="font-size: 14px; color: #1e3a8a; line-height: 1.6;">
+            This wireframe demonstrates the notifications panel dropdown that appears when clicking the notification bell in the topbar. The dropdown shows the latest 10 notifications with unread indicators, type-based icons, and a "View All" link to the full notifications page.
+          </p>
+        </div>
+      </div>
+
+      <!-- Notifications Dropdown -->
+      <div class="notifications-dropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-title">Notifications</div>
+          <a href="#" class="mark-all-read">Mark all as read</a>
+        </div>
+
+        <!-- Normal State: With Notifications -->
+        <div class="notifications-list" id="normal-state">
+          <div class="notification-item unread">
+            <div class="notification-header">
+              <div class="notification-icon application">📝</div>
+              <div class="notification-content">
+                <div class="notification-title">New loan application submitted</div>
+                <div class="notification-message">Sarah Johnson submitted a personal loan application for $15,000</div>
+                <div class="notification-time">5 minutes ago</div>
+              </div>
+              <div class="unread-badge"></div>
+            </div>
+          </div>
+
+          <div class="notification-item unread">
+            <div class="notification-header">
+              <div class="notification-icon document">📄</div>
+              <div class="notification-content">
+                <div class="notification-title">Document uploaded</div>
+                <div class="notification-message">Michael Chen uploaded W2 Form for APP-2024-015</div>
+                <div class="notification-time">28 minutes ago</div>
+              </div>
+              <div class="unread-badge"></div>
+            </div>
+          </div>
+
+          <div class="notification-item unread">
+            <div class="notification-header">
+              <div class="notification-icon approval">✓</div>
+              <div class="notification-content">
+                <div class="notification-title">Application approved</div>
+                <div class="notification-message">APP-2024-012 has been approved by Jane Doe</div>
+                <div class="notification-time">1 hour ago</div>
+              </div>
+              <div class="unread-badge"></div>
+            </div>
+          </div>
+
+          <div class="notification-item unread">
+            <div class="notification-header">
+              <div class="notification-icon document">📄</div>
+              <div class="notification-content">
+                <div class="notification-title">Document request sent</div>
+                <div class="notification-message">Requested proof of collateral from Michael Chen for APP-2024-015</div>
+                <div class="notification-time">2 hours ago</div>
+              </div>
+              <div class="unread-badge"></div>
+            </div>
+          </div>
+
+          <div class="notification-item">
+            <div class="notification-header">
+              <div class="notification-icon application">📋</div>
+              <div class="notification-content">
+                <div class="notification-title">Application status updated</div>
+                <div class="notification-message">APP-2024-010 moved to "Under Review" status</div>
+                <div class="notification-time">4 hours ago</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="notification-item">
+            <div class="notification-header">
+              <div class="notification-icon system">⚙️</div>
+              <div class="notification-content">
+                <div class="notification-title">System maintenance scheduled</div>
+                <div class="notification-message">System will be down for maintenance on Mar 5, 2026 from 2-4 AM</div>
+                <div class="notification-time">Yesterday</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="notification-item">
+            <div class="notification-header">
+              <div class="notification-icon approval">✓</div>
+              <div class="notification-content">
+                <div class="notification-title">Bulk approval completed</div>
+                <div class="notification-message">3 applications approved in batch process</div>
+                <div class="notification-time">2 days ago</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="notification-item">
+            <div class="notification-header">
+              <div class="notification-icon document">📄</div>
+              <div class="notification-content">
+                <div class="notification-title">Missing documents reminder</div>
+                <div class="notification-message">APP-2024-008 still missing proof of income (7 days overdue)</div>
+                <div class="notification-time">3 days ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State: No Notifications (hidden by default) -->
+        <div class="empty-notifications" style="display: none;" id="empty-state">
+          <div class="empty-icon">🔔</div>
+          <div class="empty-title">No notifications</div>
+          <div class="empty-message">You're all caught up!</div>
+        </div>
+
+        <!-- Loading State (hidden by default) -->
+        <div class="loading-notifications" style="display: none;" id="loading-state">
+          <div class="spinner"></div>
+          <div class="loading-text">Loading notifications...</div>
+        </div>
+
+        <div class="dropdown-footer">
+          <a href="notifications-page.html" class="view-all-link">View all notifications →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle dropdown on bell click (demo only)
+    const notifBtn = document.getElementById('notif-btn');
+    const dropdown = document.querySelector('.notifications-dropdown');
+
+    // Demo: click notification items to mark as read
+    const notificationItems = document.querySelectorAll('.notification-item.unread');
+    notificationItems.forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.remove('unread');
+        const badge = item.querySelector('.unread-badge');
+        if (badge) {
+          badge.remove();
+        }
+
+        // Update count
+        const remainingUnread = document.querySelectorAll('.notification-item.unread').length;
+        const badgeEl = notifBtn.querySelector('.badge');
+        if (remainingUnread > 0) {
+          badgeEl.textContent = remainingUnread;
+        } else {
+          badgeEl.style.display = 'none';
+          notifBtn.classList.remove('active');
+        }
+      });
+    });
+
+    // Mark all as read
+    const markAllRead = document.querySelector('.mark-all-read');
+    markAllRead.addEventListener('click', (e) => {
+      e.preventDefault();
+      notificationItems.forEach(item => {
+        item.classList.remove('unread');
+        const badge = item.querySelector('.unread-badge');
+        if (badge) badge.remove();
+      });
+
+      const badgeEl = notifBtn.querySelector('.badge');
+      badgeEl.style.display = 'none';
+      notifBtn.classList.remove('active');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Unauthorized - Ascendent Wireframe</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .unauthorized-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 60px 48px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .logo {
+      margin-bottom: 40px;
+    }
+
+    .logo-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      border-radius: 12px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+      letter-spacing: -0.5px;
+    }
+
+    .error-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .error-code {
+      font-size: 72px;
+      font-weight: 800;
+      color: #ef4444;
+      margin-bottom: 16px;
+      letter-spacing: -2px;
+    }
+
+    .error-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 16px;
+    }
+
+    .error-message {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .permission-box {
+      background: #fef3c7;
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+
+    .permission-box-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .permission-icon {
+      font-size: 20px;
+    }
+
+    .permission-details {
+      font-size: 14px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+
+    .permission-details strong {
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .permission-list {
+      margin-top: 12px;
+      padding-left: 20px;
+    }
+
+    .permission-list li {
+      margin-bottom: 6px;
+      color: #78350f;
+    }
+
+    .info-box {
+      background: #f0f4ff;
+      border: 2px solid #dbeafe;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+
+    .info-box-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-icon {
+      font-size: 20px;
+    }
+
+    .info-details {
+      font-size: 14px;
+      color: #1e40af;
+      line-height: 1.6;
+    }
+
+    .info-list {
+      margin-top: 12px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .info-list li {
+      margin-bottom: 8px;
+      color: #1e40af;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .info-list li::before {
+      content: '•';
+      color: #3b82f6;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: #1e3a8a;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e40af;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #1e3a8a;
+      border: 2px solid #1e3a8a;
+    }
+
+    .btn-secondary:hover {
+      background: #1e3a8a;
+      color: white;
+    }
+
+    .help-section {
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .help-title {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .help-contacts {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .help-contact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #1e3a8a;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .help-contact:hover {
+      text-decoration: underline;
+    }
+
+    .help-contact-icon {
+      font-size: 18px;
+    }
+
+    .session-info {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .session-info-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+
+    .session-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: left;
+    }
+
+    .session-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .session-label {
+      color: #9ca3af;
+    }
+
+    .session-value {
+      color: #374151;
+      font-weight: 500;
+    }
+
+    @media (max-width: 640px) {
+      .unauthorized-container {
+        padding: 40px 24px;
+      }
+
+      .error-code {
+        font-size: 56px;
+      }
+
+      .error-title {
+        font-size: 24px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Index</a>
+
+  <div class="unauthorized-container">
+    <div class="logo">
+      <div class="logo-box">A</div>
+      <div class="logo-text">ASCENDENT</div>
+    </div>
+
+    <div class="error-icon">🔒</div>
+
+    <div class="error-code">403</div>
+
+    <h1 class="error-title">Access Denied</h1>
+
+    <p class="error-message">
+      You don't have permission to access this resource. This page requires specific role permissions that are not assigned to your account.
+    </p>
+
+    <!-- Permission Requirements -->
+    <div class="permission-box">
+      <div class="permission-box-title">
+        <span class="permission-icon">⚠️</span>
+        <span>Required Permissions</span>
+      </div>
+      <div class="permission-details">
+        This resource requires <strong>System Administrator</strong> role permissions. Your current role is <strong>Officer</strong>.
+      </div>
+    </div>
+
+    <!-- What You Can Do -->
+    <div class="info-box">
+      <div class="info-box-title">
+        <span class="info-icon">ℹ️</span>
+        <span>What can I do?</span>
+      </div>
+      <div class="info-details">
+        <ul class="info-list">
+          <li>Return to your dashboard and access features available to your role</li>
+          <li>Contact your system administrator to request access permissions</li>
+          <li>Verify that you're logged in with the correct account</li>
+          <li>Review your account permissions in the Settings page</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="../officer/dashboard.html" class="btn btn-primary">
+        Back to Dashboard
+      </a>
+      <a href="#" class="btn btn-secondary" onclick="requestAccess()">
+        Request Access
+      </a>
+    </div>
+
+    <!-- Help Section -->
+    <div class="help-section">
+      <div class="help-title">Need help?</div>
+      <div class="help-contacts">
+        <a href="mailto:support@ascendent.com" class="help-contact">
+          <span class="help-contact-icon">📧</span>
+          <span>support@ascendent.com</span>
+        </a>
+        <a href="tel:+15551234567" class="help-contact">
+          <span class="help-contact-icon">📞</span>
+          <span>+1 (555) 123-4567</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Session Information -->
+    <div class="session-info">
+      <div class="session-info-title">Session Information</div>
+      <div class="session-details">
+        <div class="session-detail">
+          <span class="session-label">User:</span>
+          <span class="session-value">John Smith</span>
+        </div>
+        <div class="session-detail">
+          <span class="session-label">Role:</span>
+          <span class="session-value">Officer</span>
+        </div>
+        <div class="session-detail">
+          <span class="session-label">Timestamp:</span>
+          <span class="session-value">Mar 3, 2026 8:30:45 AM PT</span>
+        </div>
+        <div class="session-detail">
+          <span class="session-label">Error Code:</span>
+          <span class="session-value">ERR_INSUFFICIENT_PERMISSIONS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function requestAccess() {
+      event.preventDefault();
+
+      if (confirm('Would you like to submit an access request to your system administrator?\n\nThey will be notified via email and can review your request.')) {
+        // Simulate request submission
+        const btn = event.target;
+        btn.textContent = 'Submitting...';
+        btn.style.opacity = '0.6';
+
+        setTimeout(() => {
+          alert('✓ Access request submitted successfully!\n\nYour system administrator has been notified and will review your request. You will receive an email notification once your request has been processed.');
+
+          btn.textContent = 'Request Submitted ✓';
+          btn.style.background = '#10b981';
+          btn.style.borderColor = '#10b981';
+          btn.style.color = 'white';
+          btn.disabled = true;
+        }, 1500);
+      }
+    }
+
+    // Log unauthorized access attempt (for demo purposes)
+    console.log('Unauthorized access attempt logged:', {
+      user: 'John Smith',
+      role: 'Officer',
+      requiredRole: 'System Administrator',
+      timestamp: new Date().toISOString(),
+      path: window.location.pathname
+    });
+  </script>
+</body>
+</html>
