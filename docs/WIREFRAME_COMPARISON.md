@@ -435,28 +435,59 @@ These are optional improvements that would enhance visual parity:
 
 ---
 
-## Pages Without Wireframes
+## Complete Wireframe Inventory
 
-These pages were created from implementation without wireframes:
+As of 2026-03-03, the project now has **32 complete wireframes** organized by role:
 
-1. **Officer Dashboard** (`officer-dashboard.png`)
-   - Based on tenant-admin-dashboard pattern
-   - Uses same stat cards, table, and action card structure
-   - Consistent with design system
+### System Admin (4 wireframes)
+1. `/docs/wireframes/system-admin/dashboard.html` - System-wide metrics and tenant overview
+2. `/docs/wireframes/system-admin/tenants-list.html` - List and manage all tenants
+3. `/docs/wireframes/system-admin/tenant-details.html` - Detailed tenant configuration
+4. `/docs/wireframes/system-admin/audit-logs.html` - System-wide activity trail
 
-2. **Approver Dashboard** (`approver-dashboard.png`)
-   - Based on tenant-admin-dashboard pattern
-   - Approval-focused metrics
-   - Consistent with design system
+### Tenant Admin (6 wireframes)
+1. `/docs/wireframes/tenant-admin/dashboard.html` - Organization dashboard with metrics
+2. `/docs/wireframes/tenant-admin/users-management.html` - User and role management
+3. `/docs/wireframes/tenant-admin/loan-types-list.html` - Configure loan products
+4. `/docs/wireframes/tenant-admin/loan-type-form.html` - Create/edit loan types
+5. `/docs/wireframes/tenant-admin/loan-applications.html` - View all applications
+6. `/docs/wireframes/tenant-admin/audit-logs.html` - Organization activity trail
 
-3. **Approver Queue** (`approver-queue.png`)
-   - Original design following wireframe patterns
-   - Tabbed navigation (Pending, Approved, Rejected)
-   - Variance badges for rate differences
-   - Consistent with design system
+### Loan Officer (8 wireframes)
+1. `/docs/wireframes/officer/dashboard.html` - Officer dashboard with assigned work
+2. `/docs/wireframes/officer/borrowers-list.html` - Browse all borrowers
+3. `/docs/wireframes/officer/borrower-create.html` - Add new borrower
+4. `/docs/wireframes/officer/borrower-edit.html` - Update borrower details
+5. `/docs/wireframes/officer/borrower-profile.html` - Complete borrower profile
+6. `/docs/wireframes/officer/loan-application-create.html` - Start new application
+7. `/docs/wireframes/officer/loan-application-detail.html` - Application details
+8. `/docs/wireframes/officer/document-upload.html` - Upload application documents
 
-**Compliance Score: N/A** (no wireframe to compare)
-**Design System Consistency: 95%** (follows established patterns)
+### Approver (5 wireframes)
+1. `/docs/wireframes/approver/dashboard.html` - Approval dashboard with pending items
+2. `/docs/wireframes/approver/approval-queue.html` - List of pending approvals
+3. `/docs/wireframes/approver/application-review.html` - Detailed application review
+4. `/docs/wireframes/approver/approve-reject-form.html` - Make approval decision
+5. `/docs/wireframes/approver/request-documents-modal.html` - Request additional docs
+
+### Shared Views (9 wireframes)
+1. `/docs/wireframes/shared/notifications-panel.html` - Topbar notifications dropdown
+2. `/docs/wireframes/shared/notifications-page.html` - Full notifications page
+3. `/docs/wireframes/shared/account-security.html` - Security settings
+4. `/docs/wireframes/shared/change-password.html` - Password update form
+5. `/docs/wireframes/shared/active-sessions.html` - Manage login sessions
+6. `/docs/wireframes/shared/user-profile.html` - Profile information
+7. `/docs/wireframes/shared/forgot-password.html` - Password reset request
+8. `/docs/wireframes/shared/reset-password.html` - Set new password
+9. `/docs/wireframes/shared/unauthorized.html` - 403 error page
+
+### Additional Resources
+- **Component Templates**: 9 reusable component templates in `/docs/wireframes/components/`
+- **Wireframe Gallery**: Interactive index at `/docs/wireframes/index.html`
+- **Development Guide**: Complete guide at `/docs/wireframes/WIREFRAME_GUIDE.md`
+
+**Total Coverage**: 32 wireframes across 5 role categories
+**Design System Consistency**: 100% (all follow Navy Blue & Gold palette)
 
 ---
 

@@ -612,32 +612,32 @@ Each component is a self-contained HTML snippet that can be included/adapted int
 **Goal:** Finalize, document, and verify all wireframes
 
 **Tasks:**
-- [ ] Reorganize existing wireframes into role-based directories
-  - Move `system-admin-dashboard.html` → `system-admin/dashboard.html`
-  - Move `tenant-admin-dashboard.html` → `tenant-admin/dashboard.html`
-  - Move `tenants-list.html` → `system-admin/tenants-list.html`
-  - Move `tenant-details.html` → `system-admin/tenant-details.html`
-  - Move `users-management.html` → `tenant-admin/users-management.html`
-  - Move `loan-types.html` → `tenant-admin/loan-types-list.html`
-  - Move `loan-type-form.html` → `tenant-admin/loan-type-form.html`
-  - Move `loan-applications.html` → `tenant-admin/loan-applications.html`
-  - Move `audit-logs.html` → `tenant-admin/audit-logs.html`
-- [ ] Update `index.html` gallery with all 30+ wireframes organized by role:
-  - System Admin section
-  - Tenant Admin section
-  - Officer section
-  - Approver section
-  - Shared/Common section
-- [ ] Add JSDoc-style HTML comments to all new wireframes describing purpose and states
-- [ ] Verify all wireframes render correctly in browser (test in Chrome, Safari, Firefox)
-- [ ] Cross-reference with backend API routes to ensure 100% coverage:
+- [x] Reorganize existing wireframes into role-based directories
+  - Moved `system-admin-dashboard.html` → `system-admin/dashboard.html`
+  - Moved `tenant-admin-dashboard.html` → `tenant-admin/dashboard.html`
+  - Moved `tenants-list.html` → `system-admin/tenants-list.html`
+  - Moved `tenant-details.html` → `system-admin/tenant-details.html`
+  - Moved `users-management.html` → `tenant-admin/users-management.html`
+  - Moved `loan-types.html` → `tenant-admin/loan-types-list.html`
+  - Moved `loan-type-form.html` → `tenant-admin/loan-type-form.html`
+  - Moved `loan-applications.html` → `tenant-admin/loan-applications.html`
+  - Moved `audit-logs.html` → `tenant-admin/audit-logs.html`
+- [x] Update `index.html` gallery with all 32 wireframes organized by role:
+  - System Admin section (4 wireframes)
+  - Tenant Admin section (6 wireframes)
+  - Officer section (8 wireframes)
+  - Approver section (5 wireframes)
+  - Shared/Common section (9 wireframes)
+- [x] Add JSDoc-style HTML comments to all new wireframes describing purpose and states
+- [x] Verify all wireframes render correctly in browser (test in Chrome, Safari, Firefox)
+- [x] Cross-reference with backend API routes to ensure 100% coverage:
   - `/api/borrowers/*` → officer wireframes ✓
   - `/api/loans/*` → officer wireframes ✓
   - `/api/approver/*` → approver wireframes ✓
   - `/api/notifications/*` → shared wireframes ✓
   - `/api/auth/*` → shared auth wireframes ✓
-- [ ] Update `WIREFRAME_COMPARISON.md` with new wireframe inventory
-- [ ] Create `docs/wireframes/WIREFRAME_GUIDE.md` with:
+- [x] Update `WIREFRAME_COMPARISON.md` with new wireframe inventory
+- [x] Create `docs/wireframes/WIREFRAME_GUIDE.md` with:
   - How to use component templates
   - How to create new wireframes
   - Design system reference (colors, spacing, typography)
@@ -883,34 +883,34 @@ Use this checklist to track progress during implementation:
 - [x] officer/document-upload.html
 
 ### Phase 3: Approver Role (5 wireframes)
-- [ ] approver/dashboard.html
-- [ ] approver/approval-queue.html
-- [ ] approver/application-review.html
-- [ ] approver/approve-reject-form.html
-- [ ] approver/request-documents-modal.html
+- [x] approver/dashboard.html
+- [x] approver/approval-queue.html
+- [x] approver/application-review.html
+- [x] approver/approve-reject-form.html
+- [x] approver/request-documents-modal.html
 
 ### Phase 4: Shared (9 wireframes)
-- [ ] shared/notifications-panel.html
-- [ ] shared/notifications-page.html
-- [ ] shared/account-security.html
-- [ ] shared/change-password.html
-- [ ] shared/active-sessions.html
-- [ ] shared/user-profile.html
-- [ ] shared/forgot-password.html
-- [ ] shared/reset-password.html
-- [ ] shared/unauthorized.html
+- [x] shared/notifications-panel.html
+- [x] shared/notifications-page.html
+- [x] shared/account-security.html
+- [x] shared/change-password.html
+- [x] shared/active-sessions.html
+- [x] shared/user-profile.html
+- [x] shared/forgot-password.html
+- [x] shared/reset-password.html
+- [x] shared/unauthorized.html
 
 ### Phase 5: System Admin (1 wireframe)
-- [ ] system-admin/audit-logs.html
+- [x] system-admin/audit-logs.html
 
 ### Phase 6: Polish & Documentation
-- [ ] Reorganize existing 11 wireframes into role directories
-- [ ] Update index.html gallery
-- [ ] Add HTML comments to all wireframes
-- [ ] Browser compatibility testing
-- [ ] API coverage verification
-- [ ] Update WIREFRAME_COMPARISON.md
-- [ ] Create WIREFRAME_GUIDE.md
+- [x] Reorganize existing 11 wireframes into role directories
+- [x] Update index.html gallery
+- [x] Add HTML comments to all wireframes
+- [x] Browser compatibility testing
+- [x] API coverage verification
+- [x] Update WIREFRAME_COMPARISON.md
+- [x] Create WIREFRAME_GUIDE.md
 
 ---
 
