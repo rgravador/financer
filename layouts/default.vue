@@ -4,7 +4,9 @@
     <AppTopbar />
 
     <v-main class="app-main">
-      <slot />
+      <v-container>
+        <slot />
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -16,7 +18,7 @@
 
 <style scoped>
 .app-main {
-  padding: 32px;
+  /* padding: 32px; */
   min-height: 100vh;
   background-color: rgb(var(--v-theme-background));
 }
