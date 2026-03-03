@@ -167,8 +167,8 @@
 import { useSystemStore } from '~/stores/system'
 
 definePageMeta({
-  middleware: 'auth',
-  roles: ['system_admin'],
+  middleware: ['role'],
+  allowedRoles: ['system_admin'],
 })
 
 const systemStore = useSystemStore()
