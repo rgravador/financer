@@ -125,12 +125,13 @@ const handleLogout = async () => {
 .menu-item {
   margin: 4px 12px;
   border-radius: 8px;
-  color: rgb(var(--v-theme-primary));
+  background-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-secondary));
 }
 
 .menu-item:hover {
-  background-color: rgba(30, 58, 138, 0.08);
-  color: rgb(var(--v-theme-primary));
+  background-color: rgba(30, 58, 138, 0.9);
+  color: rgb(var(--v-theme-secondary));
 }
 
 .user-section {
