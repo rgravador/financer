@@ -1,10 +1,10 @@
 <template>
   <AppLayout>
-    <WfPageHeader
-      title="System Dashboard"
-      subtitle="Monitor system health and tenant activity"
-      :breadcrumbs="breadcrumbs"
-    />
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">System Admin Dashboard</h1>
+      <p class="page-subtitle">Complete oversight of all tenants and system activity</p>
+    </div>
 
     <!-- Loading State -->
     <div v-if="systemStore.loading" class="loading-container">
@@ -25,140 +25,118 @@
 
     <!-- Dashboard Content -->
     <div v-else-if="systemStore.stats" class="dashboard-content">
-      <!-- Stat Cards -->
-      <div class="stat-cards-grid">
-        <WfStatCard
-          :value="systemStore.stats.totalTenants"
-          label="Total Tenants"
-          :trend="`+${Math.round(systemStore.stats.totalTenants * 0.12)} this month`"
-          :trend-positive="true"
-        />
-        <WfStatCard
-          :value="systemStore.stats.totalUsers"
-          label="Total Users"
-          :trend="`+${Math.round(systemStore.stats.totalUsers * 0.08)} this month`"
-          :trend-positive="true"
-        />
-        <WfStatCard
-          :value="systemStore.stats.activeLoans"
-          label="Active Loans"
-          :trend="`${systemStore.stats.activeLoans > 50 ? '+' : ''}${Math.round(systemStore.stats.activeLoans * 0.05)} this week`"
-          :trend-positive="true"
-        />
-        <WfStatCard
-          :value="systemStore.stats.systemUptime"
-          label="System Uptime"
-        />
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{{ systemStore.stats.totalTenants }}</div>
+          <div class="stat-label">Total Tenants</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ formatNumber(systemStore.stats.totalUsers) }}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ systemStore.stats.activeLoans }}</div>
+          <div class="stat-label">Active Loans</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ systemStore.stats.systemUptime }}</div>
+          <div class="stat-label">System Uptime</div>
+        </div>
       </div>
 
-      <!-- Recent Tenants Table -->
-      <v-card elevation="0" class="recent-tenants-card">
-        <v-card-title class="card-title">Recent Tenants</v-card-title>
-        <v-card-text>
-          <v-table class="tenants-table">
-            <thead>
-              <tr>
-                <th>Tenant Name</th>
-                <th>Users</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="tenant in systemStore.stats.recentTenants" :key="tenant.id">
-                <td class="tenant-name">{{ tenant.name }}</td>
-                <td>{{ tenant.userCount }}</td>
-                <td>
-                  <WfStatusBadge :status="tenant.isActive ? 'active' : 'inactive'" />
-                </td>
-                <td>{{ formatDate(tenant.createdAt) }}</td>
-                <td>
-                  <v-btn
-                    icon="mdi-eye"
-                    variant="text"
-                    size="small"
-                    @click="viewTenant(tenant.id)"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
-        </v-card-text>
-      </v-card>
+      <!-- Recent Tenant Activity -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Recent Tenant Activity</div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>Status</th>
+              <th>Users</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="tenant in systemStore.stats.recentTenants" :key="tenant.id">
+              <td><strong>{{ tenant.name }}</strong></td>
+              <td>
+                <span
+                  class="status-badge"
+                  :class="tenant.isActive ? 'status-active' : 'status-pending'"
+                >
+                  {{ tenant.isActive ? 'Active' : 'Pending' }}
+                </span>
+              </td>
+              <td>{{ tenant.userCount }}</td>
+              <td>{{ formatDate(tenant.createdAt) }}</td>
+              <td>
+                <a href="#" class="action-btn" @click.prevent="viewTenant(tenant.id)">
+                  View →
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <!-- System Health -->
-      <v-card elevation="0" class="system-health-card">
-        <v-card-title class="card-title">System Health</v-card-title>
-        <v-card-text>
-          <div class="health-grid">
-            <div class="health-item">
-              <div class="health-label">Database</div>
-              <v-chip
-                :color="getHealthColor(systemStore.stats.systemHealth.database)"
-                size="small"
-                variant="flat"
-              >
-                {{ systemStore.stats.systemHealth.database }}
-              </v-chip>
-            </div>
-            <div class="health-item">
-              <div class="health-label">API</div>
-              <v-chip
-                :color="getHealthColor(systemStore.stats.systemHealth.api)"
-                size="small"
-                variant="flat"
-              >
-                {{ systemStore.stats.systemHealth.api }}
-              </v-chip>
-            </div>
-            <div class="health-item">
-              <div class="health-label">Storage</div>
-              <v-chip
-                :color="getHealthColor(systemStore.stats.systemHealth.storage)"
-                size="small"
-                variant="flat"
-              >
-                {{ systemStore.stats.systemHealth.storage }}
-              </v-chip>
-            </div>
+      <!-- System Info Grid -->
+      <div class="info-grid">
+        <!-- System Health -->
+        <div class="info-card">
+          <div class="info-title">System Health</div>
+          <div class="info-item">
+            <span class="info-label">
+              <span
+                class="health-indicator"
+                :class="getHealthClass(systemStore.stats.systemHealth.database)"
+              ></span>
+              Database
+            </span>
+            <span class="info-value">{{ formatHealthStatus(systemStore.stats.systemHealth.database) }}</span>
           </div>
+          <div class="info-item">
+            <span class="info-label">
+              <span
+                class="health-indicator"
+                :class="getHealthClass(systemStore.stats.systemHealth.api)"
+              ></span>
+              API
+            </span>
+            <span class="info-value">{{ formatHealthStatus(systemStore.stats.systemHealth.api) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">
+              <span
+                class="health-indicator"
+                :class="getHealthClass(systemStore.stats.systemHealth.storage)"
+              ></span>
+              Storage
+            </span>
+            <span class="info-value">{{ formatHealthStatus(systemStore.stats.systemHealth.storage) }}</span>
+          </div>
+        </div>
 
-          <div class="resource-usage">
-            <h4 class="usage-title">Resource Usage</h4>
-            <div class="usage-item">
-              <div class="usage-label">CPU</div>
-              <v-progress-linear
-                :model-value="systemStore.stats.resourceUsage.cpu"
-                color="navy"
-                height="8"
-                rounded
-              />
-              <div class="usage-value">{{ systemStore.stats.resourceUsage.cpu }}%</div>
-            </div>
-            <div class="usage-item">
-              <div class="usage-label">Memory</div>
-              <v-progress-linear
-                :model-value="systemStore.stats.resourceUsage.memory"
-                color="navy"
-                height="8"
-                rounded
-              />
-              <div class="usage-value">{{ systemStore.stats.resourceUsage.memory }}%</div>
-            </div>
-            <div class="usage-item">
-              <div class="usage-label">Disk</div>
-              <v-progress-linear
-                :model-value="systemStore.stats.resourceUsage.disk"
-                color="navy"
-                height="8"
-                rounded
-              />
-              <div class="usage-value">{{ systemStore.stats.resourceUsage.disk }}%</div>
-            </div>
+        <!-- Resource Usage -->
+        <div class="info-card">
+          <div class="info-title">Resource Usage</div>
+          <div class="info-item">
+            <span class="info-label">CPU</span>
+            <span class="info-value">{{ systemStore.stats.resourceUsage.cpu }}%</span>
           </div>
-        </v-card-text>
-      </v-card>
+          <div class="info-item">
+            <span class="info-label">Memory</span>
+            <span class="info-value">{{ systemStore.stats.resourceUsage.memory }}%</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Disk</span>
+            <span class="info-value">{{ systemStore.stats.resourceUsage.disk }}%</span>
+          </div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
@@ -174,11 +152,6 @@ definePageMeta({
 const systemStore = useSystemStore()
 const router = useRouter()
 
-const breadcrumbs = [
-  { title: 'System', disabled: true },
-  { title: 'Dashboard', disabled: true },
-]
-
 // Fetch stats on mount
 onMounted(async () => {
   try {
@@ -187,6 +160,17 @@ onMounted(async () => {
     console.error('Failed to fetch stats:', error)
   }
 })
+
+// Format large numbers (e.g., 1200000 -> 1.2M)
+const formatNumber = (num: number) => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M'
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K'
+  }
+  return num.toString()
+}
 
 // Format date helper
 const formatDate = (dateString: string) => {
@@ -198,14 +182,16 @@ const formatDate = (dateString: string) => {
   }).format(date)
 }
 
-// Get health status color
-const getHealthColor = (status: 'healthy' | 'degraded' | 'down') => {
-  const colors = {
-    healthy: 'success',
-    degraded: 'warning',
-    down: 'error',
-  }
-  return colors[status] || 'grey'
+// Format health status
+const formatHealthStatus = (status: string) => {
+  return status.charAt(0).toUpperCase() + status.slice(1)
+}
+
+// Get health indicator class
+const getHealthClass = (status: string) => {
+  if (status === 'healthy') return 'health-ok'
+  if (status === 'degraded') return 'health-warning'
+  return 'health-error'
 }
 
 // View tenant details
@@ -215,6 +201,23 @@ const viewTenant = (tenantId: string) => {
 </script>
 
 <style scoped>
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
@@ -228,87 +231,167 @@ const viewTenant = (tenantId: string) => {
   gap: 24px;
 }
 
-.stat-cards-grid {
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 8px;
 }
 
-.recent-tenants-card,
-.system-health-card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+.stat-card {
+  background: white;
+  padding: 24px;
   border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.card-title {
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.section-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.section-title {
   font-size: 18px;
   font-weight: 600;
-  color: rgb(var(--v-theme-navy));
-  padding: 24px;
+  color: #1e3a8a;
 }
 
-.tenants-table {
-  border: none;
+.table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.tenants-table th {
+.table th {
+  background: #f9fafb;
+  padding: 12px 24px;
+  text-align: left;
+  font-size: 13px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.87);
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.tenant-name {
-  font-weight: 500;
-  color: rgb(var(--v-theme-navy));
-}
-
-.health-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.health-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.health-label {
+.table td {
+  padding: 16px 24px;
+  border-top: 1px solid #f3f4f6;
   font-size: 14px;
+}
+
+.table tr:hover {
+  background: rgba(30, 58, 138, 0.04);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.action-btn {
+  color: #1e3a8a;
+  text-decoration: none;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
 }
 
-.resource-usage {
-  margin-top: 24px;
+.action-btn:hover {
+  text-decoration: underline;
 }
 
-.usage-title {
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.info-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.info-title {
   font-size: 16px;
   font-weight: 600;
-  color: rgb(var(--v-theme-navy));
+  color: #1e3a8a;
   margin-bottom: 16px;
 }
 
-.usage-item {
-  display: grid;
-  grid-template-columns: 80px 1fr 60px;
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  color: #6b7280;
+  font-size: 14px;
+  display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
 }
 
-.usage-label {
-  font-size: 14px;
+.info-value {
+  color: #1e293b;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
 }
 
-.usage-value {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgb(var(--v-theme-navy));
-  text-align: right;
+.health-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.health-ok {
+  background: #10b981;
+}
+
+.health-warning {
+  background: #f59e0b;
+}
+
+.health-error {
+  background: #ef4444;
 }
 </style>
