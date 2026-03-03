@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
 
   // Modules
-  modules: ['@pinia/nuxt', 'vuetify-nuxt-module'],
+  modules: ['@pinia/nuxt'],
 
   // Runtime config
   runtimeConfig: {
