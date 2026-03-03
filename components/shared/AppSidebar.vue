@@ -7,7 +7,7 @@
   >
     <!-- Logo Section -->
     <div class="sidebar-logo">
-      <v-icon size="32" color="primary">mdi-finance</v-icon>
+      <img src="/logo.png" alt="Ascendent Logo" class="logo-image" />
       <span class="logo-text">Ascendent</span>
     </div>
 
@@ -113,6 +113,12 @@ const handleLogout = async () => {
   align-items: center;
   gap: 12px;
   padding: 24px 20px;
+}
+
+.logo-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .logo-text {
