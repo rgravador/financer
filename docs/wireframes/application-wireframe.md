@@ -1,7 +1,7 @@
 # Ascendent Application Wireframe
 
 ## Color Scheme
-- **Primary**: Navy Blue (#1e3a8a)
+- **Primary**: Modern Blue (#2563EB)
 - **Secondary**: Amber Gold (#f59e0b)
 - **Accent**: Yellow Gold (#eab308)
 - **Background**: Light Gray (#F8FAFC)
@@ -96,7 +96,7 @@ Features:
 - Collapsible on desktop
 - Drawer on mobile
 - Role-based navigation items
-- Active state highlighting (Navy Blue bg)
+- Active state highlighting (Modern Blue bg)
 ```
 
 ---

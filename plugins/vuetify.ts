@@ -13,20 +13,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         light: {
           dark: false,
           colors: {
-            // Premium Navy Blue & Gold palette
-            primary: '#1e3a8a',      // Navy blue (trust, professionalism)
-            secondary: '#f59e0b',    // Amber gold (wealth, prosperity)
-            accent: '#eab308',       // Yellow gold (premium, success)
-
-            // Custom named colors for semantic use
-            navy: '#1e3a8a',         // Navy blue (same as primary)
-            gold: '#f59e0b',         // Gold (same as secondary)
+            // Modern Blue palette (matches VUETIFY_CUSTOMIZATION.md)
+            primary: '#2563EB',      // Modern blue (primary actions, links)
+            secondary: '#64748B',    // Slate gray (secondary actions)
+            accent: '#0EA5E9',       // Sky blue (highlights, interactive)
 
             // Semantic colors
             success: '#10B981',      // Emerald green
-            warning: '#F59E0B',      // Amber (matches gold theme)
+            warning: '#F59E0B',      // Amber
             error: '#EF4444',        // Red
-            info: '#1e3a8a',         // Navy blue (consistent with primary)
+            info: '#3B82F6',         // Blue
 
             // Surface colors
             background: '#F8FAFC',   // Very light gray

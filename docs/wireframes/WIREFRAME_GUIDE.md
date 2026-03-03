@@ -16,7 +16,7 @@ This guide explains how to create and maintain wireframes for the Ascendent loan
 
 ```css
 /* Primary Colors */
---primary: #1e3a8a;      /* Navy Blue - headers, buttons, active states */
+--primary: #2563EB;      /* Navy Blue - headers, buttons, active states */
 --secondary: #f59e0b;    /* Gold - accents, highlights, secondary actions */
 --accent: #eab308;       /* Light Gold - hover states, badges */
 
@@ -39,7 +39,7 @@ This guide explains how to create and maintain wireframes for the Ascendent loan
 
 ```css
 /* Headings */
-h1: 32px, font-weight: 700, color: #1e3a8a
+h1: 32px, font-weight: 700, color: #2563EB
 h2: 24px, font-weight: 600, color: #1E293B
 h3: 20px, font-weight: 600, color: #1E293B
 h4: 18px, font-weight: 600, color: #1E293B
@@ -290,7 +290,7 @@ shared/notifications-panel.html
   width: 40px;
   height: 40px;
   border: 4px solid #E5E7EB;
-  border-top-color: #1e3a8a;
+  border-top-color: #2563EB;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -336,7 +336,7 @@ shared/notifications-panel.html
 ```css
 /* Default */
 .btn-primary {
-  background: #1e3a8a;
+  background: #2563EB;
   color: white;
 }
 
@@ -347,7 +347,7 @@ shared/notifications-panel.html
 
 /* Active/Pressed */
 .btn-primary:active {
-  background: #1e3a8a;
+  background: #2563EB;
   transform: scale(0.98);
 }
 
@@ -386,7 +386,7 @@ shared/notifications-panel.html
 
 /* Focus */
 .form-input:focus {
-  border-color: #1e3a8a;
+  border-color: #2563EB;
   outline: none;
   box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
 }

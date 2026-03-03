@@ -31,7 +31,7 @@ All components use the design system defined in `../common-styles.css`:
 
 ```css
 /* Colors */
---primary-navy: #1e3a8a;
+--primary-navy: #2563EB;
 --secondary-gold: #f59e0b;
 --success-green: #10b981;
 --error-red: #ef4444;
