@@ -7,7 +7,7 @@
   >
     <!-- Logo Section -->
     <div class="sidebar-logo">
-      <v-icon size="32" color="gold">mdi-finance</v-icon>
+      <v-icon size="32" color="primary">mdi-finance</v-icon>
       <span class="logo-text">Ascendent</span>
     </div>
 
@@ -21,7 +21,7 @@
           :prepend-icon="item.icon"
           :title="item.title"
           class="menu-item"
-          color="gold"
+          color="primary"
         />
       </template>
     </v-list>
@@ -34,7 +34,7 @@
 
       <div class="user-section">
         <div class="user-info">
-          <v-icon size="24" color="gold">mdi-account-circle</v-icon>
+          <v-icon size="24">mdi-account-circle</v-icon>
           <div class="user-details">
             <div class="user-name">{{ authStore.user?.name || 'User' }}</div>
             <div class="user-role">{{ roleLabel }}</div>
@@ -105,8 +105,8 @@ const handleLogout = async () => {
 
 <style scoped>
 .app-sidebar {
-  background-color: rgb(var(--v-theme-navy)) !important;
-  color: white;
+  background-color: white !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-logo {
@@ -119,18 +119,18 @@ const handleLogout = async () => {
 .logo-text {
   font-size: 20px;
   font-weight: 600;
-  color: rgb(var(--v-theme-gold));
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .menu-item {
   margin: 4px 12px;
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  background-color: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .user-section {
@@ -157,7 +157,7 @@ const handleLogout = async () => {
 .user-name {
   font-size: 14px;
   font-weight: 500;
-  color: white;
+  color: rgba(0, 0, 0, 0.87);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -165,18 +165,18 @@ const handleLogout = async () => {
 
 .user-role {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .logout-btn {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .logout-btn:hover {
-  color: white;
-  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 </style>
