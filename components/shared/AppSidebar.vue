@@ -21,7 +21,6 @@
           :prepend-icon="item.icon"
           :title="item.title"
           class="menu-item"
-          color="primary"
         />
       </template>
     </v-list>
@@ -125,12 +124,18 @@ const handleLogout = async () => {
 .menu-item {
   margin: 4px 12px;
   border-radius: 8px;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.menu-item:hover {
   background-color: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-secondary));
 }
 
-.menu-item:hover {
-  background-color: rgba(30, 58, 138, 0.9);
+/* Active state - when route is active */
+.menu-item.v-list-item--active {
+  background-color: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-secondary));
 }
 
