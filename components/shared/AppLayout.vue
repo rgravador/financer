@@ -10,6 +10,9 @@
 </template>
 
 <script setup lang="ts">
+import AppSidebar from '~/components/shared/AppSidebar.vue'
+import AppTopbar from '~/components/shared/AppTopbar.vue'
+
 // Layout wrapper component that provides the app structure
 // Uses Vuetify's v-app, v-main with sidebar and topbar
 </script>

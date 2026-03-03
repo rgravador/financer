@@ -143,6 +143,7 @@
 
 <script setup lang="ts">
 import { useSystemStore } from '~/stores/system'
+import AppLayout from '~/components/shared/AppLayout.vue'
 
 definePageMeta({
   middleware: ['role'],
