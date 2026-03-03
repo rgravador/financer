@@ -14,6 +14,14 @@ export default defineNuxtConfig({
   // Modules
   modules: ['@pinia/nuxt'],
 
+  // Auto-import components
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    }
+  ],
+
   // Runtime config
   runtimeConfig: {
     // Server-only keys
