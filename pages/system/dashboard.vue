@@ -1,10 +1,9 @@
 <template>
-  <AppLayout>
-    <!-- Page Header -->
-    <div class="page-header">
-      <h1 class="page-title">System Admin Dashboard</h1>
-      <p class="page-subtitle">Complete oversight of all tenants and system activity</p>
-    </div>
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">System Admin Dashboard</h1>
+    <p class="page-subtitle">Complete oversight of all tenants and system activity</p>
+  </div>
 
     <!-- Loading State -->
     <div v-if="systemStore.loading" class="loading-container">
@@ -138,12 +137,10 @@
         </div>
       </div>
     </div>
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { useSystemStore } from '~/stores/system'
-import AppLayout from '~/components/shared/AppLayout.vue'
 
 definePageMeta({
   middleware: ['role'],
