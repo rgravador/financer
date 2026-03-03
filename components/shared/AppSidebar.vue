@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    app
     permanent
     :width="260"
     class="app-sidebar"

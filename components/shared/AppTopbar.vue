@@ -1,5 +1,6 @@
 <template>
   <v-app-bar
+    app
     :height="64"
     elevation="0"
     class="app-topbar"

@@ -18,6 +18,10 @@ export default defineNuxtPlugin((nuxtApp) => {
             secondary: '#f59e0b',    // Amber gold (wealth, prosperity)
             accent: '#eab308',       // Yellow gold (premium, success)
 
+            // Custom named colors for semantic use
+            navy: '#1e3a8a',         // Navy blue (same as primary)
+            gold: '#f59e0b',         // Gold (same as secondary)
+
             // Semantic colors
             success: '#10B981',      // Emerald green
             warning: '#F59E0B',      // Amber (matches gold theme)
