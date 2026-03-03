@@ -1,8 +1,58 @@
 # Ascendent - Implementation Status
 
-**Last Updated:** March 2, 2026
+**Last Updated:** March 3, 2026
 
 ## ✅ Completed Steps
+
+### Step 11b: System Admin UI (Dashboard)
+
+**Status:** ✅ Complete (March 3, 2026)
+
+**What was implemented:**
+
+1. **Shared Layout Components**
+   - `components/shared/AppLayout.vue` - Main app layout wrapper with sidebar and topbar
+   - `components/shared/AppSidebar.vue` - 260px fixed navigation drawer with role-based menu filtering
+   - `components/shared/AppTopbar.vue` - 64px app bar with search, notifications, and user menu
+
+2. **Wireframe Components**
+   - `components/wireframe/WfStatCard.vue` - Dashboard statistics card with value, label, and trend
+   - `components/wireframe/WfStatusBadge.vue` - Status indicator chip with color coding
+   - `components/wireframe/WfPageHeader.vue` - Page header with title, subtitle, and breadcrumbs
+
+3. **System Dashboard Page**
+   - `pages/system/dashboard.vue` - Complete system admin dashboard
+   - 4 stat cards showing total tenants, users, loans, and uptime
+   - Recent tenants table with name, user count, status, and created date
+   - System health indicators (database, API, storage)
+   - Resource usage bars (CPU, memory, disk)
+
+4. **State Management**
+   - Updated `stores/system.ts` with `fetchStats()` action
+   - Added SystemStats interface for type safety
+   - Integrated with existing authenticatedFetch pattern
+
+5. **API Integration**
+   - Verified `server/api/system/stats.get.ts` response format
+   - Updated health status values to match interface ('healthy' | 'degraded' | 'down')
+   - Proper role-based access control (system_admin only)
+
+6. **Bug Fixes**
+   - Fixed missing logo.png in `layouts/auth.vue` by replacing with Vuetify icon
+
+**Components Built:**
+- AppLayout, AppSidebar, AppTopbar (shared layout)
+- WfStatCard, WfStatusBadge, WfPageHeader (wireframe components)
+
+**Pages Built:**
+- `/system/dashboard` - System admin dashboard with stats and recent tenants
+
+**Next Steps:**
+- Build `/system/tenants` (tenants list page)
+- Build `/system/tenants/:id` (tenant details page)
+- Build `/system/audit-logs` (audit logs page)
+
+---
 
 ### Step 11: Vuetify Component Library Integration
 

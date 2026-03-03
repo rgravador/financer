@@ -6,14 +6,10 @@
           <v-col cols="12" sm="8" md="6" lg="4" xl="3">
             <!-- Logo -->
             <div class="text-center mb-8">
-              <v-img
-                src="/logo.png"
-                alt="Ascendent"
-                max-height="60"
-                max-width="200"
-                contain
-                class="mx-auto"
-              />
+              <div class="logo-container">
+                <v-icon size="48" color="white">mdi-finance</v-icon>
+                <h1 class="logo-text">Ascendent</h1>
+              </div>
             </div>
 
             <!-- Auth Card -->
@@ -38,5 +34,19 @@
 .fill-height {
   min-height: 100vh;
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-text {
+  font-size: 32px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
 }
 </style>

@@ -13,9 +13,34 @@ export interface Tenant {
   updatedAt?: Date
 }
 
+export interface SystemStats {
+  totalTenants: number
+  totalUsers: number
+  activeLoans: number
+  systemUptime: string
+  recentTenants: Array<{
+    id: string
+    name: string
+    userCount: number
+    isActive: boolean
+    createdAt: string
+  }>
+  systemHealth: {
+    database: 'healthy' | 'degraded' | 'down'
+    api: 'healthy' | 'degraded' | 'down'
+    storage: 'healthy' | 'degraded' | 'down'
+  }
+  resourceUsage: {
+    cpu: number
+    memory: number
+    disk: number
+  }
+}
+
 interface SystemState {
   tenants: Tenant[]
   selectedTenant: Tenant | null
+  stats: SystemStats | null
   loading: boolean
   error: string | null
 }
@@ -24,6 +49,7 @@ export const useSystemStore = defineStore('system', {
   state: (): SystemState => ({
     tenants: [],
     selectedTenant: null,
+    stats: null,
     loading: false,
     error: null,
   }),
@@ -36,6 +62,27 @@ export const useSystemStore = defineStore('system', {
   },
 
   actions: {
+    /**
+     * Fetch system statistics
+     */
+    async fetchStats() {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { authenticatedFetch } = useAuth()
+        const stats = await authenticatedFetch<SystemStats>('/api/system/stats')
+
+        this.stats = stats
+        return stats
+      } catch (error: any) {
+        this.error = error.data?.statusMessage || 'Failed to fetch system stats'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
     /**
      * Fetch all tenants
      */

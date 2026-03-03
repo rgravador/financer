@@ -46,9 +46,9 @@ export default defineEventHandler(async (event) => {
 
   // System health (mock - would connect to actual health checks)
   const systemHealth = {
-    database: 'OK' as const,
-    api: 'OK' as const,
-    storage: 'OK' as const,
+    database: 'healthy' as const,
+    api: 'healthy' as const,
+    storage: 'healthy' as const,
   }
 
   // Resource usage (mock - would connect to actual system metrics)
