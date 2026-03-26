@@ -2,53 +2,36 @@
   <v-navigation-drawer
     app
     permanent
-    :width="260"
+    :width="280"
     class="app-sidebar"
   >
     <!-- Logo Section -->
-    <div class="sidebar-logo">
-      <img src="/logo.png" alt="Ascendent Logo" class="logo-image" />
-      <span class="logo-text">Ascendent</span>
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <img src="/logo-transparent.png" alt="Ascendent Logo" class="logo-image" />
+      </div>
     </div>
 
-    <v-divider class="my-4" />
-
     <!-- Navigation Menu -->
-    <v-list nav density="compact">
-      <template v-for="item in filteredMenuItems" :key="item.to">
-        <v-list-item
+    <div class="nav-section">
+      <p class="nav-label">Main Menu</p>
+      <nav class="nav-menu">
+        <NuxtLink
+          v-for="item in filteredMenuItems"
+          :key="item.to"
           :to="item.to"
-          :prepend-icon="item.icon"
-          :title="item.title"
-          class="menu-item"
-        />
-      </template>
-    </v-list>
-
-    <v-spacer />
-
-    <!-- User Info & Logout -->
-    <template v-slot:append>
-      <v-divider class="mb-4" />
-
-      <div class="user-section">
-        <div class="user-info">
-          <v-icon size="24">mdi-account-circle</v-icon>
-          <div class="user-details">
-            <div class="user-name">{{ authStore.user?.name || 'User' }}</div>
-            <div class="user-role">{{ roleLabel }}</div>
+          class="nav-item"
+          :class="{ active: isActiveRoute(item.to) }"
+        >
+          <div class="nav-item-icon">
+            <v-icon size="20">{{ item.icon }}</v-icon>
           </div>
-        </div>
+          <span class="nav-item-text">{{ item.title }}</span>
+          <div v-if="item.badge" class="nav-item-badge">{{ item.badge }}</div>
+        </NuxtLink>
+      </nav>
+    </div>
 
-        <v-btn
-          icon="mdi-logout"
-          variant="text"
-          size="small"
-          @click="handleLogout"
-          class="logout-btn"
-        />
-      </div>
-    </template>
   </v-navigation-drawer>
 </template>
 
@@ -60,16 +43,17 @@ interface MenuItem {
   icon: string
   to: string
   roles: string[]
+  badge?: string | number
 }
 
 const authStore = useAuthStore()
-const router = useRouter()
+const route = useRoute()
 
 // Define menu items with role-based access
 const menuItems: MenuItem[] = [
-  { title: 'Dashboard', icon: 'mdi-view-dashboard', to: '/system/dashboard', roles: ['system_admin'] },
-  { title: 'Tenants', icon: 'mdi-office-building', to: '/system/tenants', roles: ['system_admin'] },
-  { title: 'Audit Logs', icon: 'mdi-file-document-outline', to: '/system/audit-logs', roles: ['system_admin'] },
+  { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/system/dashboard', roles: ['system_admin'] },
+  { title: 'Tenants', icon: 'mdi-office-building-outline', to: '/system/tenants', roles: ['system_admin'] },
+  { title: 'Audit Logs', icon: 'mdi-shield-check-outline', to: '/system/audit-logs', roles: ['system_admin'] },
 ]
 
 // Filter menu items based on user role
@@ -80,115 +64,144 @@ const filteredMenuItems = computed(() => {
   return menuItems.filter(item => item.roles.includes(userRole))
 })
 
-// Get readable role label
-const roleLabel = computed(() => {
-  const role = authStore.userRole
-  if (!role) return ''
-
-  return role
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-})
-
-// Handle logout
-const handleLogout = async () => {
-  try {
-    await authStore.logout()
-    router.push('/login')
-  } catch (error) {
-    console.error('Logout error:', error)
-  }
+// Check if route is active
+const isActiveRoute = (path: string) => {
+  return route.path === path || route.path.startsWith(path + '/')
 }
 </script>
 
 <style scoped>
 .app-sidebar {
-  background-color: white !important;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--bg-sidebar-gradient) !important;
+  border-right: 1px solid var(--sidebar-border) !important;
+  box-shadow: var(--sidebar-shadow);
+  transition: all var(--transition-base);
 }
 
-.sidebar-logo {
+/* Header / Logo */
+.sidebar-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.logo-container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 24px 20px;
+  justify-content: center;
 }
 
 .logo-image {
-  width: 32px;
-  height: 32px;
+  width: 140px;
+  height: auto;
   object-fit: contain;
 }
 
-.logo-text {
-  font-size: 20px;
+/* Navigation Section */
+.nav-section {
+  padding: 20px 16px;
+}
+
+.nav-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.87);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 12px 8px;
 }
 
-.menu-item {
-  margin: 4px 12px;
-  border-radius: 8px;
-  background-color: transparent;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.menu-item:hover {
-  background-color: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-secondary));
-}
-
-/* Active state - when route is active */
-.menu-item.v-list-item--active {
-  background-color: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-secondary));
-}
-
-.user-section {
-  padding: 16px;
+.nav-menu {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.user-info {
+.nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
-  min-width: 0;
+  padding: 12px 14px;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  position: relative;
 }
 
-.user-details {
-  flex: 1;
-  min-width: 0;
+.nav-item-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-sidebar-hover);
+  color: var(--sidebar-text);
+  transition: all var(--transition-base);
 }
 
-.user-name {
+.nav-item-text {
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.87);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--sidebar-text);
+  flex: 1;
+  transition: color var(--transition-base);
 }
 
-.user-role {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.nav-item-badge {
+  padding: 2px 8px;
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
 }
 
-.logout-btn {
-  color: rgba(0, 0, 0, 0.6);
+/* Hover State */
+.nav-item:hover {
+  background: var(--bg-sidebar-hover);
 }
 
-.logout-btn:hover {
-  color: rgba(0, 0, 0, 0.87);
-  background-color: rgba(0, 0, 0, 0.04);
+.nav-item:hover .nav-item-icon {
+  background: var(--bg-sidebar-active);
+  color: var(--sidebar-text-hover);
+}
+
+.nav-item:hover .nav-item-text {
+  color: var(--sidebar-text-hover);
+}
+
+/* Active State */
+.nav-item.active {
+  background: var(--bg-sidebar-active);
+}
+
+.nav-item.active .nav-item-icon {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+}
+
+.nav-item.active .nav-item-text {
+  color: var(--sidebar-text-active);
+  font-weight: 600;
+}
+
+.nav-item.active .nav-item-badge {
+  background: var(--accent-primary);
+}
+
+/* Active indicator */
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: var(--accent-primary);
+  border-radius: 0 4px 4px 0;
 }
 </style>

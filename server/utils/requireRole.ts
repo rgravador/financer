@@ -21,6 +21,7 @@ export function requireRole(event: H3Event, allowedRoles: string | string[]) {
 
   // Check if user is authenticated
   if (!user) {
+    console.error('❌ requireRole: No user in context')
     throw createError({
       statusCode: 401,
       statusMessage: 'Unauthorized - Authentication required',
@@ -32,11 +33,14 @@ export function requireRole(event: H3Event, allowedRoles: string | string[]) {
 
   // Check if user has one of the required roles
   if (!user.role || !roles.includes(user.role)) {
+    console.error(`❌ requireRole: User role '${user.role}' not in allowed roles:`, roles)
     throw createError({
       statusCode: 403,
-      statusMessage: 'Forbidden - Insufficient permissions',
+      statusMessage: `Forbidden - Insufficient permissions. Required role: ${roles.join(' or ')}, your role: ${user.role || 'none'}`,
     })
   }
+
+  console.log(`✅ requireRole: User ${user.email} with role '${user.role}' authorized`)
 
   // Return user for convenience
   return user

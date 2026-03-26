@@ -1,81 +1,82 @@
 <template>
   <v-app-bar
     app
-    :height="64"
+    :height="72"
     elevation="0"
     class="app-topbar"
   >
     <!-- Search Box -->
-    <v-text-field
-      v-model="searchQuery"
-      prepend-inner-icon="mdi-magnify"
-      placeholder="Search..."
-      variant="outlined"
-      density="compact"
-      hide-details
-      class="search-field"
-      clearable
-    />
+    <div class="search-container">
+      <v-icon size="18" class="search-icon">mdi-magnify</v-icon>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="search-input"
+        placeholder="Search anything..."
+      />
+      <kbd class="search-shortcut">⌘K</kbd>
+    </div>
 
     <v-spacer />
 
-    <!-- Notifications -->
-    <v-btn
-      icon="mdi-bell-outline"
-      variant="text"
-      class="topbar-btn"
-    >
-      <v-badge
-        v-if="notificationCount > 0"
-        :content="notificationCount"
-        color="error"
-        offset-x="-4"
-        offset-y="-4"
-      >
-        <v-icon>mdi-bell-outline</v-icon>
-      </v-badge>
-      <v-icon v-else>mdi-bell-outline</v-icon>
-    </v-btn>
+    <div class="topbar-right">
+      <!-- Notifications -->
+      <button class="topbar-btn notification-btn">
+        <v-icon size="20">mdi-bell-outline</v-icon>
+        <span v-if="notificationCount > 0" class="notification-badge">{{ notificationCount }}</span>
+      </button>
 
-    <!-- User Menu -->
-    <v-menu offset-y>
-      <template v-slot:activator="{ props }">
-        <v-btn
-          v-bind="props"
-          variant="text"
-          class="user-menu-btn"
-        >
-          <v-icon>mdi-account-circle</v-icon>
-          <span class="user-name">{{ authStore.user?.name || 'User' }}</span>
-          <v-icon>mdi-chevron-down</v-icon>
-        </v-btn>
-      </template>
+      <!-- Divider -->
+      <div class="topbar-divider"></div>
 
-      <v-list density="compact">
-        <v-list-item @click="handleProfile">
-          <template v-slot:prepend>
-            <v-icon>mdi-account</v-icon>
-          </template>
-          <v-list-item-title>Profile</v-list-item-title>
-        </v-list-item>
+      <!-- User Menu -->
+      <v-menu offset-y :close-on-content-click="true">
+        <template v-slot:activator="{ props }">
+          <button v-bind="props" class="user-menu-btn">
+            <div class="user-avatar-small">
+              <img :src="avatarImage" :alt="userName" class="avatar-img" />
+            </div>
+            <v-icon size="16" class="dropdown-icon">mdi-chevron-down</v-icon>
+          </button>
+        </template>
 
-        <v-list-item @click="handleSettings">
-          <template v-slot:prepend>
-            <v-icon>mdi-cog</v-icon>
-          </template>
-          <v-list-item-title>Settings</v-list-item-title>
-        </v-list-item>
+        <div class="user-dropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">
+              <img :src="avatarImage" :alt="userName" class="avatar-img" />
+            </div>
+            <div class="dropdown-info">
+              <p class="dropdown-name">{{ userName }}</p>
+              <p class="dropdown-email">{{ authStore.user?.email || '' }}</p>
+            </div>
+          </div>
 
-        <v-divider class="my-1" />
+          <div class="dropdown-divider"></div>
 
-        <v-list-item @click="handleLogout">
-          <template v-slot:prepend>
-            <v-icon>mdi-logout</v-icon>
-          </template>
-          <v-list-item-title>Logout</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+          <button class="dropdown-item" @click="handleProfile">
+            <v-icon size="18">mdi-account-outline</v-icon>
+            <span>My Profile</span>
+          </button>
+
+          <button class="dropdown-item" @click="handleSettings">
+            <v-icon size="18">mdi-cog-outline</v-icon>
+            <span>Settings</span>
+          </button>
+
+          <button class="dropdown-item" @click="toggleTheme">
+            <v-icon size="18">{{ isDarkMode ? 'mdi-white-balance-sunny' : 'mdi-moon-waning-crescent' }}</v-icon>
+            <span>{{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}</span>
+          </button>
+
+          <div class="dropdown-divider"></div>
+
+          <button class="dropdown-item logout-item" @click="handleLogout">
+            <v-icon size="18">mdi-logout</v-icon>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </v-menu>
+    </div>
   </v-app-bar>
 </template>
 
@@ -84,12 +85,34 @@ import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const colorMode = useColorMode()
+
+// Theme
+const isDarkMode = computed(() => colorMode.value === 'dark')
+const toggleTheme = () => {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 
 // Search query
 const searchQuery = ref('')
 
 // Mock notification count (would come from a notifications store)
 const notificationCount = ref(3)
+
+// Get avatar image based on gender (default to male if not provided)
+const avatarImage = computed(() => {
+  const gender = authStore.user?.gender || 'male'
+  return gender === 'female' ? '/female-icon.jpg' : '/male-icon.jpg'
+})
+
+// Get user's full name
+const userName = computed(() => {
+  const user = authStore.user
+  if (!user) return 'User'
+  if (user.fullName) return user.fullName
+  if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`
+  return user.firstName || user.lastName || user.email || 'User'
+})
 
 // Handle profile navigation
 const handleProfile = () => {
@@ -121,32 +144,250 @@ watch(searchQuery, (newValue) => {
 
 <style scoped>
 .app-topbar {
-  background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 0 32px;
+  background-color: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 0 32px !important;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 
-.search-field {
-  max-width: 400px;
+/* Search */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  min-width: 320px;
+  transition: all var(--transition-base);
+}
+
+.search-container:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgb(245 158 11 / 0.15);
+}
+
+.search-icon {
+  color: var(--text-muted);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-shortcut {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* Right Section */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .topbar-btn {
-  color: rgba(0, 0, 0, 0.6);
-  margin-left: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
 }
 
 .topbar-btn:hover {
-  color: rgba(0, 0, 0, 0.87);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
-.user-menu-btn {
-  margin-left: 8px;
-  text-transform: none;
-  color: rgba(0, 0, 0, 0.87);
+.notification-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 18px;
+  height: 18px;
+  background: var(--color-error);
+  color: white;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
 }
 
-.user-name {
+.topbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
   margin: 0 8px;
+}
+
+/* User Menu Button */
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.user-menu-btn:hover {
+  background: var(--bg-hover);
+}
+
+.user-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-avatar-small .avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dropdown-icon {
+  color: var(--text-muted);
+}
+
+/* User Dropdown */
+.user-dropdown {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  min-width: 240px;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+
+.dropdown-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dropdown-avatar .avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dropdown-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-name {
+  font-family: var(--font-sans);
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dropdown-email {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-hover);
+}
+
+.dropdown-item.logout-item {
+  color: var(--color-error);
+}
+
+.dropdown-item.logout-item:hover {
+  background: rgb(239 68 68 / 0.1);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .search-container {
+    min-width: 200px;
+  }
+
+  .search-shortcut {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .search-container {
+    display: none;
+  }
 }
 </style>

@@ -209,13 +209,23 @@ requireTenantAccess(event)
 - `index.scss` - Main theme entry
 
 **Design System:**
-- **Primary:** `#2563EB` (modern blue)
+- **Primary:** `#1e3a8a` (Navy Blue) - Trust, professionalism
+- **Secondary:** `#f59e0b` (Amber Gold) - Wealth, prosperity
 - **Success:** `#10B981` (emerald)
 - **Warning:** `#F59E0B` (amber)
 - **Error:** `#EF4444` (red)
-- **Typography:** Inter font family (not Roboto)
 - **Buttons:** No uppercase, 12px border radius, flat by default
 - **Cards:** Elevation 1 (subtle shadows), 12px border radius
+
+**Typography (Local Fonts):**
+- **Sora** (variable weight) - Headlines, navigation, buttons, UI elements
+  - Modern geometric sans-serif with tech-forward aesthetic
+  - Use for: h1-h6, card titles, buttons, navigation, chips, toolbar
+- **Plus Jakarta Sans** (400, 500, 600, 700) - Body text, forms, data
+  - Humanist sans-serif with excellent readability
+  - Use for: paragraphs, form inputs, labels, data tables, descriptions
+- Font files located in `styles/fonts/`
+- Utility classes: `.font-heading`, `.font-ui`, `.font-body`, `.font-data`
 
 **IMPORTANT:** Ascendent theme is heavily customized AWAY from Material Design defaults. See `docs/VUETIFY_CUSTOMIZATION.md` for detailed guidelines.
 
@@ -333,6 +343,7 @@ SMTP_PASSWORD=...
 4. **Run seeder after model changes:** `npm run seed` to populate test data
 5. **Test with different roles:** Use seeded accounts to verify role-based access
 6. **Check both light/dark themes:** Vuetify theme supports both modes
+7. **Use Frontend Design Skill:** Always use `/frontend-design` skill when generating UI designs for consistent, user-friendly interfaces (`.claude/skills/frontend-design/SKILL.md`)
 
 ## Key Design Decisions
 

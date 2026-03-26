@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose'
 import type { Types } from 'mongoose'
 
 export type UserRole = 'system_admin' | 'tenant_admin' | 'tenant_officer' | 'tenant_approver'
+export type Gender = 'male' | 'female'
 
 export interface IUser extends Document {
   tenantId: Types.ObjectId | null
@@ -10,6 +11,7 @@ export interface IUser extends Document {
   passwordHash: string
   firstName: string
   lastName: string
+  gender?: Gender
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -61,6 +63,14 @@ const UserSchema = new Schema<IUser>({
     type: String,
     required: [true, 'Last name is required'],
     trim: true,
+  },
+  gender: {
+    type: String,
+    enum: {
+      values: ['male', 'female'],
+      message: '{VALUE} is not a valid gender',
+    },
+    default: 'male',
   },
   isActive: {
     type: Boolean,

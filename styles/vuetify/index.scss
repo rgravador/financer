@@ -3,27 +3,491 @@
 @use './components';
 
 /**
- * ASCENDENT THEME - Navy Blue & Gold/Yellow (The "Premium" Blend)
+ * ASCENDENT THEME - Slate with Warm Amber Accents
  *
- * This color palette reinforces trust (navy blue) and wealth/prosperity (gold).
- * Perfect for a financial application focused on loan management.
+ * A professional, industrial palette with warm gold accents.
+ * The slate foundation conveys trust and professionalism,
+ * while amber/gold adds warmth and prosperity associations.
  *
  * Light Mode:
- *   - Primary: #1e3a8a (Navy Blue) - Trust, professionalism
- *   - Secondary: #f59e0b (Amber Gold) - Wealth, prosperity
- *   - Accent: #eab308 (Yellow Gold) - Premium, success
+ *   - Backgrounds: White to Slate-50
+ *   - Text: Slate-900 (primary) to Slate-500 (muted)
+ *   - Accent: Amber-500 (warm gold)
  *
  * Dark Mode:
- *   - Primary: #3b82f6 (Bright Blue) - Enhanced visibility
- *   - Secondary: #fbbf24 (Bright Gold) - Wealth, prosperity
- *   - Accent: #f59e0b (Amber Gold) - Premium accent
+ *   - Backgrounds: Slate-950 to Slate-900
+ *   - Text: White to Slate-400
+ *   - Accent: Amber-400 (brighter gold)
  */
 
-// Global Ascendent styles
-body {
-  font-family: $body-font-family;
+// =============================================================================
+// CSS CUSTOM PROPERTIES - LIGHT MODE (Default)
+// =============================================================================
+
+:root {
+  // Core palette - Slate with warm amber accents
+  --color-slate-950: #0f172a;
+  --color-slate-900: #1e293b;
+  --color-slate-800: #334155;
+  --color-slate-700: #475569;
+  --color-slate-600: #64748b;
+  --color-slate-500: #94a3b8;
+  --color-slate-400: #cbd5e1;
+  --color-slate-300: #e2e8f0;
+  --color-slate-200: #f1f5f9;
+  --color-slate-100: #f8fafc;
+  --color-slate-50: #fafbfc;
+
+  // Warm accent - Amber/Gold (industrial warmth)
+  --color-amber-600: #d97706;
+  --color-amber-500: #f59e0b;
+  --color-amber-400: #fbbf24;
+  --color-amber-300: #fcd34d;
+
+  // Status colors
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  // Semantic tokens - Backgrounds
+  --bg-primary: var(--color-slate-50);
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-sidebar-gradient: linear-gradient(180deg, #ffffff 0%, var(--color-slate-50) 100%);
+  --bg-sidebar-hover: var(--color-slate-100);
+  --bg-sidebar-active: var(--color-slate-200);
+  --bg-input: #ffffff;
+  --bg-hover: var(--color-slate-100);
+
+  // Sidebar specific
+  --sidebar-text: var(--color-slate-600);
+  --sidebar-text-hover: var(--color-slate-900);
+  --sidebar-text-active: var(--color-slate-900);
+  --sidebar-border: var(--color-slate-200);
+  --sidebar-shadow: 4px 0 24px rgb(0 0 0 / 0.05);
+
+  // Text colors
+  --text-primary: var(--color-slate-900);
+  --text-secondary: var(--color-slate-600);
+  --text-muted: var(--color-slate-500);
+  --text-inverse: #ffffff;
+  --text-link: var(--color-info);
+
+  // Accent colors
+  --accent-primary: var(--color-amber-500);
+  --accent-hover: var(--color-amber-400);
+  --accent-active: var(--color-amber-600);
+
+  // Border colors
+  --border-color: var(--color-slate-200);
+  --border-color-light: var(--color-slate-100);
+  --border-color-focus: var(--color-amber-500);
+
+  // Border radius
+  --border-radius-sm: 8px;
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+  --border-radius-full: 9999px;
+
+  // Shadows - soft and layered
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 10px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+
+  // Typography
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Sora', var(--font-sans);
+
+  // Transitions
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: $heading-font-family;
+// =============================================================================
+// CSS CUSTOM PROPERTIES - DARK MODE
+// =============================================================================
+
+.dark {
+  // Inverted slate palette for dark mode
+  --color-slate-950: #fafbfc;
+  --color-slate-900: #f8fafc;
+  --color-slate-800: #f1f5f9;
+  --color-slate-700: #e2e8f0;
+  --color-slate-600: #cbd5e1;
+  --color-slate-500: #94a3b8;
+  --color-slate-400: #64748b;
+  --color-slate-300: #475569;
+  --color-slate-200: #334155;
+  --color-slate-100: #1e293b;
+  --color-slate-50: #0f172a;
+
+  // Semantic tokens - Backgrounds (dark mode)
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-sidebar: #0f172a;
+  --bg-sidebar-gradient: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --bg-sidebar-hover: rgb(255 255 255 / 0.06);
+  --bg-sidebar-active: rgb(255 255 255 / 0.1);
+  --bg-input: #1e293b;
+  --bg-hover: rgb(255 255 255 / 0.05);
+
+  // Sidebar specific - dark mode
+  --sidebar-text: #94a3b8;
+  --sidebar-text-hover: #ffffff;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.06);
+  --sidebar-shadow: 4px 0 24px rgb(0 0 0 / 0.2);
+
+  // Text colors (dark mode)
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+
+  // Accent colors (brighter for dark mode)
+  --accent-primary: var(--color-amber-400);
+  --accent-hover: var(--color-amber-300);
+  --accent-active: var(--color-amber-500);
+
+  // Border colors (dark mode)
+  --border-color: rgb(255 255 255 / 0.08);
+  --border-color-light: rgb(255 255 255 / 0.04);
+  --border-color-focus: var(--color-amber-400);
+
+  // Shadows - adjusted for dark mode
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+  --shadow-card-hover: 0 10px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+}
+
+// =============================================================================
+// GLOBAL BASE STYLES
+// =============================================================================
+
+// Base body text - Plus Jakarta Sans for excellent readability
+body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+// Dark mode body
+.dark body,
+body.dark {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+// Vuetify app container - respect our theme
+.v-application {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+// Vuetify main content area
+.v-main {
+  background-color: var(--bg-primary);
+  transition: background-color var(--transition-base);
+}
+
+// Vuetify cards - use our theme
+.v-card {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color);
+  transition: background-color var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+}
+
+.v-card-text {
+  color: var(--text-secondary) !important;
+}
+
+// Vuetify tables
+.v-table {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.v-table th {
+  color: var(--text-secondary) !important;
+  background-color: var(--bg-hover) !important;
+}
+
+.v-table td {
+  border-color: var(--border-color) !important;
+}
+
+// Vuetify dialogs/modals
+.v-dialog > .v-overlay__content > .v-card {
+  background-color: var(--bg-card) !important;
+}
+
+// Vuetify text fields
+.v-field {
+  background-color: var(--bg-input) !important;
+  transition: background-color var(--transition-base);
+}
+
+.v-field__outline {
+  --v-field-border-opacity: 1;
+  color: var(--border-color) !important;
+}
+
+.v-field--focused .v-field__outline {
+  color: var(--accent-primary) !important;
+}
+
+.v-field__input {
+  color: var(--text-primary) !important;
+}
+
+.v-label {
+  color: var(--text-secondary) !important;
+}
+
+// Vuetify menus and lists
+.v-menu > .v-overlay__content,
+.v-list {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color);
+}
+
+.v-list-item {
+  color: var(--text-primary) !important;
+}
+
+.v-list-item:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+// Vuetify dividers
+.v-divider {
+  border-color: var(--border-color) !important;
+}
+
+// =============================================================================
+// HEADINGS - Sora for modern, authoritative headlines
+// =============================================================================
+
+h1, h2, h3, h4, h5, h6,
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+// =============================================================================
+// UI ELEMENTS - Sora for consistent, modern interface
+// =============================================================================
+
+// Buttons
+.v-btn {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0;
+  transition: all var(--transition-base);
+}
+
+// Navigation items
+.v-list-item-title,
+.v-tab,
+.v-breadcrumbs-item {
+  font-family: var(--font-display);
+}
+
+// Card titles
+.v-card-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+// Chips and badges
+.v-chip {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+// Toolbar titles
+.v-toolbar-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+// App bar
+.v-app-bar-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+// =============================================================================
+// FORM ELEMENTS - Plus Jakarta Sans for clarity
+// =============================================================================
+
+// Form inputs and labels
+.v-field,
+.v-label,
+.v-text-field,
+.v-textarea,
+.v-select,
+.v-autocomplete,
+.v-combobox {
+  font-family: var(--font-sans);
+}
+
+// Form field labels
+.v-field-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+// Helper text and hints
+.v-messages,
+.v-counter {
+  font-family: var(--font-sans);
+}
+
+// =============================================================================
+// DATA DISPLAY - Plus Jakarta Sans with tabular figures
+// =============================================================================
+
+// Data and numbers - use tabular figures for perfect alignment
+.data-text,
+.number-text,
+.currency-text,
+table td,
+.v-data-table td,
+.v-data-table th {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+// Data table headers
+.v-data-table th {
+  font-weight: 600;
+}
+
+// Stats and metrics
+.stat-value,
+.metric-value {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+// =============================================================================
+// CONTENT ELEMENTS - Plus Jakarta Sans for readability
+// =============================================================================
+
+// Paragraphs and body content
+p, .body-text, .v-card-text {
+  font-family: var(--font-sans);
+}
+
+// Lists
+.v-list-item-subtitle {
+  font-family: var(--font-sans);
+}
+
+// Alerts and notifications
+.v-alert {
+  font-family: var(--font-sans);
+}
+
+.v-alert-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+// Dialogs
+.v-dialog-title,
+.v-card-title {
+  font-family: var(--font-display);
+}
+
+// Tooltips
+.v-tooltip {
+  font-family: var(--font-sans);
+}
+
+// Snackbar
+.v-snackbar {
+  font-family: var(--font-sans);
+}
+
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+
+// Force heading font
+.font-heading {
+  font-family: var(--font-display) !important;
+}
+
+// Force UI font
+.font-ui {
+  font-family: var(--font-display) !important;
+}
+
+// Force body font
+.font-body {
+  font-family: var(--font-sans) !important;
+}
+
+// Force data font with tabular figures
+.font-data {
+  font-family: var(--font-sans) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+// =============================================================================
+// DARK MODE TRANSITION HELPERS
+// =============================================================================
+
+// Smooth transitions for theme switching
+.color-mode-transition {
+  transition:
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base),
+    fill var(--transition-base),
+    stroke var(--transition-base);
+}
+
+// Cards with dark mode support
+.theme-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+// Sidebar with dark mode support
+.theme-sidebar {
+  background: var(--bg-sidebar-gradient);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: var(--sidebar-shadow);
+  transition: all var(--transition-base);
 }

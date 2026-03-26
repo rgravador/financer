@@ -5,6 +5,7 @@ interface AuthState {
   user: User | null
   accessToken: string | null
   refreshToken: string | null
+  csrfToken: string | null
   loading: boolean
   error: string | null
 }
@@ -14,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     accessToken: null,
     refreshToken: null,
+    csrfToken: null,
     loading: false,
     error: null,
   }),
@@ -36,11 +38,13 @@ export const useAuthStore = defineStore('auth', {
         const accessToken = localStorage.getItem('accessToken')
         const refreshToken = localStorage.getItem('refreshToken')
         const userStr = localStorage.getItem('user')
+        const csrfToken = localStorage.getItem('csrfToken')
 
         if (accessToken && refreshToken && userStr) {
           this.accessToken = accessToken
           this.refreshToken = refreshToken
           this.user = JSON.parse(userStr)
+          this.csrfToken = csrfToken
         }
       }
     },
@@ -70,6 +74,9 @@ export const useAuthStore = defineStore('auth', {
           localStorage.setItem('user', JSON.stringify(response.user))
         }
 
+        // Fetch CSRF token after successful login
+        await this.fetchCSRFToken()
+
         return response
       } catch (error: any) {
         this.error = error.data?.statusMessage || 'Login failed'
@@ -84,11 +91,31 @@ export const useAuthStore = defineStore('auth', {
      */
     async logout() {
       const currentRefreshToken = this.refreshToken
+      const currentAccessToken = this.accessToken
 
-      // Clear state first
+      // Call backend logout endpoint to revoke refresh token BEFORE clearing state
+      if (currentRefreshToken && currentAccessToken) {
+        try {
+          await $fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${currentAccessToken}`,
+            },
+            body: {
+              refreshToken: currentRefreshToken,
+            },
+          })
+        } catch (error) {
+          // Ignore errors, proceed with local logout
+          console.error('Logout error:', error)
+        }
+      }
+
+      // Clear state AFTER API call
       this.user = null
       this.accessToken = null
       this.refreshToken = null
+      this.csrfToken = null
       this.error = null
 
       // Clear localStorage
@@ -96,21 +123,7 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('user')
-      }
-
-      // Call backend logout endpoint to revoke refresh token
-      if (currentRefreshToken) {
-        try {
-          await $fetch('/api/auth/logout', {
-            method: 'POST',
-            body: {
-              refreshToken: currentRefreshToken,
-            },
-          })
-        } catch (error) {
-          // Ignore errors, already logged out locally
-          console.error('Logout error:', error)
-        }
+        localStorage.removeItem('csrfToken')
       }
 
       // Redirect to login
@@ -140,6 +153,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
         this.accessToken = null
         this.refreshToken = null
+        this.csrfToken = null
         this.error = null
 
         // Clear localStorage
@@ -147,6 +161,7 @@ export const useAuthStore = defineStore('auth', {
           localStorage.removeItem('accessToken')
           localStorage.removeItem('refreshToken')
           localStorage.removeItem('user')
+          localStorage.removeItem('csrfToken')
         }
 
         // Redirect to login
@@ -231,6 +246,36 @@ export const useAuthStore = defineStore('auth', {
           }
         }
 
+        throw error
+      }
+    },
+
+    /**
+     * Fetch CSRF token
+     */
+    async fetchCSRFToken() {
+      if (!this.accessToken) {
+        return
+      }
+
+      try {
+        const response = await $fetch<{ csrfToken: string }>('/api/auth/csrf', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`,
+          },
+        })
+
+        this.csrfToken = response.csrfToken
+
+        // Persist to localStorage
+        if (process.client) {
+          localStorage.setItem('csrfToken', response.csrfToken)
+        }
+
+        return response.csrfToken
+      } catch (error: any) {
+        console.error('Failed to fetch CSRF token:', error)
         throw error
       }
     },

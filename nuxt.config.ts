@@ -12,7 +12,18 @@ export default defineNuxtConfig({
   },
 
   // Modules
-  modules: ['@pinia/nuxt'],
+  modules: [
+    '@pinia/nuxt',
+    '@nuxtjs/color-mode'
+  ],
+
+  // Color mode configuration
+  colorMode: {
+    preference: 'system', // default: 'system'
+    fallback: 'light', // fallback if no preference
+    classSuffix: '', // removes -mode suffix (just 'dark' instead of 'dark-mode')
+    storageKey: 'ascendent-color-mode',
+  },
 
   // Auto-import components
   components: [
@@ -71,13 +82,13 @@ export default defineNuxtConfig({
     }
   },
 
-  // App head configuration (Inter font)
+  // App head configuration (Montserrat for headlines, Inter for body)
   app: {
     head: {
       link: [
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap'
         }
       ]
     }

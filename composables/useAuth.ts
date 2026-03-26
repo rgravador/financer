@@ -152,27 +152,55 @@ export const useAuth = () => {
    */
   const authenticatedFetch = async <T>(url: string, options: any = {}) => {
     if (!authStore.accessToken) {
+      console.error('❌ authenticatedFetch: No access token available')
       throw new Error('Not authenticated')
+    }
+
+    const method = (options.method || 'GET').toUpperCase()
+    console.log(`🔐 authenticatedFetch: ${method} ${url}`)
+
+    // Prepare headers
+    const headers: Record<string, string> = {
+      ...options.headers,
+      Authorization: `Bearer ${authStore.accessToken}`,
+    }
+
+    // Add CSRF token for state-changing requests
+    const stateMethods = ['POST', 'PUT', 'PATCH', 'DELETE']
+    if (stateMethods.includes(method)) {
+      // Fetch CSRF token if not available
+      if (!authStore.csrfToken) {
+        console.log('🔐 Fetching CSRF token...')
+        await authStore.fetchCSRFToken()
+      }
+
+      if (authStore.csrfToken) {
+        headers['x-csrf-token'] = authStore.csrfToken
+      }
     }
 
     try {
       return await $fetch<T>(url, {
         ...options,
-        headers: {
-          ...options.headers,
-          Authorization: `Bearer ${authStore.accessToken}`,
-        },
+        headers,
       })
     } catch (error: any) {
       // If 401, try to refresh token and retry
       if (error.statusCode === 401) {
         const refreshResult = await refreshToken()
         if (refreshResult.success) {
-          // Retry request with new token
+          // Retry request with new token (and fetch new CSRF token if needed)
+          if (stateMethods.includes(method)) {
+            await authStore.fetchCSRFToken()
+            if (authStore.csrfToken) {
+              headers['x-csrf-token'] = authStore.csrfToken
+            }
+          }
+
           return await $fetch<T>(url, {
             ...options,
             headers: {
-              ...options.headers,
+              ...headers,
               Authorization: `Bearer ${authStore.accessToken}`,
             },
           })

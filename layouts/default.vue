@@ -4,9 +4,9 @@
     <AppTopbar />
 
     <v-main class="app-main">
-      <v-container>
+      <div class="main-content">
         <slot />
-      </v-container>
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -18,8 +18,14 @@
 
 <style scoped>
 .app-main {
-  /* padding: 32px; */
   min-height: 100vh;
-  background-color: rgb(var(--v-theme-background));
+  background-color: var(--bg-primary);
+  transition: background-color var(--transition-base);
+}
+
+.main-content {
+  padding: 32px;
+  color: var(--text-primary);
+  transition: color var(--transition-base);
 }
 </style>

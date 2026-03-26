@@ -13,6 +13,9 @@ export interface Tenant {
   updatedAt: Date
 }
 
+// Gender type
+export type Gender = 'male' | 'female'
+
 // User interface
 export interface User {
   _id: string
@@ -22,6 +25,7 @@ export interface User {
   firstName: string
   lastName: string
   fullName?: string
+  gender?: Gender
   isActive: boolean
   createdAt: Date
   updatedAt: Date

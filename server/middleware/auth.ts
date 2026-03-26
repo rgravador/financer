@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, 'authorization')
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.error(`❌ Auth middleware: Missing auth header for ${url.pathname}`)
     throw createError({
       statusCode: 401,
       statusMessage: 'Missing or invalid authorization header',
@@ -41,7 +42,10 @@ export default defineEventHandler(async (event) => {
 
     // Attach user to event context for use in route handlers
     event.context.user = decoded
+
+    console.log(`✅ Auth middleware: User ${decoded.email} (${decoded.role}) authenticated for ${url.pathname}`)
   } catch (error: any) {
+    console.error(`❌ Auth middleware: Token verification failed for ${url.pathname}:`, error.message)
     throw createError({
       statusCode: 401,
       statusMessage: error.message || 'Invalid or expired token',
