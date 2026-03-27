@@ -25,12 +25,12 @@ const credentials = {
 // Pages to capture with their required roles
 const pages = [
   // Tenant Admin pages
-  { url: '/admin/dashboard', name: 'tenant-admin-dashboard', role: 'tenant_admin' },
-  { url: '/admin/users', name: 'users-management', role: 'tenant_admin' },
-  { url: '/admin/loan-types', name: 'loan-types-list', role: 'tenant_admin' },
-  { url: '/admin/loan-types/new', name: 'loan-type-form', role: 'tenant_admin' },
+  { url: '/tenant/dashboard', name: 'tenant-admin-dashboard', role: 'tenant_admin' },
+  { url: '/tenant/users', name: 'users-management', role: 'tenant_admin' },
+  { url: '/tenant/loan-types', name: 'loan-types-list', role: 'tenant_admin' },
   { url: '/loans/applications', name: 'loan-applications', role: 'tenant_admin' },
-  { url: '/admin/audit-logs', name: 'audit-logs', role: 'tenant_admin' },
+  { url: '/tenant/settings', name: 'tenant-settings', role: 'tenant_admin' },
+  { url: '/tenant/audit-logs', name: 'audit-logs', role: 'tenant_admin' },
 
   // Officer pages
   { url: '/officer/dashboard', name: 'officer-dashboard', role: 'tenant_officer' },

@@ -7,6 +7,8 @@ export interface TenantUser {
   lastName: string
   role: string
   isActive: boolean
+  mustChangePassword?: boolean
+  lastLogin?: Date | null
   createdAt: Date
   applicationsCount?: number
   tenantId?: string
@@ -161,6 +163,39 @@ export const useUsersStore = defineStore('users', {
      */
     async activateUser(userId: string) {
       return await this.updateUser(userId, { isActive: true })
+    },
+
+    /**
+     * Reset user password
+     */
+    async resetUserPassword(userId: string) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { authenticatedFetch } = useAuth()
+        const response = await authenticatedFetch<{
+          success: boolean
+          temporaryPassword: string
+          revokedSessions: number
+          message: string
+        }>(`/api/tenant/users/${userId}/reset-password`, {
+          method: 'POST',
+        })
+
+        // Update mustChangePassword flag in list
+        const index = this.users.findIndex(u => u.id === userId)
+        if (index !== -1) {
+          this.users[index].mustChangePassword = true
+        }
+
+        return response
+      } catch (error: any) {
+        this.error = error.data?.statusMessage || 'Failed to reset password'
+        throw error
+      } finally {
+        this.loading = false
+      }
     },
 
     /**

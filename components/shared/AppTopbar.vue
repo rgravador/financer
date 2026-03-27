@@ -5,17 +5,6 @@
     elevation="0"
     class="app-topbar"
   >
-    <!-- Search Box -->
-    <div class="search-container">
-      <v-icon size="18" class="search-icon">mdi-magnify</v-icon>
-      <input
-        v-model="searchQuery"
-        type="text"
-        class="search-input"
-        placeholder="Search anything..."
-      />
-      <kbd class="search-shortcut">⌘K</kbd>
-    </div>
 
     <v-spacer />
 

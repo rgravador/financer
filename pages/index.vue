@@ -21,7 +21,7 @@ onMounted(() => {
     if (role === 'system_admin') {
       router.push('/system/dashboard')
     } else if (role === 'tenant_admin') {
-      router.push('/admin/dashboard')
+      router.push('/tenant/dashboard')
     } else if (role === 'tenant_officer') {
       router.push('/officer/dashboard')
     } else if (role === 'tenant_approver') {

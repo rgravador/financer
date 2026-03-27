@@ -51,9 +51,17 @@ const route = useRoute()
 
 // Define menu items with role-based access
 const menuItems: MenuItem[] = [
+  // System Admin menu items
   { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/system/dashboard', roles: ['system_admin'] },
   { title: 'Tenants', icon: 'mdi-office-building-outline', to: '/system/tenants', roles: ['system_admin'] },
   { title: 'Audit Logs', icon: 'mdi-shield-check-outline', to: '/system/audit-logs', roles: ['system_admin'] },
+
+  // Tenant Admin menu items
+  { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/tenant/dashboard', roles: ['tenant_admin'] },
+  { title: 'Users', icon: 'mdi-account-multiple-outline', to: '/tenant/users', roles: ['tenant_admin'] },
+  { title: 'Loan Types', icon: 'mdi-file-document-outline', to: '/tenant/loan-types', roles: ['tenant_admin'] },
+  { title: 'Settings', icon: 'mdi-cog-outline', to: '/tenant/settings', roles: ['tenant_admin'] },
+  { title: 'Audit Logs', icon: 'mdi-shield-check-outline', to: '/tenant/audit-logs', roles: ['tenant_admin'] },
 ]
 
 // Filter menu items based on user role

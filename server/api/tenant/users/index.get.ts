@@ -43,6 +43,8 @@ export default defineEventHandler(async (event) => {
     lastName: u.lastName,
     role: u.role,
     isActive: u.isActive,
+    mustChangePassword: u.mustChangePassword || false,
+    lastLogin: u.lastLogin || null,
     createdAt: u.createdAt,
     applicationsCount: 0, // Placeholder until Step 7
   }))
