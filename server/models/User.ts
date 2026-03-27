@@ -13,6 +13,10 @@ export interface IUser extends Document {
   lastName: string
   gender?: Gender
   isActive: boolean
+  mustChangePassword: boolean
+  deletedAt: Date | null
+  deletedBy: Types.ObjectId | null
+  lastLogin: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -76,6 +80,23 @@ const UserSchema = new Schema<IUser>({
     type: Boolean,
     default: true,
   },
+  mustChangePassword: {
+    type: Boolean,
+    default: false,
+  },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
+  deletedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    default: null,
+  },
+  lastLogin: {
+    type: Date,
+    default: null,
+  },
 }, {
   timestamps: true,
 })
@@ -84,6 +105,7 @@ const UserSchema = new Schema<IUser>({
 // Note: email already has unique index from schema definition
 UserSchema.index({ tenantId: 1, role: 1 })
 UserSchema.index({ tenantId: 1, isActive: 1 })
+UserSchema.index({ tenantId: 1, role: 1, deletedAt: 1 })
 
 // Virtual for full name
 UserSchema.virtual('fullName').get(function(this: IUser) {

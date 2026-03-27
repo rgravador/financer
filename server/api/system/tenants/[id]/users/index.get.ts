@@ -1,13 +1,13 @@
 import { connectDB } from '~/server/utils/db'
-import Tenant from '~/server/models/Tenant'
 import User from '~/server/models/User'
+import Tenant from '~/server/models/Tenant'
 import { requireSystemAdmin } from '~/server/utils/requireRole'
 import mongoose from 'mongoose'
 
 /**
- * GET /api/system/tenants/[id]
+ * GET /api/system/tenants/[id]/users
  *
- * Get single tenant details with user list
+ * List all tenant administrators for a specific tenant
  * Requires role: system_admin
  */
 export default defineEventHandler(async (event) => {
@@ -34,9 +34,8 @@ export default defineEventHandler(async (event) => {
 
   await connectDB()
 
-  // Find tenant
-  const tenant = await Tenant.findById(tenantId).lean()
-
+  // Verify tenant exists
+  const tenant = await Tenant.findById(tenantId)
   if (!tenant) {
     throw createError({
       statusCode: 404,
@@ -44,38 +43,38 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Find all users in this tenant
-  const users = await User.find({ tenantId: tenant._id })
+  // Find all tenant admins for this tenant (exclude soft-deleted)
+  const users = await User.find({
+    tenantId,
+    role: 'tenant_admin',
+    deletedAt: null,
+  })
     .select('-passwordHash -__v')
     .sort({ createdAt: -1 })
     .lean()
 
-  // Format users
-  const formattedUsers = users.map(user => ({
-    id: user._id.toString(),
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    role: user.role,
-    isActive: user.isActive,
-    createdAt: user.createdAt,
+  // Format users for response
+  const formattedUsers = users.map(u => ({
+    id: u._id.toString(),
+    email: u.email,
+    firstName: u.firstName,
+    lastName: u.lastName,
+    role: u.role,
+    isActive: u.isActive,
+    mustChangePassword: u.mustChangePassword || false,
+    lastLogin: u.lastLogin || null,
+    createdAt: u.createdAt,
+    updatedAt: u.updatedAt,
   }))
 
-  // TODO: Add activeLoansCount when LoanApplication model is created
-  const activeLoansCount = 0 // Placeholder
-
   return {
-    id: tenant._id.toString(),
-    name: tenant.name,
-    slug: tenant.slug,
-    logo: tenant.logo,
-    address: tenant.address,
-    contact: tenant.contact,
-    isActive: tenant.isActive,
-    createdAt: tenant.createdAt,
-    updatedAt: tenant.updatedAt,
-    userCount: formattedUsers.length,
-    activeLoansCount,
     users: formattedUsers,
+    total: formattedUsers.length,
+    tenant: {
+      id: tenant._id.toString(),
+      name: tenant.name,
+      slug: tenant.slug,
+      isActive: tenant.isActive,
+    },
   }
 })

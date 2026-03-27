@@ -66,9 +66,26 @@ npm start
 
 ### Testing
 ```bash
-# No test suite currently configured
-# Playwright is installed but tests not yet implemented
+# Run Playwright E2E tests
+npx playwright test
+
+# Run specific test file
+npx playwright test tests/e2e/tenant-admin.spec.ts
+
+# Run tests with UI
+npx playwright test --ui
+
+# Run tests headed (visible browser)
+npx playwright test --headed
 ```
+
+**Testing Requirements (ENFORCED):**
+1. **Always test implementations using Playwright** - After completing any feature or fix, run Playwright tests to verify functionality works correctly in the browser
+2. **Always add E2E tests for every implementation** - Every new feature, page, or significant change must include a corresponding Playwright E2E test in `tests/e2e/`
+3. **Test file naming:** `tests/e2e/<feature-name>.spec.ts`
+4. **Test user credentials:**
+   - System Admin: `admin@ascendent.com` / `Admin@123`
+   - Demo Tenant Admin: `demo.admin@ascendent.com` / `Demo@123`
 
 ## Architecture Patterns
 

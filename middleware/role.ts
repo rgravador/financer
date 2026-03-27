@@ -10,6 +10,11 @@
 export default defineNuxtRouteMiddleware((to) => {
   const authStore = useAuthStore()
 
+  // Ensure auth state is initialized from localStorage (safety check)
+  if (process.client && !authStore.accessToken) {
+    authStore.initAuth()
+  }
+
   // Check if route has role restrictions
   const allowedRoles = to.meta.allowedRoles as string[] | undefined
 

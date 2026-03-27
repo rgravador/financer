@@ -1,13 +1,22 @@
 import { connectDB } from '~/server/utils/db'
-import Tenant from '~/server/models/Tenant'
+import Tenant, { type ITenantAddress, type ITenantContact } from '~/server/models/Tenant'
 import { requireSystemAdmin } from '~/server/utils/requireRole'
-import { validateTenantName } from '~/server/utils/validation'
+import { validateTenantName, validateEmail, validateURL } from '~/server/utils/validation'
 import mongoose from 'mongoose'
+
+interface UpdateTenantBody {
+  name?: string
+  slug?: string
+  logo?: string
+  address?: ITenantAddress
+  contact?: ITenantContact
+  isActive?: boolean
+}
 
 /**
  * PATCH /api/system/tenants/[id]
  *
- * Update tenant name or isActive status
+ * Update tenant details including name, slug, logo, address, contact, and isActive status
  * Requires role: system_admin
  */
 export default defineEventHandler(async (event) => {
@@ -33,14 +42,15 @@ export default defineEventHandler(async (event) => {
   }
 
   // Parse request body
-  const body = await readBody<{ name?: string; isActive?: boolean }>(event)
-  const { name, isActive } = body
+  const body = await readBody<UpdateTenantBody>(event)
+  const { name, slug, logo, address, contact, isActive } = body
 
   // Validate at least one field is provided
-  if (name === undefined && isActive === undefined) {
+  const hasUpdates = [name, slug, logo, address, contact, isActive].some(v => v !== undefined)
+  if (!hasUpdates) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'At least one field (name or isActive) must be provided',
+      statusMessage: 'At least one field must be provided for update',
     })
   }
 
@@ -53,6 +63,38 @@ export default defineEventHandler(async (event) => {
         statusMessage: nameValidation.errors.join(', '),
       })
     }
+  }
+
+  // Validate slug if provided
+  if (slug !== undefined) {
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Slug must contain only lowercase letters, numbers, and hyphens',
+      })
+    }
+    if (slug.length < 2 || slug.length > 50) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Slug must be between 2 and 50 characters',
+      })
+    }
+  }
+
+  // Validate contact email if provided
+  if (contact?.email && !validateEmail(contact.email)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid contact email address',
+    })
+  }
+
+  // Validate contact website if provided
+  if (contact?.website && !validateURL(contact.website)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid website URL',
+    })
   }
 
   // Validate isActive if provided
@@ -75,9 +117,32 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Check slug uniqueness if changing
+  if (slug !== undefined && slug !== tenant.slug) {
+    const existingTenant = await Tenant.findOne({ slug, _id: { $ne: tenantId } })
+    if (existingTenant) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'A tenant with this slug already exists',
+      })
+    }
+  }
+
   // Update fields
   if (name !== undefined) {
     tenant.name = name
+  }
+  if (slug !== undefined) {
+    tenant.slug = slug
+  }
+  if (logo !== undefined) {
+    tenant.logo = logo
+  }
+  if (address !== undefined) {
+    tenant.address = { ...tenant.address, ...address }
+  }
+  if (contact !== undefined) {
+    tenant.contact = { ...tenant.contact, ...contact }
   }
   if (isActive !== undefined) {
     tenant.isActive = isActive
@@ -91,6 +156,9 @@ export default defineEventHandler(async (event) => {
     id: tenant._id.toString(),
     name: tenant.name,
     slug: tenant.slug,
+    logo: tenant.logo,
+    address: tenant.address,
+    contact: tenant.contact,
     isActive: tenant.isActive,
     createdAt: tenant.createdAt,
     updatedAt: tenant.updatedAt,

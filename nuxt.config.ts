@@ -19,8 +19,8 @@ export default defineNuxtConfig({
 
   // Color mode configuration
   colorMode: {
-    preference: 'system', // default: 'system'
-    fallback: 'light', // fallback if no preference
+    preference: 'dark', // default to dark mode
+    fallback: 'dark', // fallback if no preference
     classSuffix: '', // removes -mode suffix (just 'dark' instead of 'dark-mode')
     storageKey: 'ascendent-color-mode',
   },

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import zxcvbn from 'zxcvbn'
+import crypto from 'crypto'
 
 const SALT_ROUNDS = 12
 
@@ -103,4 +104,33 @@ export function validatePasswordStrength(password: string): {
     isCommon: false,
     isAcceptable,
   }
+}
+
+/**
+ * Generate a secure temporary password
+ * Format: 3 random words + 2 digits + 1 special char
+ * Example: "Maple-River-Stone42!"
+ */
+export function generateTemporaryPassword(): string {
+  const words = [
+    'Apple', 'River', 'Stone', 'Cloud', 'Tiger', 'Ocean', 'Eagle', 'Maple',
+    'Storm', 'Cedar', 'Flame', 'Pearl', 'Delta', 'Coral', 'Frost', 'Lunar',
+    'Solar', 'Terra', 'Viper', 'Amber', 'Blaze', 'Crown', 'Drift', 'Ember',
+  ]
+  const specials = ['!', '@', '#', '$', '%', '&', '*']
+
+  // Pick 3 random words
+  const selectedWords: string[] = []
+  for (let i = 0; i < 3; i++) {
+    const randomIndex = crypto.randomInt(words.length)
+    selectedWords.push(words[randomIndex])
+  }
+
+  // Generate 2 random digits
+  const digits = crypto.randomInt(10, 99).toString()
+
+  // Pick a random special character
+  const special = specials[crypto.randomInt(specials.length)]
+
+  return `${selectedWords.join('-')}${digits}${special}`
 }
