@@ -62,6 +62,13 @@ const menuItems: MenuItem[] = [
   { title: 'Loan Types', icon: 'mdi-file-document-outline', to: '/tenant/loan-types', roles: ['tenant_admin'] },
   { title: 'Settings', icon: 'mdi-cog-outline', to: '/tenant/settings', roles: ['tenant_admin'] },
   { title: 'Audit Logs', icon: 'mdi-shield-check-outline', to: '/tenant/audit-logs', roles: ['tenant_admin'] },
+
+  // Loan Officer menu items
+  { title: 'Applications', icon: 'mdi-file-document-multiple-outline', to: '/officer/applications', roles: ['tenant_officer'] },
+  { title: 'New Application', icon: 'mdi-plus-circle-outline', to: '/officer/applications/new', roles: ['tenant_officer'] },
+
+  // Approver menu items
+  { title: 'Review Queue', icon: 'mdi-clipboard-check-outline', to: '/approver/queue', roles: ['tenant_approver'] },
 ]
 
 // Filter menu items based on user role

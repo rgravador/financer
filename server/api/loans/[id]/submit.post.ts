@@ -2,6 +2,7 @@ import LoanApplication from '~/server/models/LoanApplication'
 import { LoanType } from '~/server/models/LoanType'
 import Notification from '~/server/models/Notification'
 import { requireRole } from '~/server/utils/requireRole'
+import { logAction } from '~/server/utils/audit'
 
 export default defineEventHandler(async (event) => {
   // Require tenant officer role (only officers submit)
@@ -81,6 +82,20 @@ export default defineEventHandler(async (event) => {
 
   // Save application
   await application.save()
+
+  // Log audit action
+  await logAction(event, {
+    action: 'loan.submit',
+    entity: 'LoanApplication',
+    entityId: application._id,
+    tenantId: user.tenantId,
+    metadata: {
+      applicationId: applicationId,
+      requestedAmount: application.loanDetails.requestedAmount,
+      borrowerId: application.borrowerId.toString(),
+      documentsCount: application.documents.length,
+    },
+  })
 
   // Create notification for assigned approver if assigned
   if (application.assignedApproverId) {

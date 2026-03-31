@@ -1,6 +1,7 @@
 import { connectDB } from '~/server/utils/db'
 import User from '~/server/models/User'
 import { requireTenantAdmin } from '~/server/utils/requireRole'
+import { logAction } from '~/server/utils/audit'
 import mongoose from 'mongoose'
 
 /**
@@ -80,7 +81,17 @@ export default defineEventHandler(async (event) => {
   user.isActive = false
   await user.save()
 
-  console.log(`User deactivated: ${user.email}`)
+  // Log audit action
+  await logAction(event, {
+    action: 'user.deactivate',
+    entity: 'User',
+    entityId: user._id,
+    tenantId: currentUser.tenantId,
+    metadata: {
+      email: user.email,
+      role: user.role,
+    },
+  })
 
   return {
     message: 'User deactivated successfully',

@@ -8,6 +8,9 @@
         <slot />
       </div>
     </v-main>
+
+    <!-- Global Snackbar -->
+    <SnackbarContainer />
   </v-app>
 </template>
 

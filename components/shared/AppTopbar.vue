@@ -10,10 +10,7 @@
 
     <div class="topbar-right">
       <!-- Notifications -->
-      <button class="topbar-btn notification-btn">
-        <v-icon size="20">mdi-bell-outline</v-icon>
-        <span v-if="notificationCount > 0" class="notification-badge">{{ notificationCount }}</span>
-      </button>
+      <NotificationBell />
 
       <!-- Divider -->
       <div class="topbar-divider"></div>
@@ -84,9 +81,6 @@ const toggleTheme = () => {
 
 // Search query
 const searchQuery = ref('')
-
-// Mock notification count (would come from a notifications store)
-const notificationCount = ref(3)
 
 // Get avatar image based on gender (default to male if not provided)
 const avatarImage = computed(() => {

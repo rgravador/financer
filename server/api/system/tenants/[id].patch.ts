@@ -2,6 +2,7 @@ import { connectDB } from '~/server/utils/db'
 import Tenant, { type ITenantAddress, type ITenantContact } from '~/server/models/Tenant'
 import { requireSystemAdmin } from '~/server/utils/requireRole'
 import { validateTenantName, validateEmail, validateURL } from '~/server/utils/validation'
+import { logAction } from '~/server/utils/audit'
 import mongoose from 'mongoose'
 
 interface UpdateTenantBody {
@@ -150,7 +151,17 @@ export default defineEventHandler(async (event) => {
 
   await tenant.save()
 
-  console.log(`Tenant updated: ${tenant.name} (${tenant.slug})`)
+  // Log audit action
+  await logAction(event, {
+    action: 'tenant.update',
+    entity: 'Tenant',
+    entityId: tenant._id,
+    metadata: {
+      name: tenant.name,
+      slug: tenant.slug,
+      fieldsUpdated: Object.keys(body).filter(k => body[k as keyof UpdateTenantBody] !== undefined),
+    },
+  })
 
   return {
     id: tenant._id.toString(),

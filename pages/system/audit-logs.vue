@@ -12,7 +12,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="action-btn secondary-btn">
+        <button class="action-btn secondary-btn" @click="exportToCsv">
           <v-icon size="18">mdi-download</v-icon>
           Export
         </button>
@@ -26,40 +26,57 @@
     <!-- Stats Bar -->
     <div class="stats-bar">
       <div class="stat-item">
-        <span class="stat-value">{{ totalLogs }}</span>
+        <span class="stat-value">{{ pagination.total }}</span>
         <span class="stat-label">Total Events</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-value stat-success">{{ successCount }}</span>
-        <span class="stat-label">Successful</span>
+        <span class="stat-value stat-success">{{ stats.creates }}</span>
+        <span class="stat-label">Creates</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-value stat-warning">{{ warningCount }}</span>
-        <span class="stat-label">Warnings</span>
+        <span class="stat-value stat-info">{{ stats.updates }}</span>
+        <span class="stat-label">Updates</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-value stat-error">{{ errorCount }}</span>
-        <span class="stat-label">Errors</span>
+        <span class="stat-value stat-error">{{ stats.deletes }}</span>
+        <span class="stat-label">Deletes</span>
       </div>
     </div>
 
     <!-- Filters Section -->
     <div class="filters-section">
-      <!-- Search -->
-      <div class="search-container">
-        <v-icon size="20" class="search-icon">mdi-magnify</v-icon>
-        <input
-          v-model="searchQuery"
-          type="text"
-          class="search-input"
-          placeholder="Search by user, action, or description..."
+      <!-- Search and Tenant Filter -->
+      <div class="filters-row">
+        <div class="search-container">
+          <v-icon size="20" class="search-icon">mdi-magnify</v-icon>
+          <input
+            v-model="searchQuery"
+            type="text"
+            class="search-input"
+            placeholder="Search by user, action, or entity..."
+            @input="debouncedFetch"
+          />
+          <button v-if="searchQuery" class="clear-search" @click="searchQuery = ''; fetchLogs()">
+            <v-icon size="16">mdi-close</v-icon>
+          </button>
+        </div>
+
+        <v-select
+          v-model="selectedTenant"
+          :items="tenantOptions"
+          item-title="name"
+          item-value="id"
+          label="Filter by Tenant"
+          variant="outlined"
+          density="compact"
+          clearable
+          hide-details
+          class="tenant-select"
+          @update:model-value="fetchLogs"
         />
-        <button v-if="searchQuery" class="clear-search" @click="searchQuery = ''">
-          <v-icon size="16">mdi-close</v-icon>
-        </button>
       </div>
 
       <!-- Filter Chips -->
@@ -68,11 +85,10 @@
           v-for="filter in actionFilters"
           :key="filter.value"
           :class="['filter-chip', { active: selectedAction === filter.value }]"
-          @click="selectedAction = filter.value"
+          @click="selectedAction = filter.value; fetchLogs()"
         >
           <v-icon size="16">{{ filter.icon }}</v-icon>
           {{ filter.label }}
-          <span v-if="filter.count" class="chip-count">{{ filter.count }}</span>
         </button>
       </div>
 
@@ -82,7 +98,7 @@
           v-for="range in dateRanges"
           :key="range.value"
           :class="['date-chip', { active: selectedDateRange === range.value }]"
-          @click="selectedDateRange = range.value"
+          @click="selectedDateRange = range.value; fetchLogs()"
         >
           {{ range.label }}
         </button>
@@ -96,18 +112,18 @@
         <p>Loading audit logs...</p>
       </div>
 
-      <div v-else-if="filteredLogs.length === 0" class="empty-state">
+      <div v-else-if="logs.length === 0" class="empty-state">
         <div class="empty-icon">
           <v-icon size="56">mdi-file-search-outline</v-icon>
         </div>
         <h3 class="empty-title">No audit logs found</h3>
         <p class="empty-text">
-          {{ searchQuery || selectedAction !== 'all'
+          {{ searchQuery || selectedAction !== 'all' || selectedTenant
             ? 'Try adjusting your filters or search query'
             : 'System audit logs will appear here once activity is recorded'
           }}
         </p>
-        <button v-if="searchQuery || selectedAction !== 'all'" class="clear-filters-btn" @click="clearFilters">
+        <button v-if="searchQuery || selectedAction !== 'all' || selectedTenant" class="clear-filters-btn" @click="clearFilters">
           Clear Filters
         </button>
       </div>
@@ -117,46 +133,43 @@
           <div class="col-timestamp">Timestamp</div>
           <div class="col-action">Action</div>
           <div class="col-user">User</div>
-          <div class="col-target">Target</div>
-          <div class="col-status">Status</div>
+          <div class="col-entity">Entity</div>
+          <div class="col-tenant">Tenant</div>
           <div class="col-details">Details</div>
         </div>
 
         <div class="table-body">
           <div
-            v-for="log in filteredLogs"
+            v-for="log in logs"
             :key="log.id"
             class="log-row"
             @click="viewLogDetails(log)"
           >
             <div class="col-timestamp">
-              <span class="timestamp-date">{{ formatDate(log.timestamp) }}</span>
-              <span class="timestamp-time">{{ formatTime(log.timestamp) }}</span>
+              <span class="timestamp-date">{{ formatDate(log.createdAt) }}</span>
+              <span class="timestamp-time">{{ formatTime(log.createdAt) }}</span>
             </div>
             <div class="col-action">
-              <div :class="['action-badge', `action-${log.actionType}`]">
-                <v-icon size="14">{{ getActionIcon(log.actionType) }}</v-icon>
-                {{ log.action }}
+              <div :class="['action-badge', `action-${getActionType(log.action)}`]">
+                <v-icon size="14">{{ getActionIcon(log.action) }}</v-icon>
+                {{ formatActionName(log.action) }}
               </div>
             </div>
             <div class="col-user">
               <div class="user-info">
-                <div class="user-avatar">{{ log.user.charAt(0).toUpperCase() }}</div>
+                <div class="user-avatar">{{ getUserInitials(log.user) }}</div>
                 <div class="user-details">
-                  <span class="user-name">{{ log.user }}</span>
-                  <span class="user-role">{{ log.userRole }}</span>
+                  <span class="user-name">{{ log.user?.fullName || log.user?.email || 'System' }}</span>
+                  <span class="user-role">{{ log.user?.email || '' }}</span>
                 </div>
               </div>
             </div>
-            <div class="col-target">
-              <span class="target-type">{{ log.targetType }}</span>
-              <span class="target-id">{{ log.targetId }}</span>
+            <div class="col-entity">
+              <span class="entity-type">{{ log.entity }}</span>
+              <span class="entity-id">{{ formatEntityId(log.entityId) }}</span>
             </div>
-            <div class="col-status">
-              <span :class="['status-badge', `status-${log.status}`]">
-                <v-icon size="12">{{ getStatusIcon(log.status) }}</v-icon>
-                {{ log.status }}
-              </span>
+            <div class="col-tenant">
+              <span class="tenant-name">{{ log.tenant?.name || 'System' }}</span>
             </div>
             <div class="col-details">
               <button class="details-btn">
@@ -168,23 +181,23 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="filteredLogs.length > 0" class="pagination">
+      <div v-if="logs.length > 0" class="pagination">
         <div class="pagination-info">
-          Showing {{ startIndex + 1 }} - {{ endIndex }} of {{ totalFilteredLogs }} logs
+          Showing {{ startIndex + 1 }} - {{ endIndex }} of {{ pagination.total }} logs
         </div>
         <div class="pagination-controls">
           <button
             class="page-btn"
-            :disabled="currentPage === 1"
-            @click="currentPage--"
+            :disabled="pagination.page === 1"
+            @click="pagination.page--; fetchLogs()"
           >
             <v-icon size="18">mdi-chevron-left</v-icon>
           </button>
-          <span class="page-indicator">Page {{ currentPage }} of {{ totalPages }}</span>
+          <span class="page-indicator">Page {{ pagination.page }} of {{ pagination.totalPages }}</span>
           <button
             class="page-btn"
-            :disabled="currentPage === totalPages"
-            @click="currentPage++"
+            :disabled="pagination.page === pagination.totalPages"
+            @click="pagination.page++; fetchLogs()"
           >
             <v-icon size="18">mdi-chevron-right</v-icon>
           </button>
@@ -197,11 +210,11 @@
       <div v-if="selectedLog" class="details-dialog">
         <div class="dialog-header">
           <div class="dialog-icon">
-            <v-icon size="24">{{ getActionIcon(selectedLog.actionType) }}</v-icon>
+            <v-icon size="24">{{ getActionIcon(selectedLog.action) }}</v-icon>
           </div>
           <div class="dialog-title-content">
             <h3 class="dialog-title">Audit Log Details</h3>
-            <p class="dialog-subtitle">{{ selectedLog.action }}</p>
+            <p class="dialog-subtitle">{{ formatActionName(selectedLog.action) }}</p>
           </div>
           <button class="dialog-close" @click="detailsDialog = false">
             <v-icon size="20">mdi-close</v-icon>
@@ -210,33 +223,35 @@
         <div class="dialog-body">
           <div class="detail-group">
             <label>Timestamp</label>
-            <span>{{ formatFullDate(selectedLog.timestamp) }}</span>
+            <span>{{ formatFullDate(selectedLog.createdAt) }}</span>
           </div>
           <div class="detail-group">
             <label>User</label>
-            <span>{{ selectedLog.user }} ({{ selectedLog.userRole }})</span>
+            <span>{{ selectedLog.user?.fullName || selectedLog.user?.email || 'System' }}</span>
           </div>
           <div class="detail-group">
             <label>Action</label>
-            <span>{{ selectedLog.action }}</span>
+            <span>{{ formatActionName(selectedLog.action) }}</span>
           </div>
           <div class="detail-group">
-            <label>Target</label>
-            <span>{{ selectedLog.targetType }}: {{ selectedLog.targetId }}</span>
+            <label>Entity</label>
+            <span>{{ selectedLog.entity }}: {{ selectedLog.entityId }}</span>
           </div>
           <div class="detail-group">
-            <label>Status</label>
-            <span :class="['status-badge', `status-${selectedLog.status}`]">
-              {{ selectedLog.status }}
-            </span>
+            <label>Tenant</label>
+            <span>{{ selectedLog.tenant?.name || 'System-wide' }}</span>
           </div>
           <div class="detail-group">
             <label>IP Address</label>
-            <span class="mono-text">{{ selectedLog.ipAddress }}</span>
+            <span class="mono-text">{{ selectedLog.ipAddress || 'N/A' }}</span>
           </div>
-          <div v-if="selectedLog.changes" class="detail-group full-width">
-            <label>Changes</label>
-            <pre class="changes-code">{{ JSON.stringify(selectedLog.changes, null, 2) }}</pre>
+          <div class="detail-group">
+            <label>User Agent</label>
+            <span class="mono-text small-text">{{ selectedLog.userAgent || 'N/A' }}</span>
+          </div>
+          <div v-if="selectedLog.metadata && Object.keys(selectedLog.metadata).length > 0" class="detail-group full-width">
+            <label>Metadata</label>
+            <pre class="changes-code">{{ JSON.stringify(selectedLog.metadata, null, 2) }}</pre>
           </div>
         </div>
         <div class="dialog-footer">
@@ -248,123 +263,89 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+import { useSystemStore } from '~/stores/system'
+
 definePageMeta({
   middleware: ['role'],
   allowedRoles: ['system_admin'],
 })
 
+interface AuditLogUser {
+  _id: string
+  email: string
+  fullName?: string
+}
+
+interface AuditLogTenant {
+  _id: string
+  name: string
+  slug: string
+}
+
 interface AuditLog {
   id: string
-  timestamp: string
   action: string
-  actionType: 'create' | 'update' | 'delete' | 'login' | 'system'
-  user: string
-  userRole: string
-  targetType: string
-  targetId: string
-  status: 'success' | 'warning' | 'error'
-  ipAddress: string
-  changes?: Record<string, unknown>
+  entity: string
+  entityId: string
+  user: AuditLogUser | null
+  tenant: AuditLogTenant | null
+  metadata?: Record<string, unknown>
+  ipAddress?: string
+  userAgent?: string
+  createdAt: string
 }
+
+interface TenantOption {
+  id: string | null
+  name: string
+}
+
+const auth = useAuthStore()
+const systemStore = useSystemStore()
 
 // State
 const loading = ref(false)
+const logs = ref<AuditLog[]>([])
 const searchQuery = ref('')
 const selectedAction = ref('all')
 const selectedDateRange = ref('7d')
-const currentPage = ref(1)
-const itemsPerPage = 10
+const selectedTenant = ref<string | null>(null)
 const detailsDialog = ref(false)
 const selectedLog = ref<AuditLog | null>(null)
 
-// Mock data for demonstration
-const mockLogs = ref<AuditLog[]>([
-  {
-    id: '1',
-    timestamp: new Date().toISOString(),
-    action: 'User Login',
-    actionType: 'login',
-    user: 'admin@ascendent.com',
-    userRole: 'System Admin',
-    targetType: 'Session',
-    targetId: 'sess_abc123',
-    status: 'success',
-    ipAddress: '192.168.1.100',
-  },
-  {
-    id: '2',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    action: 'Tenant Created',
-    actionType: 'create',
-    user: 'admin@ascendent.com',
-    userRole: 'System Admin',
-    targetType: 'Tenant',
-    targetId: 'ten_xyz789',
-    status: 'success',
-    ipAddress: '192.168.1.100',
-    changes: { name: 'New Company LLC', slug: 'new-company' },
-  },
-  {
-    id: '3',
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
-    action: 'User Status Updated',
-    actionType: 'update',
-    user: 'admin@ascendent.com',
-    userRole: 'System Admin',
-    targetType: 'User',
-    targetId: 'usr_def456',
-    status: 'success',
-    ipAddress: '192.168.1.100',
-    changes: { isActive: { from: true, to: false } },
-  },
-  {
-    id: '4',
-    timestamp: new Date(Date.now() - 10800000).toISOString(),
-    action: 'Failed Login Attempt',
-    actionType: 'login',
-    user: 'unknown@test.com',
-    userRole: 'Unknown',
-    targetType: 'Authentication',
-    targetId: 'auth_failed',
-    status: 'error',
-    ipAddress: '10.0.0.55',
-  },
-  {
-    id: '5',
-    timestamp: new Date(Date.now() - 14400000).toISOString(),
-    action: 'Tenant Suspended',
-    actionType: 'update',
-    user: 'admin@ascendent.com',
-    userRole: 'System Admin',
-    targetType: 'Tenant',
-    targetId: 'ten_old123',
-    status: 'warning',
-    ipAddress: '192.168.1.100',
-    changes: { isActive: { from: true, to: false } },
-  },
-  {
-    id: '6',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    action: 'System Backup Completed',
-    actionType: 'system',
-    user: 'system',
-    userRole: 'Automated',
-    targetType: 'Database',
-    targetId: 'backup_20240315',
-    status: 'success',
-    ipAddress: 'internal',
-  },
-])
+const pagination = ref({
+  page: 1,
+  limit: 20,
+  total: 0,
+  totalPages: 0,
+})
 
-// Computed
-const actionFilters = computed(() => [
-  { value: 'all', label: 'All', icon: 'mdi-view-list', count: mockLogs.value.length },
-  { value: 'login', label: 'Logins', icon: 'mdi-login', count: mockLogs.value.filter(l => l.actionType === 'login').length },
-  { value: 'create', label: 'Creates', icon: 'mdi-plus-circle', count: mockLogs.value.filter(l => l.actionType === 'create').length },
-  { value: 'update', label: 'Updates', icon: 'mdi-pencil', count: mockLogs.value.filter(l => l.actionType === 'update').length },
-  { value: 'delete', label: 'Deletes', icon: 'mdi-delete', count: mockLogs.value.filter(l => l.actionType === 'delete').length },
-  { value: 'system', label: 'System', icon: 'mdi-cog', count: mockLogs.value.filter(l => l.actionType === 'system').length },
-])
+const stats = ref({
+  creates: 0,
+  updates: 0,
+  deletes: 0,
+})
+
+// Fetch tenants for filter
+const tenantOptions = computed<TenantOption[]>(() => {
+  const options: TenantOption[] = [{ id: null, name: 'All Tenants' }]
+  if (systemStore.tenants) {
+    systemStore.tenants.forEach(t => {
+      options.push({ id: t._id, name: t.name })
+    })
+  }
+  return options
+})
+
+// Action filters
+const actionFilters = [
+  { value: 'all', label: 'All', icon: 'mdi-view-list' },
+  { value: 'login', label: 'Logins', icon: 'mdi-login' },
+  { value: 'create', label: 'Creates', icon: 'mdi-plus-circle' },
+  { value: 'update', label: 'Updates', icon: 'mdi-pencil' },
+  { value: 'delete', label: 'Deletes', icon: 'mdi-delete' },
+]
 
 const dateRanges = [
   { value: '24h', label: 'Last 24 hours' },
@@ -373,38 +354,147 @@ const dateRanges = [
   { value: 'all', label: 'All time' },
 ]
 
-const totalLogs = computed(() => mockLogs.value.length)
-const successCount = computed(() => mockLogs.value.filter(l => l.status === 'success').length)
-const warningCount = computed(() => mockLogs.value.filter(l => l.status === 'warning').length)
-const errorCount = computed(() => mockLogs.value.filter(l => l.status === 'error').length)
+// Computed
+const startIndex = computed(() => (pagination.value.page - 1) * pagination.value.limit)
+const endIndex = computed(() => Math.min(startIndex.value + pagination.value.limit, pagination.value.total))
 
-const filteredLogs = computed(() => {
-  let logs = [...mockLogs.value]
-
-  // Filter by action type
-  if (selectedAction.value !== 'all') {
-    logs = logs.filter(l => l.actionType === selectedAction.value)
-  }
-
-  // Filter by search query
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    logs = logs.filter(l =>
-      l.user.toLowerCase().includes(query) ||
-      l.action.toLowerCase().includes(query) ||
-      l.targetType.toLowerCase().includes(query)
-    )
-  }
-
-  return logs
-})
-
-const totalFilteredLogs = computed(() => filteredLogs.value.length)
-const totalPages = computed(() => Math.ceil(totalFilteredLogs.value / itemsPerPage))
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage)
-const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage, totalFilteredLogs.value))
+// Debounce helper
+let debounceTimer: NodeJS.Timeout | null = null
+const debouncedFetch = () => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    pagination.value.page = 1
+    fetchLogs()
+  }, 300)
+}
 
 // Methods
+const getDateRange = () => {
+  const now = new Date()
+  let dateFrom: Date | null = null
+
+  switch (selectedDateRange.value) {
+    case '24h':
+      dateFrom = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+      break
+    case '7d':
+      dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      break
+    case '30d':
+      dateFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      break
+    default:
+      dateFrom = null
+  }
+
+  return dateFrom ? dateFrom.toISOString() : null
+}
+
+const fetchLogs = async () => {
+  loading.value = true
+  try {
+    const params = new URLSearchParams()
+    params.append('page', pagination.value.page.toString())
+    params.append('limit', pagination.value.limit.toString())
+
+    if (selectedTenant.value) {
+      params.append('tenantId', selectedTenant.value)
+    }
+
+    if (selectedAction.value !== 'all') {
+      params.append('action', selectedAction.value)
+    }
+
+    const dateFrom = getDateRange()
+    if (dateFrom) {
+      params.append('dateFrom', dateFrom)
+    }
+
+    const response = await auth.authenticatedFetch(`/api/system/audit-logs?${params.toString()}`)
+
+    // Transform API response to match UI interface
+    logs.value = response.logs.map((log: any) => ({
+      id: log._id,
+      action: log.action,
+      entity: log.entity,
+      entityId: log.entityId,
+      user: log.userId,
+      tenant: log.tenantId,
+      metadata: log.metadata,
+      ipAddress: log.ipAddress,
+      userAgent: log.userAgent,
+      createdAt: log.createdAt,
+    }))
+
+    pagination.value = {
+      ...pagination.value,
+      total: response.pagination.total,
+      totalPages: response.pagination.totalPages,
+    }
+
+    // Calculate stats from current page (could be enhanced with separate API)
+    stats.value = {
+      creates: logs.value.filter(l => l.action.toLowerCase().includes('create')).length,
+      updates: logs.value.filter(l => l.action.toLowerCase().includes('update')).length,
+      deletes: logs.value.filter(l => l.action.toLowerCase().includes('delete')).length,
+    }
+  } catch (error) {
+    console.error('Failed to fetch audit logs:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const refreshLogs = () => {
+  pagination.value.page = 1
+  fetchLogs()
+}
+
+const clearFilters = () => {
+  searchQuery.value = ''
+  selectedAction.value = 'all'
+  selectedDateRange.value = '7d'
+  selectedTenant.value = null
+  pagination.value.page = 1
+  fetchLogs()
+}
+
+const viewLogDetails = (log: AuditLog) => {
+  selectedLog.value = log
+  detailsDialog.value = true
+}
+
+const exportToCsv = () => {
+  if (logs.value.length === 0) return
+
+  const headers = ['Timestamp', 'Action', 'Entity', 'Entity ID', 'User', 'Tenant', 'IP Address']
+  const rows = logs.value.map(log => [
+    formatFullDate(log.createdAt),
+    formatActionName(log.action),
+    log.entity,
+    log.entityId,
+    log.user?.fullName || log.user?.email || 'System',
+    log.tenant?.name || 'System',
+    log.ipAddress || 'N/A',
+  ])
+
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', `system-audit-logs-${new Date().toISOString().split('T')[0]}.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+// Formatting helpers
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-US', {
     month: 'short',
@@ -430,7 +520,24 @@ const formatFullDate = (date: string) => {
   })
 }
 
-const getActionIcon = (type: string) => {
+const formatActionName = (action: string) => {
+  return action
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
+
+const getActionType = (action: string): string => {
+  const lowerAction = action.toLowerCase()
+  if (lowerAction.includes('create')) return 'create'
+  if (lowerAction.includes('update')) return 'update'
+  if (lowerAction.includes('delete')) return 'delete'
+  if (lowerAction.includes('login') || lowerAction.includes('logout')) return 'login'
+  return 'system'
+}
+
+const getActionIcon = (action: string) => {
+  const type = getActionType(action)
   const icons: Record<string, string> = {
     create: 'mdi-plus-circle',
     update: 'mdi-pencil',
@@ -441,33 +548,33 @@ const getActionIcon = (type: string) => {
   return icons[type] || 'mdi-information'
 }
 
-const getStatusIcon = (status: string) => {
-  const icons: Record<string, string> = {
-    success: 'mdi-check-circle',
-    warning: 'mdi-alert',
-    error: 'mdi-close-circle',
+const getUserInitials = (user: AuditLogUser | null): string => {
+  if (!user) return 'S'
+  if (user.fullName) {
+    const parts = user.fullName.split(' ')
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    }
+    return user.fullName.substring(0, 2).toUpperCase()
   }
-  return icons[status] || 'mdi-information'
+  return user.email.substring(0, 2).toUpperCase()
 }
 
-const viewLogDetails = (log: AuditLog) => {
-  selectedLog.value = log
-  detailsDialog.value = true
+const formatEntityId = (id: string): string => {
+  if (!id) return 'N/A'
+  if (id.length > 12) {
+    return `...${id.slice(-8)}`
+  }
+  return id
 }
 
-const clearFilters = () => {
-  searchQuery.value = ''
-  selectedAction.value = 'all'
-  selectedDateRange.value = '7d'
-  currentPage.value = 1
-}
-
-const refreshLogs = () => {
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-  }, 1000)
-}
+// Load data on mount
+onMounted(async () => {
+  await Promise.all([
+    fetchLogs(),
+    systemStore.fetchTenants(),
+  ])
+})
 </script>
 
 <style scoped>
@@ -596,6 +703,7 @@ const refreshLogs = () => {
 }
 
 .stat-success { color: var(--color-success); }
+.stat-info { color: var(--color-info); }
 .stat-warning { color: var(--color-warning); }
 .stat-error { color: var(--color-error); }
 
@@ -622,9 +730,20 @@ const refreshLogs = () => {
   margin-bottom: 24px;
 }
 
+.filters-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 .search-container {
   position: relative;
-  max-width: 480px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.tenant-select {
+  width: 250px;
 }
 
 .search-icon {
@@ -707,23 +826,6 @@ const refreshLogs = () => {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
   color: var(--text-inverse);
-}
-
-.chip-count {
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.filter-chip.active .chip-count {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .date-filter {
@@ -838,7 +940,7 @@ const refreshLogs = () => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 120px 160px 1fr 140px 100px 60px;
+  grid-template-columns: 120px 160px 1fr 140px 120px 60px;
   gap: 16px;
   padding: 16px 24px;
   background: var(--bg-hover);
@@ -859,7 +961,7 @@ const refreshLogs = () => {
 
 .log-row {
   display: grid;
-  grid-template-columns: 120px 160px 1fr 140px 100px 60px;
+  grid-template-columns: 120px 160px 1fr 140px 120px 60px;
   gap: 16px;
   padding: 16px 24px;
   border-bottom: 1px solid var(--border-color);
@@ -979,21 +1081,21 @@ const refreshLogs = () => {
   transition: color var(--transition-base);
 }
 
-.col-target {
+.col-entity {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.target-type {
+.entity-type {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-primary);
   transition: color var(--transition-base);
 }
 
-.target-id {
+.entity-id {
   font-family: monospace;
   font-size: 11px;
   color: var(--text-muted);
@@ -1001,31 +1103,16 @@ const refreshLogs = () => {
   transition: color var(--transition-base);
 }
 
-.status-badge {
-  display: inline-flex;
+.col-tenant {
+  display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 20px;
+}
+
+.tenant-name {
   font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.status-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--color-success);
-}
-
-.status-warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--color-warning);
-}
-
-.status-error {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-error);
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: color var(--transition-base);
 }
 
 .details-btn {
@@ -1207,6 +1294,11 @@ const refreshLogs = () => {
   font-family: monospace;
 }
 
+.small-text {
+  font-size: 12px;
+  word-break: break-all;
+}
+
 .changes-code {
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
@@ -1253,7 +1345,7 @@ const refreshLogs = () => {
 @media (max-width: 1200px) {
   .table-header,
   .log-row {
-    grid-template-columns: 100px 140px 1fr 120px 80px 50px;
+    grid-template-columns: 100px 140px 1fr 120px 100px 50px;
     gap: 12px;
   }
 }
@@ -1275,6 +1367,19 @@ const refreshLogs = () => {
 
   .stat-divider {
     display: none;
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-container {
+    max-width: 100%;
+  }
+
+  .tenant-select {
+    width: 100%;
   }
 
   .table-header {

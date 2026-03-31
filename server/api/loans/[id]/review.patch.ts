@@ -1,5 +1,6 @@
 import LoanApplication from '~/server/models/LoanApplication'
 import { requireRole } from '~/server/utils/requireRole'
+import { logAction } from '~/server/utils/audit'
 
 export default defineEventHandler(async (event) => {
   // Require tenant approver role
@@ -55,6 +56,19 @@ export default defineEventHandler(async (event) => {
 
   // Save application
   await application.save()
+
+  // Log audit action
+  await logAction(event, {
+    action: 'loan.start_review',
+    entity: 'LoanApplication',
+    entityId: application._id,
+    tenantId: user.tenantId,
+    metadata: {
+      applicationId: applicationId,
+      requestedAmount: application.loanDetails.requestedAmount,
+      borrowerId: application.borrowerId.toString(),
+    },
+  })
 
   // Transform to match interface
   return {

@@ -2,6 +2,7 @@ import LoanApplication from '~/server/models/LoanApplication'
 import { LoanType } from '~/server/models/LoanType'
 import Borrower from '~/server/models/Borrower'
 import { requireRole } from '~/server/utils/requireRole'
+import { logAction } from '~/server/utils/audit'
 
 export default defineEventHandler(async (event) => {
   // Require tenant officer role (only officers create applications)
@@ -159,6 +160,21 @@ export default defineEventHandler(async (event) => {
         notes: 'Application created',
       },
     ],
+  })
+
+  // Log audit action
+  await logAction(event, {
+    action: 'loan.create',
+    entity: 'LoanApplication',
+    entityId: application._id,
+    tenantId: user.tenantId,
+    metadata: {
+      loanTypeId: body.loanTypeId,
+      borrowerId: body.borrowerId,
+      requestedAmount: requestedAmount,
+      requestedTerm: requestedTerm,
+      suggestedInterestRate: suggestedInterestRate,
+    },
   })
 
   // Transform to match interface

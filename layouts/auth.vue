@@ -27,6 +27,9 @@
         </v-row>
       </v-container>
     </v-main>
+
+    <!-- Global Snackbar -->
+    <SnackbarContainer />
   </v-app>
 </template>
 

@@ -3,6 +3,7 @@ import User from '~/server/models/User'
 import { requireTenantAdmin } from '~/server/utils/requireRole'
 import { validateEmail, validatePassword } from '~/server/utils/validation'
 import { hashPassword } from '~/server/utils/password'
+import { logAction } from '~/server/utils/audit'
 
 /**
  * POST /api/tenant/users
@@ -92,7 +93,19 @@ export default defineEventHandler(async (event) => {
     isActive: true,
   })
 
-  console.log(`User created: ${user.email} (${user.role}) in tenant ${currentUser.tenantId}`)
+  // Log audit action
+  await logAction(event, {
+    action: 'user.create',
+    entity: 'User',
+    entityId: user._id,
+    tenantId: currentUser.tenantId,
+    metadata: {
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    },
+  })
 
   // Return user without password hash
   return {

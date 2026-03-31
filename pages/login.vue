@@ -234,7 +234,7 @@ const currentYear = new Date().getFullYear()
 const demoAccounts = [
   { label: 'System Admin', email: 'admin@ascendent.com', password: 'Admin@123' },
   { label: 'Tenant Admin', email: 'admin@fral.com', password: 'Just1234!' },
-  { label: 'Officer', email: 'demo.officer@ascendent.com', password: 'Demo@123' },
+  { label: 'Officer', email: 'redgiegravador@gmail.com', password: 'Just1234!' },
   { label: 'Approver', email: 'demo.approver@ascendent.com', password: 'Demo@123' },
 ]
 
@@ -290,9 +290,9 @@ const handleLogin = async () => {
     } else if (role === 'tenant_admin') {
       router.push('/tenant/dashboard')
     } else if (role === 'tenant_officer') {
-      router.push('/officer/dashboard')
+      router.push('/officer/applications')
     } else if (role === 'tenant_approver') {
-      router.push('/approver/dashboard')
+      router.push('/approver/queue')
     } else {
       router.push('/')
     }

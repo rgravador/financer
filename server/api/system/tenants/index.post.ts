@@ -2,6 +2,7 @@ import { connectDB } from '~/server/utils/db'
 import Tenant from '~/server/models/Tenant'
 import { requireSystemAdmin } from '~/server/utils/requireRole'
 import { validateTenantName, validateTenantSlug } from '~/server/utils/validation'
+import { logAction } from '~/server/utils/audit'
 
 /**
  * POST /api/system/tenants
@@ -61,7 +62,16 @@ export default defineEventHandler(async (event) => {
     isActive: true,
   })
 
-  console.log(`Tenant created: ${tenant.name} (${tenant.slug})`)
+  // Log audit action
+  await logAction(event, {
+    action: 'tenant.create',
+    entity: 'Tenant',
+    entityId: tenant._id,
+    metadata: {
+      name: tenant.name,
+      slug: tenant.slug,
+    },
+  })
 
   return {
     id: tenant._id.toString(),

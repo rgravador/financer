@@ -1,6 +1,7 @@
 import { connectDB } from '~/server/utils/db'
 import User from '~/server/models/User'
 import { requireTenantAdmin } from '~/server/utils/requireRole'
+import { logAction } from '~/server/utils/audit'
 import mongoose from 'mongoose'
 
 /**
@@ -113,7 +114,17 @@ export default defineEventHandler(async (event) => {
 
   await user.save()
 
-  console.log(`User updated: ${user.email}`)
+  // Log audit action
+  await logAction(event, {
+    action: 'user.update',
+    entity: 'User',
+    entityId: user._id,
+    tenantId: currentUser.tenantId,
+    metadata: {
+      email: user.email,
+      fieldsUpdated: Object.keys(body).filter(k => body[k as keyof typeof body] !== undefined),
+    },
+  })
 
   // Return user without password hash
   return {

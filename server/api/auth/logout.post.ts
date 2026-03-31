@@ -1,5 +1,6 @@
 import { connectDB } from '~/server/utils/db'
 import RefreshToken from '~/server/models/RefreshToken'
+import { logAction } from '~/server/utils/audit'
 import crypto from 'crypto'
 
 /**
@@ -48,8 +49,17 @@ export default defineEventHandler(async (event) => {
       await token.save()
     }
 
-    // TODO: Log audit action
-    console.log(`User ${contextUser.email} logged out`)
+    // Log audit action
+    await logAction(event, {
+      action: 'auth.logout',
+      entity: 'User',
+      entityId: contextUser.sub,
+      userId: contextUser.sub,
+      tenantId: contextUser.tenantId,
+      metadata: {
+        email: contextUser.email,
+      },
+    })
 
     return {
       message: 'Logged out successfully',
