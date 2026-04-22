@@ -9,28 +9,28 @@
             Manage and track your loan applications
           </p>
         </div>
-        <div class="header-stats">
+        <dl class="header-stats" aria-label="Application statistics">
           <div class="stat-pill">
-            <v-icon size="16" color="grey">mdi-file-document-outline</v-icon>
-            <span class="stat-value">{{ draftCount }}</span>
-            <span class="stat-label">Drafts</span>
+            <v-icon size="16" color="grey" aria-hidden="true">mdi-file-document-outline</v-icon>
+            <dd class="stat-value">{{ draftCount }}</dd>
+            <dt class="stat-label">Drafts</dt>
           </div>
           <div class="stat-pill">
-            <v-icon size="16" color="primary">mdi-send</v-icon>
-            <span class="stat-value">{{ submittedCount }}</span>
-            <span class="stat-label">Submitted</span>
+            <v-icon size="16" color="primary" aria-hidden="true">mdi-send</v-icon>
+            <dd class="stat-value">{{ submittedCount }}</dd>
+            <dt class="stat-label">Submitted</dt>
           </div>
           <div class="stat-pill">
-            <v-icon size="16" color="warning">mdi-clock-outline</v-icon>
-            <span class="stat-value">{{ pendingDocumentsCount }}</span>
-            <span class="stat-label">Pending Docs</span>
+            <v-icon size="16" color="warning" aria-hidden="true">mdi-clock-outline</v-icon>
+            <dd class="stat-value">{{ pendingDocumentsCount }}</dd>
+            <dt class="stat-label">Pending Docs</dt>
           </div>
           <div class="stat-pill">
-            <v-icon size="16" color="success">mdi-check-circle</v-icon>
-            <span class="stat-value">{{ approvedCount }}</span>
-            <span class="stat-label">Approved</span>
+            <v-icon size="16" color="success" aria-hidden="true">mdi-check-circle</v-icon>
+            <dd class="stat-value">{{ approvedCount }}</dd>
+            <dt class="stat-label">Approved</dt>
           </div>
-        </div>
+        </dl>
       </div>
       <div class="header-actions">
         <v-btn
@@ -193,6 +193,7 @@
               variant="text"
               size="small"
               color="primary"
+              aria-label="View application"
               @click="viewApplication(item)"
             >
               <v-icon size="18">mdi-eye-outline</v-icon>
@@ -202,6 +203,7 @@
               variant="text"
               size="small"
               color="secondary"
+              aria-label="Edit application"
               @click="editApplication(item)"
             >
               <v-icon size="18">mdi-pencil-outline</v-icon>
@@ -212,6 +214,7 @@
                   variant="text"
                   size="small"
                   icon="mdi-dots-vertical"
+                  aria-label="More actions"
                   v-bind="props"
                 />
               </template>
@@ -339,7 +342,6 @@ const loadApplications = async () => {
     await loansStore.fetchApplications()
   } catch (err: any) {
     error.value = err.data?.statusMessage || 'Failed to load applications'
-    console.error('Failed to load applications:', err)
   }
 }
 
@@ -713,11 +715,16 @@ onMounted(() => {
   color: rgba(var(--v-theme-on-surface), 0.7);
 }
 
-/* Action Buttons */
+/* Action Buttons — enforce 44px min touch target */
 .action-buttons {
   display: flex;
   gap: 4px;
   align-items: center;
+}
+
+.action-buttons :deep(.v-btn--size-small) {
+  min-width: 44px;
+  min-height: 44px;
 }
 
 /* Actions Menu */
@@ -753,6 +760,25 @@ onMounted(() => {
   .search-field,
   .status-filter {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-title {
+    font-size: 24px;
+  }
+
+  .header-stats {
+    gap: 8px;
+  }
+
+  .stat-pill {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .search-field {
+    min-width: 0;
   }
 }
 </style>

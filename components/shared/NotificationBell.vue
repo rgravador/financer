@@ -4,19 +4,30 @@
     :close-on-content-click="false"
     offset-y
     location="bottom end"
-    max-width="380"
-    min-width="340"
+    :max-width="dropdownMaxWidth"
+    :min-width="dropdownMinWidth"
   >
     <template v-slot:activator="{ props }">
-      <button v-bind="props" class="topbar-btn notification-btn">
-        <v-icon size="20">mdi-bell-outline</v-icon>
-        <span v-if="notificationsStore.unreadCount > 0" class="notification-badge">
+      <button
+        v-bind="props"
+        class="topbar-btn notification-btn"
+        aria-label="Notifications"
+        aria-haspopup="true"
+        :aria-expanded="menuOpen"
+      >
+        <v-icon size="20" aria-hidden="true">mdi-bell-outline</v-icon>
+        <span
+          v-if="notificationsStore.unreadCount > 0"
+          class="notification-badge"
+          aria-live="polite"
+          :aria-label="`${notificationsStore.unreadCount} unread notifications`"
+        >
           {{ notificationsStore.unreadCount > 99 ? '99+' : notificationsStore.unreadCount }}
         </span>
       </button>
     </template>
 
-    <div class="notification-dropdown">
+    <div class="notification-dropdown" role="region" aria-label="Notifications panel">
       <!-- Header -->
       <div class="dropdown-header">
         <h3 class="dropdown-title">Notifications</h3>
@@ -30,16 +41,18 @@
       </div>
 
       <!-- Notifications List -->
-      <div class="notification-list" v-if="!notificationsStore.loading">
+      <div class="notification-list" role="list" aria-label="Notification items" v-if="!notificationsStore.loading">
         <template v-if="notificationsStore.notifications.length > 0">
           <button
             v-for="notification in notificationsStore.notifications"
             :key="notification.id"
             class="notification-item"
             :class="{ 'notification-item--unread': !notification.isRead }"
+            role="listitem"
+            :aria-label="`${notification.isRead ? '' : 'Unread: '}${notification.title}. ${notification.message}`"
             @click="handleNotificationClick(notification)"
           >
-            <div class="notification-icon" :class="getIconClass(notification.type)">
+            <div class="notification-icon" :class="getIconClass(notification.type)" aria-hidden="true">
               <v-icon size="18">{{ getIcon(notification.type) }}</v-icon>
             </div>
             <div class="notification-content">
@@ -47,20 +60,20 @@
               <p class="notification-message">{{ notification.message }}</p>
               <span class="notification-time">{{ formatTime(notification.createdAt) }}</span>
             </div>
-            <div v-if="!notification.isRead" class="unread-dot"></div>
+            <div v-if="!notification.isRead" class="unread-dot" aria-hidden="true"></div>
           </button>
         </template>
 
         <!-- Empty State -->
-        <div v-else class="empty-state">
-          <v-icon size="48" color="grey-lighten-1">mdi-bell-off-outline</v-icon>
+        <div v-else class="empty-state" role="status">
+          <v-icon size="48" color="grey-lighten-1" aria-hidden="true">mdi-bell-off-outline</v-icon>
           <p>No notifications yet</p>
         </div>
       </div>
 
       <!-- Loading State -->
-      <div v-else class="loading-state">
-        <v-progress-circular indeterminate size="24" color="primary" />
+      <div v-else class="loading-state" role="status" aria-label="Loading notifications">
+        <v-progress-circular indeterminate size="24" color="primary" aria-hidden="true" />
         <span>Loading...</span>
       </div>
 
@@ -85,24 +98,43 @@ const router = useRouter()
 
 const menuOpen = ref(false)
 let stopPolling: (() => void) | null = null
+let abortController: AbortController | null = null
+
+// Responsive dropdown width
+const dropdownMaxWidth = computed(() => {
+  if (typeof window !== 'undefined' && window.innerWidth < 420) {
+    return `${window.innerWidth - 32}px`
+  }
+  return '380'
+})
+
+const dropdownMinWidth = computed(() => {
+  if (typeof window !== 'undefined' && window.innerWidth < 420) {
+    return `${window.innerWidth - 32}px`
+  }
+  return '340'
+})
 
 // Fetch notifications and start polling on mount
 onMounted(async () => {
   if (authStore.isAuthenticated) {
     try {
+      abortController = new AbortController()
       await notificationsStore.fetchNotifications()
-      // Start polling every 60 seconds
       stopPolling = notificationsStore.startPolling(60000)
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error)
+    } catch {
+      // Non-critical: notifications will load on next poll or menu open
     }
   }
 })
 
-// Stop polling on unmount
+// Stop polling and abort pending requests on unmount
 onUnmounted(() => {
   if (stopPolling) {
     stopPolling()
+  }
+  if (abortController) {
+    abortController.abort()
   }
 })
 
@@ -111,8 +143,8 @@ watch(menuOpen, async (isOpen) => {
   if (isOpen && authStore.isAuthenticated) {
     try {
       await notificationsStore.fetchNotifications()
-    } catch (error) {
-      console.error('Failed to refresh notifications:', error)
+    } catch {
+      // Non-critical: list shows cached data
     }
   }
 })
@@ -120,39 +152,35 @@ watch(menuOpen, async (isOpen) => {
 // Methods
 const handleNotificationClick = async (notification: Notification) => {
   try {
-    // Mark as read if unread
     if (!notification.isRead) {
       await notificationsStore.markAsRead(notification.id)
     }
 
-    // Close menu
     menuOpen.value = false
 
-    // Navigate based on notification type and data
     if (notification.data?.applicationId) {
       const userRole = authStore.user?.role
-      if (userRole === 'tenant_approver' || userRole === 'tenant_admin') {
+      if (['tenant_approver', 'tenant_admin'].includes(userRole || '')) {
         router.push(`/approver/queue/${notification.data.applicationId}`)
       } else if (userRole === 'tenant_officer') {
         router.push(`/officer/applications/${notification.data.applicationId}`)
       }
     }
-  } catch (error) {
-    console.error('Failed to handle notification click:', error)
+  } catch {
+    // Non-critical
   }
 }
 
 const handleMarkAllRead = async () => {
   try {
     await notificationsStore.markAllRead()
-  } catch (error) {
-    console.error('Failed to mark all as read:', error)
+  } catch {
+    // Non-critical
   }
 }
 
 const handleViewAll = () => {
   menuOpen.value = false
-  // Navigate to notifications page if it exists
   router.push('/notifications')
 }
 
@@ -208,23 +236,28 @@ const formatTime = (date: Date | string): string => {
 
 <style scoped>
 .topbar-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 8px;
-  color: rgba(var(--v-theme-on-surface), 0.6);
+  border-radius: var(--border-radius-sm, 8px);
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base, 200ms);
   position: relative;
 }
 
 .topbar-btn:hover {
-  background: rgba(var(--v-theme-on-surface), 0.05);
-  color: rgb(var(--v-theme-on-surface));
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.topbar-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .notification-badge {
@@ -233,9 +266,9 @@ const formatTime = (date: Date | string): string => {
   right: 6px;
   min-width: 18px;
   height: 18px;
-  background: rgb(var(--v-theme-error));
+  background: var(--color-error);
   color: white;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 10px;
   font-weight: 600;
   border-radius: 9px;
@@ -247,10 +280,10 @@ const formatTime = (date: Date | string): string => {
 
 /* Dropdown */
 .notification-dropdown {
-  background: rgb(var(--v-theme-surface));
-  border-radius: 12px;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background: var(--bg-card);
+  border-radius: var(--border-radius, 12px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
@@ -259,32 +292,37 @@ const formatTime = (date: Date | string): string => {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .dropdown-title {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display);
   font-size: 16px;
   font-weight: 600;
-  color: rgb(var(--v-theme-on-surface));
+  color: var(--text-primary);
   margin: 0;
 }
 
 .mark-all-btn {
   background: transparent;
   border: none;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 500;
   color: rgb(var(--v-theme-primary));
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
-  transition: background 0.2s ease;
+  transition: background var(--transition-base, 200ms);
 }
 
 .mark-all-btn:hover {
   background: rgba(var(--v-theme-primary), 0.1);
+}
+
+.mark-all-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 /* Notification List */
@@ -303,12 +341,17 @@ const formatTime = (date: Date | string): string => {
   width: 100%;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background var(--transition-base, 200ms);
   position: relative;
 }
 
 .notification-item:hover {
-  background: rgba(var(--v-theme-on-surface), 0.04);
+  background: var(--bg-hover);
+}
+
+.notification-item:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
 }
 
 .notification-item--unread {
@@ -322,7 +365,7 @@ const formatTime = (date: Date | string): string => {
 .notification-icon {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm, 8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -335,28 +378,28 @@ const formatTime = (date: Date | string): string => {
 }
 
 .icon-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: rgba(var(--v-theme-success), 0.1);
+  color: rgb(var(--v-theme-success));
 }
 
 .icon-error {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: rgba(var(--v-theme-error), 0.1);
+  color: rgb(var(--v-theme-error));
 }
 
 .icon-warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
+  background: rgba(var(--v-theme-warning), 0.1);
+  color: rgb(var(--v-theme-warning));
 }
 
 .icon-info {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background: rgba(var(--v-theme-info), 0.1);
+  color: rgb(var(--v-theme-info));
 }
 
 .icon-default {
-  background: rgba(var(--v-theme-on-surface), 0.1);
-  color: rgba(var(--v-theme-on-surface), 0.6);
+  background: var(--bg-hover);
+  color: var(--text-muted);
 }
 
 .notification-content {
@@ -365,18 +408,18 @@ const formatTime = (date: Date | string): string => {
 }
 
 .notification-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
-  color: rgb(var(--v-theme-on-surface));
+  color: var(--text-primary);
   margin: 0 0 2px 0;
   line-height: 1.4;
 }
 
 .notification-message {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
-  color: rgba(var(--v-theme-on-surface), 0.6);
+  color: var(--text-secondary);
   margin: 0 0 4px 0;
   line-height: 1.4;
   display: -webkit-box;
@@ -386,9 +429,9 @@ const formatTime = (date: Date | string): string => {
 }
 
 .notification-time {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
-  color: rgba(var(--v-theme-on-surface), 0.4);
+  color: var(--text-muted);
 }
 
 .unread-dot {
@@ -410,9 +453,9 @@ const formatTime = (date: Date | string): string => {
 }
 
 .empty-state p {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: rgba(var(--v-theme-on-surface), 0.5);
+  color: var(--text-muted);
   margin: 12px 0 0 0;
 }
 
@@ -423,15 +466,15 @@ const formatTime = (date: Date | string): string => {
   justify-content: center;
   gap: 12px;
   padding: 40px 20px;
-  color: rgba(var(--v-theme-on-surface), 0.5);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
   font-size: 14px;
 }
 
 /* Footer */
 .dropdown-footer {
   padding: 12px 16px;
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  border-top: 1px solid var(--border-color);
 }
 
 .view-all-btn {
@@ -439,16 +482,21 @@ const formatTime = (date: Date | string): string => {
   padding: 10px;
   background: rgba(var(--v-theme-primary), 0.08);
   border: none;
-  border-radius: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  border-radius: var(--border-radius-sm, 8px);
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
   color: rgb(var(--v-theme-primary));
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background var(--transition-base, 200ms);
 }
 
 .view-all-btn:hover {
   background: rgba(var(--v-theme-primary), 0.15);
+}
+
+.view-all-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 </style>

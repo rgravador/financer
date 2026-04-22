@@ -1,9 +1,10 @@
 <template>
-  <div class="status-timeline">
+  <div class="status-timeline" role="list" aria-label="Status history">
     <div
       v-for="(item, index) in sortedItems"
       :key="index"
       class="timeline-item"
+      role="listitem"
       :class="{
         'timeline-item--current': index === 0,
         'timeline-item--completed': isCompleted(item.status),
@@ -233,7 +234,7 @@ const getInitials = (name: string): string => {
   align-items: center;
   justify-content: center;
   z-index: 1;
-  background: #9e9e9e;
+  background: rgba(var(--v-theme-on-surface), 0.4);
 }
 
 .timeline-item--current .marker-dot {
@@ -313,12 +314,12 @@ const getInitials = (name: string): string => {
 
 /* Completed State */
 .timeline-item--completed .marker-dot {
-  background: #10b981;
+  background: rgb(var(--v-theme-success));
 }
 
 /* Error State */
 .timeline-item--error .marker-dot {
-  background: #ef4444;
+  background: rgb(var(--v-theme-error));
 }
 
 /* Empty State */
@@ -337,11 +338,36 @@ const getInitials = (name: string): string => {
 }
 
 /* Responsive */
+@media (max-width: 960px) {
+  .timeline-content {
+    padding-bottom: 20px;
+  }
+
+  .timeline-item--current .timeline-content {
+    padding: 12px;
+    margin: -6px -8px 12px -8px;
+  }
+}
+
 @media (max-width: 600px) {
   .timeline-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+  }
+
+  .timeline-marker {
+    width: 20px;
+  }
+
+  .marker-dot {
+    width: 20px;
+    height: 20px;
+  }
+
+  .timeline-item--current .marker-dot {
+    width: 24px;
+    height: 24px;
   }
 }
 </style>

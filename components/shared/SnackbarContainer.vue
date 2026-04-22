@@ -6,8 +6,8 @@
     location="bottom right"
     class="app-snackbar"
   >
-    <div class="snackbar-content">
-      <v-icon v-if="snackbarIcon" class="snackbar-icon">{{ snackbarIcon }}</v-icon>
+    <div class="snackbar-content" role="status" aria-live="polite">
+      <v-icon v-if="snackbarIcon" class="snackbar-icon" aria-hidden="true">{{ snackbarIcon }}</v-icon>
       <span class="snackbar-message">{{ snackbar.state.value.message }}</span>
     </div>
 
@@ -15,6 +15,7 @@
       <v-btn
         variant="text"
         size="small"
+        aria-label="Dismiss notification"
         @click="snackbar.hide()"
       >
         <v-icon>mdi-close</v-icon>
@@ -39,7 +40,7 @@ const snackbarIcon = computed(() => {
 
 <style scoped>
 .app-snackbar {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
 }
 
 .snackbar-content {

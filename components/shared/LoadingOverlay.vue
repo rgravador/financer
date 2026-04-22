@@ -40,7 +40,7 @@ const internalLoading = computed(() => props.loading)
 
 <style scoped>
 .loading-overlay {
-  z-index: 9999;
+  z-index: var(--z-overlay, 500);
 }
 
 .loading-content {
@@ -52,11 +52,11 @@ const internalLoading = computed(() => props.loading)
   padding: 32px;
   background: var(--bg-card, #ffffff);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.12));
 }
 
 .loading-message {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary);

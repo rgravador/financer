@@ -1,9 +1,12 @@
 <template>
   <v-navigation-drawer
+    v-model="drawerOpen"
     app
-    permanent
+    :permanent="!isMobile"
+    :temporary="isMobile"
     :width="280"
     class="app-sidebar"
+    :aria-label="'Main navigation'"
   >
     <!-- Logo Section -->
     <div class="sidebar-header">
@@ -14,20 +17,21 @@
 
     <!-- Navigation Menu -->
     <div class="nav-section">
-      <p class="nav-label">Main Menu</p>
-      <nav class="nav-menu">
+      <p class="nav-label" id="main-menu-label">Main Menu</p>
+      <nav class="nav-menu" aria-labelledby="main-menu-label" role="navigation">
         <NuxtLink
           v-for="item in filteredMenuItems"
           :key="item.to"
           :to="item.to"
           class="nav-item"
           :class="{ active: isActiveRoute(item.to) }"
+          :aria-current="isActiveRoute(item.to) ? 'page' : undefined"
         >
-          <div class="nav-item-icon">
+          <div class="nav-item-icon" aria-hidden="true">
             <v-icon size="20">{{ item.icon }}</v-icon>
           </div>
           <span class="nav-item-text">{{ item.title }}</span>
-          <div v-if="item.badge" class="nav-item-badge">{{ item.badge }}</div>
+          <div v-if="item.badge" class="nav-item-badge" :aria-label="`${item.badge} new items`">{{ item.badge }}</div>
         </NuxtLink>
       </nav>
     </div>
@@ -37,6 +41,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useDisplay } from 'vuetify'
 
 interface MenuItem {
   title: string
@@ -45,6 +50,22 @@ interface MenuItem {
   roles: string[]
   badge?: string | number
 }
+
+const props = defineProps<{
+  modelValue?: boolean
+}>()
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+}>()
+
+const { mobile } = useDisplay()
+const isMobile = computed(() => mobile.value)
+
+const drawerOpen = computed({
+  get: () => props.modelValue ?? true,
+  set: (value: boolean) => emit('update:modelValue', value),
+})
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -141,6 +162,11 @@ const isActiveRoute = (path: string) => {
   text-decoration: none;
   transition: all var(--transition-base);
   position: relative;
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
 }
 
 .nav-item-icon {

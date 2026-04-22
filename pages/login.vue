@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <!-- Decorative Background Elements -->
-    <div class="bg-decoration">
+    <div class="bg-decoration" aria-hidden="true">
       <div class="bg-circle bg-circle-1"></div>
       <div class="bg-circle bg-circle-2"></div>
       <div class="bg-circle bg-circle-3"></div>
@@ -29,70 +29,81 @@
           variant="tonal"
           closable
           class="mb-6 error-alert"
+          role="alert"
           @click:close="authStore.clearError()"
         >
           {{ authStore.error }}
         </v-alert>
 
         <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="login-form">
+        <form @submit.prevent="handleLogin" class="login-form" aria-label="Sign in">
           <div class="form-group">
-            <label class="form-label">Email address</label>
+            <label for="email-input" class="form-label">Email address</label>
             <div class="input-wrapper" :class="{ 'input-focused': emailFocused, 'input-error': emailError }">
-              <v-icon class="input-icon">mdi-email-outline</v-icon>
+              <v-icon class="input-icon" aria-hidden="true">mdi-email-outline</v-icon>
               <input
+                id="email-input"
                 v-model="email"
                 type="email"
                 class="form-input"
                 placeholder="you@company.com"
+                autocomplete="email"
                 :disabled="authStore.loading"
+                :aria-invalid="!!emailError"
+                :aria-describedby="emailError ? 'email-error' : undefined"
                 @focus="emailFocused = true"
                 @blur="emailFocused = false"
               >
             </div>
-            <span v-if="emailError" class="field-error">{{ emailError }}</span>
+            <span v-if="emailError" id="email-error" class="field-error" role="alert">{{ emailError }}</span>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Password</label>
+            <label for="password-input" class="form-label">Password</label>
             <div class="input-wrapper" :class="{ 'input-focused': passwordFocused, 'input-error': passwordError }">
-              <v-icon class="input-icon">mdi-lock-outline</v-icon>
+              <v-icon class="input-icon" aria-hidden="true">mdi-lock-outline</v-icon>
               <input
+                id="password-input"
                 v-model="password"
                 :type="showPassword ? 'text' : 'password'"
                 class="form-input"
                 placeholder="Enter your password"
+                autocomplete="current-password"
                 :disabled="authStore.loading"
+                :aria-invalid="!!passwordError"
+                :aria-describedby="passwordError ? 'password-error' : undefined"
                 @focus="passwordFocused = true"
                 @blur="passwordFocused = false"
               >
-              <v-icon
+              <button
+                type="button"
                 class="toggle-password"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
                 @click="showPassword = !showPassword"
               >
-                {{ showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}
-              </v-icon>
+                <v-icon>{{ showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>
+              </button>
             </div>
-            <span v-if="passwordError" class="field-error">{{ passwordError }}</span>
+            <span v-if="passwordError" id="password-error" class="field-error" role="alert">{{ passwordError }}</span>
           </div>
 
           <div class="form-options">
             <label class="checkbox-label">
               <input v-model="rememberMe" type="checkbox" class="checkbox-input">
-              <span class="checkbox-custom"></span>
+              <span class="checkbox-custom" aria-hidden="true"></span>
               <span class="checkbox-text">Remember me</span>
             </label>
-            <a href="#" class="forgot-link">Forgot password?</a>
+            <a href="#" class="forgot-link" aria-label="Forgot your password?">Forgot password?</a>
           </div>
 
-          <button type="submit" class="submit-button" :disabled="authStore.loading">
+          <button type="submit" class="submit-button" :disabled="authStore.loading" aria-label="Sign in to your account">
             <span v-if="authStore.loading" class="loading-state">
-              <v-progress-circular indeterminate size="20" width="2" color="white" />
+              <v-progress-circular indeterminate size="20" width="2" color="white" aria-hidden="true" />
               <span>Signing in...</span>
             </span>
             <span v-else class="button-content">
               Sign in
-              <v-icon size="20">mdi-arrow-right</v-icon>
+              <v-icon size="20" aria-hidden="true">mdi-arrow-right</v-icon>
             </span>
           </button>
         </form>
@@ -102,16 +113,17 @@
           <div class="demo-divider">
             <span class="demo-divider-text">Quick Access</span>
           </div>
-          <div class="demo-chips">
+          <div class="demo-chips" role="group" aria-label="Demo account credentials">
             <button
               v-for="account in demoAccounts"
               :key="account.email"
               type="button"
               class="demo-chip"
               :class="getDemoChipClass(account.label)"
+              :aria-label="`Sign in as ${account.label}`"
               @click="fillDemoAccount(account)"
             >
-              <v-icon size="16" class="chip-icon">{{ getDemoIcon(account.label) }}</v-icon>
+              <v-icon size="16" class="chip-icon" aria-hidden="true">{{ getDemoIcon(account.label) }}</v-icon>
               {{ account.label }}
             </button>
           </div>
@@ -125,14 +137,14 @@
     </div>
 
     <!-- Divider -->
-    <div class="section-divider"></div>
+    <div class="section-divider" aria-hidden="true"></div>
 
     <!-- Right Section - Branding -->
-    <div class="branding-section">
+    <div class="branding-section" aria-hidden="true">
       <div class="branding-content">
         <!-- Logo & Brand -->
         <div class="brand-header">
-          <img src="/logo-transparent.png" alt="Ascendent" class="brand-logo" />
+          <img src="/logo-transparent.png" alt="" class="brand-logo" />
           <div class="brand-info">
             <h1 class="brand-name">Ascendent</h1>
             <span class="brand-tagline">Lending Platform</span>
@@ -296,8 +308,8 @@ const handleLogin = async () => {
     } else {
       router.push('/')
     }
-  } catch (error) {
-    console.error('Login failed:', error)
+  } catch {
+    // Auth store handles error state via authStore.error
   }
 }
 
@@ -310,10 +322,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ============================================================================
+   LOGIN PAGE — Custom Color Tokens
+   This page uses a fixed dark theme (not switchable) so we define
+   page-scoped tokens referencing the global :root palette where possible.
+   ============================================================================ */
 .login-page {
+  /* Page-scoped color tokens (referencing :root vars where available) */
+  --login-bg-dark: var(--color-slate-950, #0f172a);
+  --login-bg-medium: var(--color-slate-900, #1e293b);
+  --login-bg-input: var(--color-slate-900, #1e293b);
+  --login-border: var(--color-slate-800, #334155);
+  --login-border-hover: var(--color-slate-700, #475569);
+  --login-text-primary: #ffffff;
+  --login-text-secondary: var(--color-slate-500, #94a3b8);
+  --login-text-muted: var(--color-slate-600, #64748b);
+  --login-text-label: var(--color-slate-300, #e2e8f0);
+  --login-accent: var(--color-amber-400, #fbbf24);
+  --login-primary: var(--color-info, #3b82f6);
+  --login-primary-dark: #2563eb;
+  --login-primary-light: #60a5fa;
+  --login-primary-lighter: #93c5fd;
+  --login-error: var(--color-error, #ef4444);
+
   min-height: 100vh;
   display: flex;
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
+  background: linear-gradient(135deg, var(--login-bg-dark) 0%, #1e3a8a 50%, #1e40af 100%);
   position: relative;
   overflow: hidden;
 }
@@ -351,10 +385,10 @@ onMounted(() => {
 }
 
 .mobile-brand-name {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 24px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--login-text-primary);
 }
 
 /* Welcome Section */
@@ -363,18 +397,18 @@ onMounted(() => {
 }
 
 .welcome-title {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--login-text-primary);
   margin: 0 0 8px 0;
   letter-spacing: -0.02em;
 }
 
 .welcome-subtitle {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 15px;
-  color: #94a3b8;
+  color: var(--login-text-secondary);
   margin: 0;
 }
 
@@ -469,19 +503,19 @@ onMounted(() => {
 }
 
 .brand-name {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 32px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--login-text-primary);
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .brand-tagline {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--login-accent);
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
@@ -492,17 +526,17 @@ onMounted(() => {
 }
 
 .headline-text {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 36px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--login-text-primary);
   line-height: 1.2;
   margin: 0 0 16px 0;
   letter-spacing: -0.02em;
 }
 
 .headline-sub {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
@@ -530,20 +564,20 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fbbf24;
+  color: var(--login-accent);
   flex-shrink: 0;
 }
 
 .feature-text h4 {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--login-text-primary);
   margin: 0 0 4px 0;
 }
 
 .feature-text p {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
@@ -557,7 +591,7 @@ onMounted(() => {
 }
 
 .trust-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
   color: rgba(255, 255, 255, 0.5);
   margin: 0 0 20px 0;
@@ -578,14 +612,14 @@ onMounted(() => {
 }
 
 .stat-value {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--login-text-primary);
 }
 
 .stat-label {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -615,10 +649,10 @@ onMounted(() => {
 }
 
 .form-label {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--login-text-label);
 }
 
 .input-wrapper {
@@ -626,52 +660,58 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border: 2px solid #334155;
+  border: 2px solid var(--login-border);
   border-radius: 12px;
-  background: #1e293b;
+  background: var(--login-bg-input);
   transition: all 0.2s ease;
 }
 
+.input-wrapper:focus-within {
+  border-color: var(--login-primary);
+  background: var(--login-bg-dark);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
 .input-wrapper.input-focused {
-  border-color: #3b82f6;
-  background: #0f172a;
+  border-color: var(--login-primary);
+  background: var(--login-bg-dark);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
 .input-wrapper.input-error {
-  border-color: #ef4444;
+  border-color: var(--login-error);
   background: rgba(239, 68, 68, 0.1);
 }
 
 .input-icon {
-  color: #64748b;
+  color: var(--login-text-muted);
   flex-shrink: 0;
 }
 
 .input-focused .input-icon {
-  color: #3b82f6;
+  color: var(--login-primary);
 }
 
 .form-input {
   flex: 1;
   border: none;
   background: transparent;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 15px;
-  color: #ffffff;
+  color: var(--login-text-primary);
   outline: none;
 }
 
 .form-input::placeholder {
-  color: #64748b;
+  color: var(--login-text-muted);
 }
 
 .form-input:-webkit-autofill,
 .form-input:-webkit-autofill:hover,
 .form-input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #1e293b inset;
-  -webkit-text-fill-color: #ffffff;
-  caret-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px var(--login-bg-input) inset;
+  -webkit-text-fill-color: var(--login-text-primary);
+  caret-color: var(--login-text-primary);
 }
 
 .form-input:disabled {
@@ -680,19 +720,31 @@ onMounted(() => {
 }
 
 .toggle-password {
-  color: #64748b;
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--login-text-muted);
   cursor: pointer;
   transition: color 0.2s;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toggle-password:hover {
-  color: #94a3b8;
+  color: var(--login-text-secondary);
+}
+
+.toggle-password:focus-visible {
+  outline: 2px solid var(--login-primary);
+  outline-offset: 2px;
 }
 
 .field-error {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
-  color: #ef4444;
+  color: var(--login-error);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -713,22 +765,31 @@ onMounted(() => {
 }
 
 .checkbox-input {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
 }
 
 .checkbox-custom {
   width: 20px;
   height: 20px;
-  border: 2px solid #475569;
+  border: 2px solid var(--login-border-hover);
   border-radius: 6px;
   transition: all 0.2s;
   position: relative;
-  background: #1e293b;
+  background: var(--login-bg-input);
+}
+
+.checkbox-input:focus-visible + .checkbox-custom {
+  outline: 2px solid var(--login-primary);
+  outline-offset: 2px;
 }
 
 .checkbox-input:checked + .checkbox-custom {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--login-primary);
+  border-color: var(--login-primary);
 }
 
 .checkbox-input:checked + .checkbox-custom::after {
@@ -744,34 +805,42 @@ onMounted(() => {
 }
 
 .checkbox-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--login-text-secondary);
 }
 
 .forgot-link {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
   font-weight: 500;
-  color: #60a5fa;
+  color: var(--login-primary-light);
   text-decoration: none;
   transition: color 0.2s;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
 }
 
 .forgot-link:hover {
-  color: #93c5fd;
+  color: var(--login-primary-lighter);
   text-decoration: underline;
+}
+
+.forgot-link:focus-visible {
+  outline: 2px solid var(--login-primary);
+  outline-offset: 2px;
 }
 
 /* Submit Button */
 .submit-button {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--login-primary) 0%, var(--login-primary-dark) 100%);
   color: white;
   border: none;
   border-radius: 12px;
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -782,6 +851,11 @@ onMounted(() => {
 .submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+}
+
+.submit-button:focus-visible {
+  outline: 2px solid var(--login-primary-lighter);
+  outline-offset: 2px;
 }
 
 .submit-button:active:not(:disabled) {
@@ -825,14 +899,14 @@ onMounted(() => {
   content: '';
   flex: 1;
   height: 1px;
-  background: #334155;
+  background: var(--login-border);
 }
 
 .demo-divider-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 12px;
   font-weight: 500;
-  color: #64748b;
+  color: var(--login-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -849,23 +923,28 @@ onMounted(() => {
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--login-bg-medium);
+  border: 1px solid var(--login-border);
   border-radius: 10px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--login-text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .demo-chip:hover {
-  background: #0f172a;
-  border-color: #3b82f6;
-  color: #60a5fa;
+  background: var(--login-bg-dark);
+  border-color: var(--login-primary);
+  color: var(--login-primary-light);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.demo-chip:focus-visible {
+  outline: 2px solid var(--login-primary);
+  outline-offset: 2px;
 }
 
 .chip-icon {
@@ -896,8 +975,8 @@ onMounted(() => {
 }
 
 .chip-approver:hover {
-  border-color: #fbbf24;
-  color: #fbbf24;
+  border-color: var(--login-accent);
+  color: var(--login-accent);
   box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
 }
 
@@ -905,9 +984,9 @@ onMounted(() => {
 .login-footer {
   margin-top: 40px;
   text-align: center;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
-  color: #64748b;
+  color: var(--login-text-muted);
 }
 
 /* Responsive - Tablet */

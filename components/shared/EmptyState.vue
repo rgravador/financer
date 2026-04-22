@@ -97,37 +97,37 @@ const handleAction = () => {
 }
 
 .empty-icon.icon-primary {
-  background: rgba(30, 58, 138, 0.08);
-  color: #1e3a8a;
+  background: rgba(var(--v-theme-primary), 0.08);
+  color: rgb(var(--v-theme-primary));
 }
 
 .empty-icon.icon-secondary {
-  background: rgba(100, 116, 139, 0.08);
-  color: #64748b;
+  background: rgba(var(--v-theme-secondary), 0.08);
+  color: rgb(var(--v-theme-secondary));
 }
 
 .empty-icon.icon-success {
-  background: rgba(16, 185, 129, 0.08);
-  color: #10b981;
+  background: rgba(var(--v-theme-success), 0.08);
+  color: rgb(var(--v-theme-success));
 }
 
 .empty-icon.icon-warning {
-  background: rgba(245, 158, 11, 0.08);
-  color: #f59e0b;
+  background: rgba(var(--v-theme-warning), 0.08);
+  color: rgb(var(--v-theme-warning));
 }
 
 .empty-icon.icon-error {
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
+  background: rgba(var(--v-theme-error), 0.08);
+  color: rgb(var(--v-theme-error));
 }
 
 .empty-icon.icon-info {
-  background: rgba(14, 165, 233, 0.08);
-  color: #0ea5e9;
+  background: rgba(var(--v-theme-info), 0.08);
+  color: rgb(var(--v-theme-info));
 }
 
 .empty-title {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
@@ -139,7 +139,7 @@ const handleAction = () => {
 }
 
 .empty-description {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
   color: var(--text-secondary);
   margin: 0 0 24px 0;

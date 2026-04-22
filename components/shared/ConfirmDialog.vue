@@ -4,6 +4,8 @@
     :max-width="maxWidth"
     persistent
     class="confirm-dialog"
+    role="alertdialog"
+    :aria-label="title"
   >
     <v-card class="confirm-card">
       <!-- Icon -->
@@ -65,7 +67,7 @@ const props = withDefaults(defineProps<Props>(), {
   cancelColor: 'grey',
   icon: undefined,
   loading: false,
-  maxWidth: 400,
+  maxWidth: '400',
 })
 
 const emit = defineEmits<{
@@ -111,27 +113,27 @@ const handleCancel = () => {
 }
 
 .dialog-icon.icon-primary {
-  background: rgba(30, 58, 138, 0.1);
-  color: #1e3a8a;
+  background: rgba(var(--v-theme-primary), 0.1);
+  color: rgb(var(--v-theme-primary));
 }
 
 .dialog-icon.icon-error {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: rgba(var(--v-theme-error), 0.1);
+  color: rgb(var(--v-theme-error));
 }
 
 .dialog-icon.icon-warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
+  background: rgba(var(--v-theme-warning), 0.1);
+  color: rgb(var(--v-theme-warning));
 }
 
 .dialog-icon.icon-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: rgba(var(--v-theme-success), 0.1);
+  color: rgb(var(--v-theme-success));
 }
 
 .dialog-title {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
@@ -140,7 +142,7 @@ const handleCancel = () => {
 }
 
 .dialog-message {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
   color: var(--text-secondary);
   padding: 0 0 24px 0;

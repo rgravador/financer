@@ -71,7 +71,7 @@ export default defineNuxtConfig({
     '~/styles/wireframe.scss'
   ],
 
-  // Vite configuration for SCSS
+  // Vite configuration for SCSS and Vuetify tree-shaking
   vite: {
     css: {
       preprocessorOptions: {
@@ -80,6 +80,11 @@ export default defineNuxtConfig({
         }
       }
     }
+  },
+
+  // Build optimization: Vuetify tree-shaking
+  build: {
+    transpile: ['vuetify'],
   },
 
   // App head configuration (Montserrat for headlines, Inter for body)

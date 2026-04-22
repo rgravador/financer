@@ -92,6 +92,18 @@
   --border-radius-xl: 20px;
   --border-radius-full: 9999px;
 
+  // Z-index scale (systematic layering)
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-sidebar: 300;
+  --z-topbar: 400;
+  --z-overlay: 500;
+  --z-drawer: 600;
+  --z-modal: 700;
+  --z-snackbar: 800;
+  --z-tooltip: 900;
+  --z-skip-link: 2000;
+
   // Shadows - soft and layered
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 3px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
@@ -115,18 +127,8 @@
 // =============================================================================
 
 .dark {
-  // Inverted slate palette for dark mode
-  --color-slate-950: #fafbfc;
-  --color-slate-900: #f8fafc;
-  --color-slate-800: #f1f5f9;
-  --color-slate-700: #e2e8f0;
-  --color-slate-600: #cbd5e1;
-  --color-slate-500: #94a3b8;
-  --color-slate-400: #64748b;
-  --color-slate-300: #475569;
-  --color-slate-200: #334155;
-  --color-slate-100: #1e293b;
-  --color-slate-50: #0f172a;
+  // Raw palette values stay constant — only semantic tokens change.
+  // This prevents confusion where --color-slate-950 is actually the lightest value.
 
   // Semantic tokens - Backgrounds (dark mode)
   --bg-primary: #0f172a;
@@ -146,21 +148,21 @@
   --sidebar-border: rgb(255 255 255 / 0.06);
   --sidebar-shadow: 4px 0 24px rgb(0 0 0 / 0.2);
 
-  // Text colors (dark mode)
+  // Text colors (dark mode) — using literal hex, not inverted palette vars
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
   --text-inverse: #0f172a;
 
   // Accent colors (brighter for dark mode)
-  --accent-primary: var(--color-amber-400);
-  --accent-hover: var(--color-amber-300);
-  --accent-active: var(--color-amber-500);
+  --accent-primary: #fbbf24;
+  --accent-hover: #fcd34d;
+  --accent-active: #f59e0b;
 
   // Border colors (dark mode)
   --border-color: rgb(255 255 255 / 0.08);
   --border-color-light: rgb(255 255 255 / 0.04);
-  --border-color-focus: var(--color-amber-400);
+  --border-color-focus: #fbbf24;
 
   // Shadows - adjusted for dark mode
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 0 rgb(0 0 0 / 0.4);

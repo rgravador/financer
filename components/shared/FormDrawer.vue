@@ -3,8 +3,11 @@
     v-model="internalShow"
     location="right"
     temporary
-    :width="width"
+    :width="responsiveWidth"
     class="form-drawer"
+    aria-modal="true"
+    role="dialog"
+    :aria-label="title"
   >
     <!-- Header -->
     <div class="drawer-header">
@@ -16,6 +19,7 @@
         icon
         variant="text"
         size="small"
+        aria-label="Close drawer"
         @click="handleClose"
         :disabled="loading"
       >
@@ -89,6 +93,14 @@ const emit = defineEmits<{
   close: []
 }>()
 
+// Responsive width: cap at viewport width on mobile
+const responsiveWidth = computed(() => {
+  if (typeof window !== 'undefined' && window.innerWidth < 520) {
+    return window.innerWidth
+  }
+  return props.width
+})
+
 const internalShow = computed({
   get: () => props.modelValue,
   set: (value: boolean) => emit('update:modelValue', value),
@@ -122,7 +134,7 @@ const handleSave = () => {
 }
 
 .drawer-title {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-display, 'Sora', sans-serif);
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
@@ -131,7 +143,7 @@ const handleSave = () => {
 }
 
 .drawer-subtitle {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 13px;
   color: var(--text-secondary);
   margin: 4px 0 0 0;

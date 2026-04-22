@@ -34,13 +34,19 @@
             <span>Loading loan types...</span>
           </div>
 
-          <div v-else class="loan-types-grid">
+          <div v-else class="loan-types-grid" role="radiogroup" aria-label="Available loan types">
             <div
               v-for="loanType in activeLoanTypes"
               :key="loanType.id"
               class="loan-type-option"
               :class="{ 'loan-type-option--selected': formData.loanTypeId === loanType.id }"
+              role="radio"
+              tabindex="0"
+              :aria-checked="formData.loanTypeId === loanType.id"
+              :aria-label="`${loanType.name}. ${loanType.minInterestRate}% to ${loanType.maxInterestRate}% interest. Up to ${formatCurrency(loanType.maxLoanAmount)}`"
               @click="selectLoanType(loanType)"
+              @keydown.enter="selectLoanType(loanType)"
+              @keydown.space.prevent="selectLoanType(loanType)"
             >
               <div class="loan-type-icon" :style="{ background: getLoanTypeColor(loanType.name) }">
                 <v-icon size="28" color="white">{{ getLoanTypeIcon(loanType.name) }}</v-icon>
@@ -112,7 +118,13 @@
                 :key="borrower.id"
                 class="borrower-option"
                 :class="{ 'borrower-option--selected': formData.borrowerId === borrower.id }"
+                role="radio"
+                tabindex="0"
+                :aria-checked="formData.borrowerId === borrower.id"
+                :aria-label="`${borrower.firstName} ${borrower.lastName}`"
                 @click="selectBorrower(borrower)"
+                @keydown.enter="selectBorrower(borrower)"
+                @keydown.space.prevent="selectBorrower(borrower)"
               >
                 <v-avatar size="48" color="primary" variant="tonal">
                   <span>{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
@@ -1198,6 +1210,11 @@ onMounted(() => {
   border-color: rgba(var(--v-theme-primary), 0.2);
 }
 
+.loan-type-option:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+}
+
 .loan-type-option--selected {
   background: rgba(var(--v-theme-primary), 0.08);
   border-color: rgb(var(--v-theme-primary));
@@ -1298,6 +1315,11 @@ onMounted(() => {
 .borrower-option:hover {
   background: rgba(var(--v-theme-primary), 0.04);
   border-color: rgba(var(--v-theme-primary), 0.2);
+}
+
+.borrower-option:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
 }
 
 .borrower-option--selected {

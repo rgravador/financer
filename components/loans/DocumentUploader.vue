@@ -7,11 +7,17 @@
         'upload-zone--active': isDragging,
         'upload-zone--disabled': disabled || loading,
       }"
+      role="button"
+      tabindex="0"
+      :aria-label="`Upload files. ${hint || `Supported: ${acceptedTypes}`}`"
+      :aria-disabled="disabled || loading"
       @dragenter.prevent="onDragEnter"
       @dragleave.prevent="onDragLeave"
       @dragover.prevent
       @drop.prevent="onDrop"
       @click="triggerFileInput"
+      @keydown.enter="triggerFileInput"
+      @keydown.space.prevent="triggerFileInput"
     >
       <input
         ref="fileInputRef"
@@ -57,6 +63,7 @@
         variant="text"
         icon="mdi-close"
         size="small"
+        aria-label="Remove file"
         @click.stop="clearFile"
       />
     </div>
@@ -81,6 +88,7 @@
           variant="text"
           icon="mdi-close"
           size="x-small"
+          :aria-label="`Remove ${file.name}`"
           @click.stop="removeFile(index)"
         />
       </div>
@@ -312,6 +320,12 @@ watch(
 .upload-zone:hover:not(.upload-zone--disabled) {
   border-color: rgba(var(--v-theme-primary), 0.4);
   background: rgba(var(--v-theme-primary), 0.04);
+}
+
+.upload-zone:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+  border-color: rgba(var(--v-theme-primary), 0.4);
 }
 
 .upload-zone--active {
