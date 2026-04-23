@@ -719,8 +719,8 @@ const getLoanTypeIcon = (name: string) => {
   const nameLower = name.toLowerCase()
   if (nameLower.includes('personal')) return 'mdi-account-cash'
   if (nameLower.includes('business')) return 'mdi-briefcase-outline'
-  if (nameLower.includes('auto') || nameLower.includes('car') || nameLower.includes('vehicle')) return 'mdi-car-outline'
-  if (nameLower.includes('mortgage') || nameLower.includes('home') || nameLower.includes('house')) return 'mdi-home-outline'
+  if (['auto', 'car', 'vehicle'].some(k => nameLower.includes(k))) return 'mdi-car-outline'
+  if (['mortgage', 'home', 'house'].some(k => nameLower.includes(k))) return 'mdi-home-outline'
   return 'mdi-file-document-outline'
 }
 
@@ -728,8 +728,8 @@ const getLoanTypeColor = (name: string) => {
   const nameLower = name.toLowerCase()
   if (nameLower.includes('personal')) return 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
   if (nameLower.includes('business')) return 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-  if (nameLower.includes('auto') || nameLower.includes('car') || nameLower.includes('vehicle')) return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-  if (nameLower.includes('mortgage') || nameLower.includes('home') || nameLower.includes('house')) return 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
+  if (['auto', 'car', 'vehicle'].some(k => nameLower.includes(k))) return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+  if (['mortgage', 'home', 'house'].some(k => nameLower.includes(k))) return 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
   return 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
 }
 
@@ -1170,13 +1170,13 @@ onMounted(() => {
 }
 
 .status-active {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  background: rgba(var(--v-theme-success), 0.12);
+  color: rgb(var(--v-theme-success));
 }
 
 .status-inactive {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  background: rgba(var(--v-theme-error), 0.1);
+  color: rgb(var(--v-theme-error));
 }
 
 /* Card Body */

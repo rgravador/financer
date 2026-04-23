@@ -86,7 +86,10 @@ const menuItems: MenuItem[] = [
 
   // Loan Officer menu items
   { title: 'Applications', icon: 'mdi-file-document-multiple-outline', to: '/officer/applications', roles: ['tenant_officer'] },
-  { title: 'New Application', icon: 'mdi-plus-circle-outline', to: '/officer/applications/new', roles: ['tenant_officer'] },
+  { title: 'Accounts', icon: 'mdi-account-group-outline', to: '/officer/accounts', roles: ['tenant_officer'] },
+  { title: 'Leads', icon: 'mdi-account-search-outline', to: '/officer/leads', roles: ['tenant_officer'] },
+  { title: 'Repayments', icon: 'mdi-cash-check', to: '/officer/repayments', roles: ['tenant_officer'] },
+  { title: 'Reports', icon: 'mdi-chart-bar', to: '/officer/reports', roles: ['tenant_officer'] },
 
   // Approver menu items
   { title: 'Review Queue', icon: 'mdi-clipboard-check-outline', to: '/approver/queue', roles: ['tenant_approver'] },

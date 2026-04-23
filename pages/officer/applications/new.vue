@@ -34,41 +34,91 @@
             <span>Loading loan types...</span>
           </div>
 
-          <div v-else class="loan-types-grid" role="radiogroup" aria-label="Available loan types">
-            <div
-              v-for="loanType in activeLoanTypes"
-              :key="loanType.id"
-              class="loan-type-option"
-              :class="{ 'loan-type-option--selected': formData.loanTypeId === loanType.id }"
-              role="radio"
-              tabindex="0"
-              :aria-checked="formData.loanTypeId === loanType.id"
-              :aria-label="`${loanType.name}. ${loanType.minInterestRate}% to ${loanType.maxInterestRate}% interest. Up to ${formatCurrency(loanType.maxLoanAmount)}`"
-              @click="selectLoanType(loanType)"
-              @keydown.enter="selectLoanType(loanType)"
-              @keydown.space.prevent="selectLoanType(loanType)"
-            >
-              <div class="loan-type-icon" :style="{ background: getLoanTypeColor(loanType.name) }">
-                <v-icon size="28" color="white">{{ getLoanTypeIcon(loanType.name) }}</v-icon>
+          <div v-else class="loan-type-selector">
+            <!-- Searchable Dropdown -->
+            <v-select
+              v-model="formData.loanTypeId"
+              :items="activeLoanTypes"
+              item-title="name"
+              item-value="id"
+              label="Select a loan type"
+              prepend-inner-icon="mdi-file-document-outline"
+              variant="outlined"
+              density="comfortable"
+              clearable
+              no-data-text="No loan types available"
+              :menu-props="{ contentClass: 'loan-type-dropdown-menu' }"
+              class="loan-type-autocomplete"
+              aria-label="Select a loan type"
+              @update:model-value="onLoanTypeSelected"
+            />
+
+            <!-- Selected Loan Type Detail Card -->
+            <Transition name="fade-slide">
+              <div v-if="selectedLoanType" class="loan-type-detail-card">
+                <div class="detail-card-header">
+                  <div class="detail-card-icon" :style="{ background: getLoanTypeColor(selectedLoanType.name) }">
+                    <v-icon size="28" color="white">{{ getLoanTypeIcon(selectedLoanType.name) }}</v-icon>
+                  </div>
+                  <div class="detail-card-title-group">
+                    <h3 class="detail-card-title">{{ selectedLoanType.name }}</h3>
+                    <p class="detail-card-description">{{ selectedLoanType.description || 'No description available' }}</p>
+                  </div>
+                  <div class="detail-card-check">
+                    <v-icon color="success" size="28">mdi-check-circle</v-icon>
+                  </div>
+                </div>
+
+                <v-divider class="my-4" />
+
+                <div class="detail-card-grid">
+                  <div class="detail-stat">
+                    <div class="detail-stat-icon">
+                      <v-icon size="18" color="primary">mdi-percent</v-icon>
+                    </div>
+                    <div class="detail-stat-content">
+                      <span class="detail-stat-label">Interest Rate</span>
+                      <span class="detail-stat-value">{{ selectedLoanType.minInterestRate }}% – {{ selectedLoanType.maxInterestRate }}%</span>
+                      <span class="detail-stat-note">Default: {{ selectedLoanType.defaultInterestRate }}%</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-stat">
+                    <div class="detail-stat-icon">
+                      <v-icon size="18" color="primary">mdi-cash</v-icon>
+                    </div>
+                    <div class="detail-stat-content">
+                      <span class="detail-stat-label">Loan Amount</span>
+                      <span class="detail-stat-value">{{ formatCurrency(selectedLoanType.minLoanAmount) }} – {{ formatCurrency(selectedLoanType.maxLoanAmount) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-stat">
+                    <div class="detail-stat-icon">
+                      <v-icon size="18" color="primary">mdi-calendar-range</v-icon>
+                    </div>
+                    <div class="detail-stat-content">
+                      <span class="detail-stat-label">Available Terms</span>
+                      <span class="detail-stat-value">
+                        {{ selectedLoanType.availableTerms.map(t => `${t}mo`).join(', ') }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="detail-stat">
+                    <div class="detail-stat-icon">
+                      <v-icon size="18" color="primary">mdi-file-document-check-outline</v-icon>
+                    </div>
+                    <div class="detail-stat-content">
+                      <span class="detail-stat-label">Required Documents</span>
+                      <span class="detail-stat-value">
+                        {{ selectedLoanType.requiredDocuments.filter(d => d.isRequired).length }} required, {{ selectedLoanType.requiredDocuments.length }} total
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="loan-type-info">
-                <h3>{{ loanType.name }}</h3>
-                <p>{{ loanType.description || 'No description' }}</p>
-              </div>
-              <div class="loan-type-meta">
-                <span class="meta-item">
-                  <v-icon size="14">mdi-percent</v-icon>
-                  {{ loanType.minInterestRate }}% - {{ loanType.maxInterestRate }}%
-                </span>
-                <span class="meta-item">
-                  <v-icon size="14">mdi-cash</v-icon>
-                  Up to {{ formatCurrency(loanType.maxLoanAmount) }}
-                </span>
-              </div>
-              <div v-if="formData.loanTypeId === loanType.id" class="selected-indicator">
-                <v-icon color="success">mdi-check-circle</v-icon>
-              </div>
-            </div>
+            </Transition>
           </div>
         </div>
       </template>
@@ -412,16 +462,25 @@
                     Remove
                   </v-btn>
                 </template>
-                <v-btn
-                  v-else
-                  variant="tonal"
-                  size="small"
-                  color="primary"
-                  @click="openUploadDialog(doc.documentName)"
-                >
-                  <v-icon start size="16">mdi-upload</v-icon>
-                  Upload
-                </v-btn>
+                <template v-else>
+                  <input
+                    :ref="(el: any) => { if (el) fileInputRefs[doc.documentName] = el }"
+                    type="file"
+                    accept="image/*,.pdf,.doc,.docx"
+                    class="hidden-file-input"
+                    @change="handleFileSelected($event, doc.documentName)"
+                  />
+                  <v-btn
+                    variant="tonal"
+                    size="small"
+                    color="primary"
+                    :loading="uploadingDocumentName === doc.documentName && uploading"
+                    @click="triggerFileInput(doc.documentName)"
+                  >
+                    <v-icon start size="16">mdi-upload</v-icon>
+                    Upload
+                  </v-btn>
+                </template>
               </div>
             </div>
           </div>
@@ -571,41 +630,6 @@
       </div>
     </div>
 
-    <!-- Upload Dialog -->
-    <v-dialog v-model="showUploadDialog" max-width="500" persistent>
-      <v-card class="upload-dialog">
-        <v-card-title class="dialog-title">
-          <v-icon start color="primary">mdi-upload</v-icon>
-          Upload Document
-        </v-card-title>
-        <v-card-text>
-          <p class="upload-label">{{ uploadingDocumentName }}</p>
-          <v-file-input
-            v-model="selectedFile"
-            label="Select file"
-            prepend-icon="mdi-paperclip"
-            variant="outlined"
-            density="comfortable"
-            accept="image/*,.pdf,.doc,.docx"
-            :rules="[rules.required]"
-            show-size
-          />
-        </v-card-text>
-        <v-card-actions class="dialog-actions">
-          <v-spacer />
-          <v-btn variant="text" @click="closeUploadDialog">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            :loading="uploading"
-            :disabled="!selectedFile"
-            @click="uploadDocument"
-          >
-            Upload
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
     <!-- Snackbar -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="4000">
       {{ snackbar.message }}
@@ -681,11 +705,10 @@ const newBorrower = ref({
 
 // Document state
 const uploadedDocuments = ref<UploadedDocument[]>([])
-const showUploadDialog = ref(false)
 const uploadingDocumentName = ref('')
-const selectedFile = ref<File | null>(null)
 const uploading = ref(false)
 const uploadProgress = ref(0)
+const fileInputRefs: Record<string, HTMLInputElement> = {}
 
 // Loading state
 const loanTypesLoading = ref(false)
@@ -794,16 +817,26 @@ const loadLoanTypes = async () => {
   loanTypesLoading.value = true
   try {
     await loanTypesStore.fetchLoanTypes()
+    // Auto-select first loan type if none is selected
+    if (activeLoanTypes.value.length > 0 && !formData.value.loanTypeId) {
+      applyLoanTypeDefaults(activeLoanTypes.value[0])
+    }
   } finally {
     loanTypesLoading.value = false
   }
 }
 
-const selectLoanType = (loanType: LoanType) => {
+const onLoanTypeSelected = (loanTypeId: string | null) => {
+  if (!loanTypeId) return
+  const loanType = loanTypesStore.loanTypes.find(lt => lt.id === loanTypeId)
+  if (loanType) {
+    applyLoanTypeDefaults(loanType)
+  }
+}
+
+const applyLoanTypeDefaults = (loanType: LoanType) => {
   formData.value.loanTypeId = loanType.id
-  // Set default interest rate
   formData.value.loanDetails.suggestedInterestRate = loanType.defaultInterestRate
-  // Set first available term as default
   if (loanType.availableTerms.length > 0) {
     formData.value.loanDetails.requestedTerm = loanType.availableTerms[0]
   }
@@ -813,8 +846,8 @@ const getLoanTypeIcon = (name: string) => {
   const nameLower = name.toLowerCase()
   if (nameLower.includes('personal')) return 'mdi-account-cash'
   if (nameLower.includes('business')) return 'mdi-briefcase-outline'
-  if (nameLower.includes('auto') || nameLower.includes('car')) return 'mdi-car-outline'
-  if (nameLower.includes('mortgage') || nameLower.includes('home')) return 'mdi-home-outline'
+  if (['auto', 'car', 'vehicle'].some(k => nameLower.includes(k))) return 'mdi-car-outline'
+  if (['mortgage', 'home', 'house'].some(k => nameLower.includes(k))) return 'mdi-home-outline'
   return 'mdi-file-document-outline'
 }
 
@@ -822,8 +855,8 @@ const getLoanTypeColor = (name: string) => {
   const nameLower = name.toLowerCase()
   if (nameLower.includes('personal')) return 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
   if (nameLower.includes('business')) return 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-  if (nameLower.includes('auto') || nameLower.includes('car')) return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-  if (nameLower.includes('mortgage') || nameLower.includes('home')) return 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
+  if (['auto', 'car', 'vehicle'].some(k => nameLower.includes(k))) return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+  if (['mortgage', 'home', 'house'].some(k => nameLower.includes(k))) return 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
   return 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
 }
 
@@ -925,54 +958,47 @@ const isDocumentUploaded = (docName: string) => {
   return uploadedDocuments.value.some(d => d.documentName === docName)
 }
 
-const openUploadDialog = (docName: string) => {
+const triggerFileInput = (docName: string) => {
+  const input = fileInputRefs[docName]
+  if (input) {
+    input.value = ''
+    input.click()
+  }
+}
+
+const handleFileSelected = async (event: Event, docName: string) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
   uploadingDocumentName.value = docName
-  selectedFile.value = null
-  showUploadDialog.value = true
-}
-
-const closeUploadDialog = () => {
-  showUploadDialog.value = false
-  uploadingDocumentName.value = ''
-  selectedFile.value = null
-}
-
-const uploadDocument = async () => {
-  if (!selectedFile.value) return
-
   uploading.value = true
   uploadProgress.value = 0
 
   try {
-    // Convert file to base64
     const reader = new FileReader()
-    const base64Promise = new Promise<string>((resolve, reject) => {
+    const base64 = await new Promise<string>((resolve, reject) => {
       reader.onload = () => resolve(reader.result as string)
       reader.onerror = reject
-      reader.readAsDataURL(selectedFile.value!)
+      reader.readAsDataURL(file)
     })
 
-    const base64 = await base64Promise
-    uploadProgress.value = 50
-
-    // Simulate upload progress (actual upload happens when application is saved)
     uploadProgress.value = 100
 
-    // Add to local uploaded documents
     uploadedDocuments.value.push({
-      documentName: uploadingDocumentName.value,
-      fileUrl: base64, // Store base64 temporarily
-      filePublicId: '', // Will be set after actual upload
+      documentName: docName,
+      fileUrl: base64,
+      filePublicId: '',
       uploadedAt: new Date(),
       status: 'uploaded',
     })
 
-    showSnackbar('Document added successfully', 'success')
-    closeUploadDialog()
-  } catch (err) {
+    showSnackbar(`${docName} added successfully`, 'success')
+  } catch {
     showSnackbar('Failed to process document', 'error')
   } finally {
     uploading.value = false
+    uploadingDocumentName.value = ''
     uploadProgress.value = 0
   }
 }
@@ -1097,12 +1123,18 @@ onMounted(() => {
   // Check for duplicate parameter
   const duplicateId = route.query.duplicate as string
   if (duplicateId) {
-    // Load the application to duplicate
     loansStore.fetchApplicationById(duplicateId).then(() => {
       const app = loansStore.currentApplication
       if (app) {
         formData.value.loanTypeId = app.loanTypeId
         formData.value.loanDetails = { ...app.loanDetails }
+        // Apply defaults from the loan type (interest rate, term)
+        const loanType = loanTypesStore.loanTypes.find(lt => lt.id === app.loanTypeId)
+        if (loanType) {
+          applyLoanTypeDefaults(loanType)
+          // Restore the duplicated loan details on top of defaults
+          formData.value.loanDetails = { ...app.loanDetails }
+        }
       }
     })
   }
@@ -1188,75 +1220,167 @@ onMounted(() => {
   color: rgba(var(--v-theme-on-surface), 0.6);
 }
 
-/* Loan Types Grid */
-.loan-types-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+/* Loan Type Selector */
+.loan-type-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loan-type-autocomplete :deep(.v-field) {
+  border-radius: 12px;
+}
+
+/* Dropdown custom item */
+.loan-type-list-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+}
+
+.loan-type-list-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.loan-type-list-subtitle {
+  font-size: 12px;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+}
+
+/* Selected item in input */
+.loan-type-selection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loan-type-selection-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Detail Card */
+.loan-type-detail-card {
+  background: rgba(var(--v-theme-on-surface), 0.02);
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.detail-card-header {
+  display: flex;
+  align-items: flex-start;
   gap: 16px;
 }
 
-.loan-type-option {
-  position: relative;
-  background: rgba(var(--v-theme-on-surface), 0.02);
-  border: 2px solid transparent;
-  border-radius: 16px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.loan-type-option:hover {
-  background: rgba(var(--v-theme-primary), 0.04);
-  border-color: rgba(var(--v-theme-primary), 0.2);
-}
-
-.loan-type-option:focus-visible {
-  outline: 2px solid rgb(var(--v-theme-primary));
-  outline-offset: 2px;
-}
-
-.loan-type-option--selected {
-  background: rgba(var(--v-theme-primary), 0.08);
-  border-color: rgb(var(--v-theme-primary));
-}
-
-.loan-type-icon {
+.detail-card-icon {
   width: 56px;
   height: 56px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
-.loan-type-info h3 {
+.detail-card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-card-title {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  margin: 0 0 6px 0;
+  color: rgb(var(--v-theme-on-surface));
+  margin: 0 0 4px 0;
+}
+
+.detail-card-description {
+  font-size: 14px;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.detail-card-check {
+  flex-shrink: 0;
+}
+
+.detail-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.detail-stat {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.detail-stat-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(var(--v-theme-primary), 0.08);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.detail-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(var(--v-theme-on-surface), 0.5);
+}
+
+.detail-stat-value {
+  font-size: 14px;
+  font-weight: 600;
   color: rgb(var(--v-theme-on-surface));
 }
 
-.loan-type-info p {
-  font-size: 13px;
-  color: rgba(var(--v-theme-on-surface), 0.6);
-  margin: 0 0 12px 0;
-  line-height: 1.4;
-}
-
-.loan-type-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.detail-stat-note {
   font-size: 12px;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  color: rgba(var(--v-theme-on-surface), 0.5);
+}
+
+/* Transition */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 .selected-indicator {
@@ -1507,6 +1631,10 @@ onMounted(() => {
   color: rgba(var(--v-theme-on-surface), 0.5);
 }
 
+.hidden-file-input {
+  display: none;
+}
+
 .document-actions {
   display: flex;
   gap: 4px;
@@ -1655,7 +1783,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .loan-types-grid {
+  .detail-card-grid {
     grid-template-columns: 1fr;
   }
 

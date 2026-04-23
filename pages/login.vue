@@ -246,7 +246,7 @@ const currentYear = new Date().getFullYear()
 const demoAccounts = [
   { label: 'System Admin', email: 'admin@ascendent.com', password: 'Admin@123' },
   { label: 'Tenant Admin', email: 'admin@fral.com', password: 'Just1234!' },
-  { label: 'Officer', email: 'redgiegravador@gmail.com', password: 'Just1234!' },
+  { label: 'Officer', email: 'demo.officer@ascendent.com', password: 'Officer@123' },
   { label: 'Approver', email: 'demo.approver@ascendent.com', password: 'Demo@123' },
 ]
 
