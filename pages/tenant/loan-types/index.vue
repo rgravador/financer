@@ -137,104 +137,137 @@
       </v-btn>
     </div>
 
-    <!-- Loan Types Grid -->
-    <div v-else class="loan-types-grid">
-      <div
-        v-for="loanType in filteredLoanTypes"
-        :key="loanType.id"
-        class="loan-type-card"
-        :class="{ 'loan-type-card--inactive': !loanType.isActive }"
+    <!-- Loan Types Table -->
+    <div v-else class="loan-types-table-wrapper">
+      <v-data-table
+        :headers="tableHeaders"
+        :items="filteredLoanTypes"
+        :items-per-page="20"
+        class="loan-types-table"
+        item-value="id"
       >
-        <div class="card-header">
-          <div class="card-icon" :style="{ background: getLoanTypeColor(loanType.name) }">
-            <v-icon size="24" color="white">{{ getLoanTypeIcon(loanType.name) }}</v-icon>
+        <!-- Name Column -->
+        <template #item.name="{ item }">
+          <div class="table-name-cell">
+            <div class="loan-type-icon" :style="{ background: getLoanTypeColor(item.name) }">
+              <v-icon size="18" color="white">{{ getLoanTypeIcon(item.name) }}</v-icon>
+            </div>
+            <div class="name-info">
+              <span class="loan-type-name">{{ item.name }}</span>
+              <span v-if="item.description" class="loan-type-desc">{{ item.description }}</span>
+            </div>
           </div>
-          <div class="card-status" :class="loanType.isActive ? 'status-active' : 'status-inactive'">
-            {{ loanType.isActive ? 'Active' : 'Inactive' }}
-          </div>
-        </div>
+        </template>
 
-        <div class="card-body">
-          <h3 class="loan-type-name">{{ loanType.name }}</h3>
-          <p class="loan-type-description">{{ loanType.description || 'No description provided' }}</p>
-        </div>
-
-        <div class="card-metrics">
-          <div class="metric-row">
-            <div class="metric">
-              <span class="metric-label">Interest Rate</span>
-              <span class="metric-value">{{ loanType.defaultInterestRate }}%</span>
-              <span class="metric-range">{{ loanType.minInterestRate }}% - {{ loanType.maxInterestRate }}%</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">Loan Amount</span>
-              <span class="metric-value">{{ formatCurrency(loanType.maxLoanAmount) }}</span>
-              <span class="metric-range">{{ formatCurrency(loanType.minLoanAmount) }} min</span>
-            </div>
+        <!-- Interest Rate Column -->
+        <template #item.defaultInterestRate="{ item }">
+          <div class="rate-cell">
+            <span class="rate-value">{{ item.defaultInterestRate }}%</span>
+            <span class="rate-range">{{ item.minInterestRate }}% - {{ item.maxInterestRate }}%</span>
           </div>
-          <div class="metric-row">
-            <div class="metric">
-              <span class="metric-label">Terms Available</span>
-              <span class="metric-value">{{ loanType.availableTerms.length }}</span>
-              <span class="metric-range">{{ formatTerms(loanType.availableTerms) }}</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">Required Docs</span>
-              <span class="metric-value">{{ loanType.requiredDocuments.length }}</span>
-              <span class="metric-range">{{ getRequiredCount(loanType) }} mandatory</span>
-            </div>
-          </div>
-        </div>
+        </template>
 
-        <div class="card-actions">
-          <v-btn
-            variant="text"
+        <!-- Amount Range Column -->
+        <template #item.maxLoanAmount="{ item }">
+          <div class="amount-cell">
+            <span class="amount-value">{{ formatCurrency(item.maxLoanAmount) }}</span>
+            <span class="amount-range">Min {{ formatCurrency(item.minLoanAmount) }}</span>
+          </div>
+        </template>
+
+        <!-- Terms Column -->
+        <template #item.availableTerms="{ item }">
+          <span class="terms-text">{{ formatTerms(item.availableTerms) }}</span>
+        </template>
+
+        <!-- Documents Column -->
+        <template #item.requiredDocuments="{ item }">
+          <div class="docs-cell">
+            <span class="docs-count">{{ item.requiredDocuments.length }}</span>
+            <span class="docs-required">({{ getRequiredCount(item) }} required)</span>
+          </div>
+        </template>
+
+        <!-- Default Column -->
+        <template #item.isDefault="{ item }">
+          <v-chip
+            v-if="item.isDefault"
             color="primary"
             size="small"
-            @click="openEditDialog(loanType)"
+            variant="tonal"
+            prepend-icon="mdi-star"
           >
-            <v-icon start size="16">mdi-pencil-outline</v-icon>
-            Edit
-          </v-btn>
-          <v-btn
-            variant="text"
+            Default
+          </v-chip>
+          <span v-else class="no-default">&mdash;</span>
+        </template>
+
+        <!-- Status Column -->
+        <template #item.isActive="{ item }">
+          <v-chip
+            :color="item.isActive ? 'success' : 'error'"
             size="small"
-            @click="openDocumentsDialog(loanType)"
+            variant="tonal"
           >
-            <v-icon start size="16">mdi-file-document-outline</v-icon>
-            Documents
-          </v-btn>
-          <v-menu>
-            <template #activator="{ props }">
-              <v-btn
-                variant="text"
-                size="small"
-                icon="mdi-dots-vertical"
-                v-bind="props"
-              />
-            </template>
-            <v-list class="actions-menu" density="compact">
-              <v-list-item prepend-icon="mdi-content-copy" @click="duplicateLoanType(loanType)">
-                <v-list-item-title>Duplicate</v-list-item-title>
-              </v-list-item>
-              <v-list-item
-                :prepend-icon="loanType.isActive ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
-                @click="toggleStatus(loanType)"
-              >
-                <v-list-item-title>{{ loanType.isActive ? 'Deactivate' : 'Activate' }}</v-list-item-title>
-              </v-list-item>
-              <v-divider class="my-1" />
-              <v-list-item
-                prepend-icon="mdi-delete-outline"
-                class="delete-action"
-                @click="openDeleteDialog(loanType)"
-              >
-                <v-list-item-title>Delete</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </div>
-      </div>
+            {{ item.isActive ? 'Active' : 'Inactive' }}
+          </v-chip>
+        </template>
+
+        <!-- Actions Column -->
+        <template #item.actions="{ item }">
+          <div class="table-actions">
+            <v-btn
+              variant="text"
+              color="primary"
+              size="small"
+              icon="mdi-pencil-outline"
+              @click="openEditDialog(item)"
+            />
+            <v-menu>
+              <template #activator="{ props }">
+                <v-btn
+                  variant="text"
+                  size="small"
+                  icon="mdi-dots-vertical"
+                  v-bind="props"
+                />
+              </template>
+              <v-list class="actions-menu" density="compact">
+                <v-list-item
+                  v-if="item.isActive && !item.isDefault"
+                  prepend-icon="mdi-star-outline"
+                  @click="setAsDefault(item)"
+                >
+                  <v-list-item-title>Set as Default</v-list-item-title>
+                </v-list-item>
+                <v-list-item
+                  prepend-icon="mdi-file-document-outline"
+                  @click="openDocumentsDialog(item)"
+                >
+                  <v-list-item-title>Documents</v-list-item-title>
+                </v-list-item>
+                <v-list-item prepend-icon="mdi-content-copy" @click="duplicateLoanType(item)">
+                  <v-list-item-title>Duplicate</v-list-item-title>
+                </v-list-item>
+                <v-list-item
+                  :prepend-icon="item.isActive ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+                  @click="toggleStatus(item)"
+                >
+                  <v-list-item-title>{{ item.isActive ? 'Deactivate' : 'Activate' }}</v-list-item-title>
+                </v-list-item>
+                <v-divider class="my-1" />
+                <v-list-item
+                  prepend-icon="mdi-delete-outline"
+                  class="delete-action"
+                  @click="openDeleteDialog(item)"
+                >
+                  <v-list-item-title>Delete</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </template>
+      </v-data-table>
     </div>
 
     <!-- Create/Edit Dialog -->
@@ -476,6 +509,9 @@
           <p class="dialog-text">
             Are you sure you want to delete <strong>{{ selectedLoanType?.name }}</strong>?
           </p>
+          <v-alert v-if="selectedLoanType?.isDefault" type="warning" variant="tonal" density="compact" class="mt-4">
+            This loan type is currently set as the default. Deleting it will remove the default selection.
+          </v-alert>
           <v-alert type="warning" variant="tonal" density="compact" class="mt-4">
             This will deactivate the loan type. Existing applications using this loan type will not be affected.
           </v-alert>
@@ -514,6 +550,18 @@ definePageMeta({
 })
 
 const loanTypesStore = useLoanTypesStore()
+
+// Table headers
+const tableHeaders = [
+  { title: 'Loan Product', key: 'name', sortable: true },
+  { title: 'Interest Rate', key: 'defaultInterestRate', sortable: true },
+  { title: 'Max Amount', key: 'maxLoanAmount', sortable: true },
+  { title: 'Terms', key: 'availableTerms', sortable: false },
+  { title: 'Documents', key: 'requiredDocuments', sortable: false },
+  { title: 'Default', key: 'isDefault', sortable: true },
+  { title: 'Status', key: 'isActive', sortable: true },
+  { title: '', key: 'actions', sortable: false, align: 'end' as const },
+]
 
 // Loan templates (predefined configurations)
 const loanTemplates = [
@@ -684,7 +732,8 @@ const filteredLoanTypes = computed(() => {
     )
   }
 
-  return loanTypes
+  // Sort default loan type to top
+  return [...loanTypes].sort((a, b) => Number(b.isDefault) - Number(a.isDefault))
 })
 
 // Methods
@@ -731,6 +780,15 @@ const getLoanTypeColor = (name: string) => {
   if (['auto', 'car', 'vehicle'].some(k => nameLower.includes(k))) return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
   if (['mortgage', 'home', 'house'].some(k => nameLower.includes(k))) return 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
   return 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
+}
+
+const setAsDefault = async (loanType: LoanType) => {
+  try {
+    await loanTypesStore.setDefaultLoanType(loanType.id)
+    showSnackbar(`"${loanType.name}" set as default loan type`, 'success')
+  } catch (error: any) {
+    showSnackbar(error.data?.statusMessage || 'Failed to set default', 'error')
+  }
 }
 
 const openCreateFromTemplate = (template: typeof loanTemplates[0]) => {
@@ -1112,145 +1170,154 @@ onMounted(() => {
   justify-content: center;
 }
 
-/* Loan Types Grid */
-.loan-types-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 24px;
-}
-
-.loan-type-card {
+/* Table Styles */
+.loan-types-table-wrapper {
   background: rgb(var(--v-theme-surface));
-  border-radius: 20px;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  padding: 24px;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.loan-type-card:hover {
-  border-color: rgba(var(--v-theme-primary), 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-  transform: translateY(-2px);
-}
-
-.loan-type-card--inactive {
-  opacity: 0.7;
-}
-
-.loan-type-card--inactive:hover {
-  opacity: 1;
-}
-
-/* Card Header */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.card-icon {
-  width: 56px;
-  height: 56px;
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  overflow: hidden;
 }
 
-.card-status {
-  padding: 6px 12px;
-  border-radius: 20px;
+.loan-types-table {
+  background: transparent;
+}
+
+.loan-types-table :deep(.v-data-table__thead) {
+  background: rgba(var(--v-theme-on-surface), 0.02);
+}
+
+.loan-types-table :deep(.v-data-table__thead th) {
+  font-family: var(--font-display);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  color: rgba(var(--v-theme-on-surface), 0.6) !important;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08) !important;
 }
 
-.status-active {
-  background: rgba(var(--v-theme-success), 0.12);
-  color: rgb(var(--v-theme-success));
+.loan-types-table :deep(.v-data-table__td) {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.04) !important;
 }
 
-.status-inactive {
-  background: rgba(var(--v-theme-error), 0.1);
-  color: rgb(var(--v-theme-error));
+.loan-types-table :deep(.v-data-table__tr:hover) {
+  background: rgba(var(--v-theme-primary), 0.02) !important;
 }
 
-/* Card Body */
-.card-body {
-  flex: 1;
+.loan-types-table :deep(.v-data-table-footer) {
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  padding: 12px 16px;
+}
+
+/* Table Cell Styles */
+.table-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.loan-type-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.name-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .loan-type-name {
-  font-family: var(--font-display);
-  font-size: 20px;
   font-weight: 600;
-  color: rgb(var(--v-theme-on-surface));
-  margin: 0 0 8px 0;
-}
-
-.loan-type-description {
   font-size: 14px;
-  color: rgba(var(--v-theme-on-surface), 0.6);
-  margin: 0;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  color: rgb(var(--v-theme-on-surface));
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Card Metrics */
-.card-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  background: rgba(var(--v-theme-on-surface), 0.02);
-  border-radius: 14px;
+.loan-type-desc {
+  font-size: 12px;
+  color: rgba(var(--v-theme-on-surface), 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
 }
 
-.metric-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.metric {
+.rate-cell {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.metric-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(var(--v-theme-on-surface), 0.5);
-}
-
-.metric-value {
-  font-size: 18px;
+.rate-value {
   font-weight: 700;
+  font-size: 14px;
   color: rgb(var(--v-theme-on-surface));
 }
 
-.metric-range {
+.rate-range {
   font-size: 12px;
   color: rgba(var(--v-theme-on-surface), 0.5);
 }
 
-/* Card Actions */
-.card-actions {
+.amount-cell {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.amount-value {
+  font-weight: 600;
+  font-size: 14px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.amount-range {
+  font-size: 12px;
+  color: rgba(var(--v-theme-on-surface), 0.5);
+}
+
+.terms-text {
+  font-size: 13px;
+  color: rgba(var(--v-theme-on-surface), 0.8);
+}
+
+.docs-cell {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.docs-count {
+  font-weight: 600;
+  font-size: 14px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.docs-required {
+  font-size: 12px;
+  color: rgba(var(--v-theme-on-surface), 0.5);
+}
+
+.no-default {
+  color: rgba(var(--v-theme-on-surface), 0.3);
+}
+
+.table-actions {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.06);
+  justify-content: flex-end;
+  gap: 4px;
 }
 
 /* Actions Menu */
@@ -1400,10 +1467,6 @@ onMounted(() => {
   .search-field,
   .status-filter {
     max-width: 100%;
-  }
-
-  .loan-types-grid {
-    grid-template-columns: 1fr;
   }
 
   .form-row.two-col,

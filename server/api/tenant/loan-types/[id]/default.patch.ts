@@ -1,15 +1,16 @@
-import { requireRole } from '~/server/utils/requireRole'
+import { requireTenantAdmin } from '~/server/utils/requireRole'
 import { connectDB } from '~/server/utils/db'
 import { LoanType } from '~/server/models/LoanType'
 import { isValidObjectId } from 'mongoose'
 
 /**
- * GET /api/tenant/loan-types/[id]
- * Returns a single loan type
- * Must belong to caller's tenant
+ * PATCH /api/tenant/loan-types/[id]/default
+ * Sets a loan type as the default for the tenant.
+ * Unsets any previously default loan type.
+ * Requires: tenant_admin role
  */
 export default defineEventHandler(async (event) => {
-  const user = requireRole(event, ['tenant_admin', 'tenant_officer', 'tenant_approver'])
+  const user = requireTenantAdmin(event)
 
   if (!user.tenantId) {
     throw createError({
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
 
   await connectDB()
 
-  const loanType = await LoanType.findById(loanTypeId).lean()
+  const loanType = await LoanType.findById(loanTypeId)
 
   if (!loanType) {
     throw createError({
@@ -38,13 +39,29 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Ensure loan type belongs to user's tenant
   if (loanType.tenantId.toString() !== user.tenantId) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Cannot access loan types from other tenants',
+      statusMessage: 'Cannot modify loan types from other tenants',
     })
   }
+
+  if (!loanType.isActive) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Cannot set an inactive loan type as default',
+    })
+  }
+
+  // Unset any existing default for this tenant
+  await LoanType.updateMany(
+    { tenantId: user.tenantId, isDefault: true },
+    { $set: { isDefault: false } }
+  )
+
+  // Set the selected loan type as default
+  loanType.isDefault = true
+  await loanType.save()
 
   return {
     id: loanType._id.toString(),
@@ -62,7 +79,7 @@ export default defineEventHandler(async (event) => {
       description: doc.description,
       isRequired: doc.isRequired,
     })),
-    isDefault: loanType.isDefault || false,
+    isDefault: loanType.isDefault,
     isActive: loanType.isActive,
     createdAt: loanType.createdAt,
     updatedAt: loanType.updatedAt,

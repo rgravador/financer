@@ -15,6 +15,7 @@ export interface ILoanType extends Document {
     description?: string
     isRequired: boolean
   }[]
+  isDefault: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -95,6 +96,10 @@ const LoanTypeSchema = new Schema<ILoanType>(
         },
       ],
       default: [],
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
     },
     isActive: {
       type: Boolean,

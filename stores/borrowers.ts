@@ -79,18 +79,7 @@ export const useBorrowersStore = defineStore('borrowers', {
       }
     },
 
-    async createBorrower(payload: {
-      firstName: string
-      lastName: string
-      email: string
-      contactNumber: string
-      address: string
-      employmentType: string
-      employer?: string
-      monthlyIncome: number
-      dateOfBirth?: string
-      notes?: string
-    }) {
+    async createBorrower(payload: Record<string, any>) {
       this.loading = true
       try {
         const data = await $fetch('/api/borrowers', {
@@ -109,22 +98,7 @@ export const useBorrowersStore = defineStore('borrowers', {
       }
     },
 
-    async updateBorrower(
-      id: string,
-      payload: {
-        firstName?: string
-        lastName?: string
-        email?: string
-        contactNumber?: string
-        address?: string
-        employmentType?: string
-        employer?: string
-        monthlyIncome?: number
-        dateOfBirth?: string
-        notes?: string
-        isActive?: boolean
-      }
-    ) {
+    async updateBorrower(id: string, payload: Record<string, any>) {
       this.loading = true
       try {
         const data = await $fetch(`/api/borrowers/${id}`, {

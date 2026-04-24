@@ -83,18 +83,45 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Update borrower fields
-  if (body.firstName !== undefined) borrower.firstName = body.firstName.trim()
-  if (body.lastName !== undefined) borrower.lastName = body.lastName.trim()
+  // Update string fields
+  const stringFields = ['firstName', 'middleName', 'lastName', 'suffix', 'contactNumber', 'address', 'previousAddress', 'employer', 'creditHistory', 'bankName', 'bankAccountNumber', 'notes', 'governmentIdNumber'] as const
+  for (const field of stringFields) {
+    if (body[field] !== undefined) {
+      ;(borrower as any)[field] = body[field] ? body[field].trim() : undefined
+    }
+  }
+
+  // Update email (special handling for lowercase)
   if (body.email !== undefined) borrower.email = body.email.toLowerCase().trim()
-  if (body.contactNumber !== undefined) borrower.contactNumber = body.contactNumber.trim()
-  if (body.address !== undefined) borrower.address = body.address.trim()
+
+  // Update enum fields
   if (body.employmentType !== undefined) borrower.employmentType = body.employmentType
-  if (body.employer !== undefined) borrower.employer = body.employer ? body.employer.trim() : undefined
-  if (body.monthlyIncome !== undefined) borrower.monthlyIncome = body.monthlyIncome
+  if (body.incomeSource !== undefined) borrower.incomeSource = body.incomeSource
+  if (body.governmentIdType !== undefined) borrower.governmentIdType = body.governmentIdType
+  if (body.housingStatus !== undefined) (borrower as any).housingStatus = body.housingStatus
+
+  // Update number fields
+  const numberFields = ['monthlyIncome', 'annualIncome', 'existingObligations', 'dependentsCount', 'monthlyRent', 'yearsAtCurrentAddress', 'employmentLength', 'creditScore'] as const
+  for (const field of numberFields) {
+    if (body[field] !== undefined) {
+      ;(borrower as any)[field] = body[field]
+    }
+  }
+
+  // Update boolean fields
+  const booleanFields = ['isActive', 'hasDefaults', 'hasLatePayments', 'hasBankStatements'] as const
+  for (const field of booleanFields) {
+    if (body[field] !== undefined) {
+      ;(borrower as any)[field] = body[field]
+    }
+  }
+
+  // Update date fields
   if (body.dateOfBirth !== undefined) borrower.dateOfBirth = body.dateOfBirth ? new Date(body.dateOfBirth) : undefined
-  if (body.notes !== undefined) borrower.notes = body.notes ? body.notes.trim() : undefined
-  if (body.isActive !== undefined) borrower.isActive = body.isActive
+
+  // Update array fields
+  if (body.pastLoans !== undefined) borrower.pastLoans = body.pastLoans
+  if (body.references !== undefined) borrower.references = body.references
 
   // Save updated borrower
   await borrower.save()

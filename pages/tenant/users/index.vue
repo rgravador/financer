@@ -265,7 +265,7 @@
                     <v-icon :color="getRoleColor(item.value)" size="20">{{ getRoleIcon(item.value) }}</v-icon>
                   </template>
                   <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.raw.description }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>{{ item.raw?.description }}</v-list-item-subtitle>
                 </v-list-item>
               </template>
             </v-select>

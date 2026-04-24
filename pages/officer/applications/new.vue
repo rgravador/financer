@@ -127,27 +127,13 @@
       <template #item.2>
         <div class="step-content">
           <h2 class="step-title">Borrower Information</h2>
-          <p class="step-description">Select an existing borrower or create a new one</p>
+          <p class="step-description">Search for an existing account or create a new one</p>
 
-          <!-- Borrower Selection Mode -->
-          <div class="borrower-mode-toggle">
-            <v-btn-toggle v-model="borrowerMode" mandatory color="primary" density="compact">
-              <v-btn value="existing">
-                <v-icon start>mdi-account-search</v-icon>
-                Existing Borrower
-              </v-btn>
-              <v-btn value="new">
-                <v-icon start>mdi-account-plus</v-icon>
-                New Borrower
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-
-          <!-- Existing Borrower Search -->
-          <div v-if="borrowerMode === 'existing'" class="existing-borrower-section">
+          <!-- Search + New Account Button -->
+          <div class="borrower-search-row">
             <v-text-field
               v-model="borrowerSearch"
-              placeholder="Search borrowers by name or email..."
+              placeholder="Search accounts by name or email..."
               prepend-inner-icon="mdi-magnify"
               variant="outlined"
               density="comfortable"
@@ -156,117 +142,55 @@
               class="borrower-search"
               @update:model-value="debouncedSearchBorrowers"
             />
+            <v-btn
+              color="primary"
+              variant="tonal"
+              size="large"
+              icon="mdi-plus"
+              @click="openNewAccountPage"
+            />
+          </div>
 
-            <div v-if="borrowersLoading" class="loading-section">
-              <v-progress-circular indeterminate color="primary" size="32" />
-              <span>Searching...</span>
-            </div>
+          <!-- Search Results -->
+          <div v-if="borrowersLoading" class="loading-section">
+            <v-progress-circular indeterminate color="primary" size="32" />
+            <span>Searching...</span>
+          </div>
 
-            <div v-else-if="borrowerResults.length > 0" class="borrower-results">
-              <div
-                v-for="borrower in borrowerResults"
-                :key="borrower.id"
-                class="borrower-option"
-                :class="{ 'borrower-option--selected': formData.borrowerId === borrower.id }"
-                role="radio"
-                tabindex="0"
-                :aria-checked="formData.borrowerId === borrower.id"
-                :aria-label="`${borrower.firstName} ${borrower.lastName}`"
-                @click="selectBorrower(borrower)"
-                @keydown.enter="selectBorrower(borrower)"
-                @keydown.space.prevent="selectBorrower(borrower)"
-              >
-                <v-avatar size="48" color="primary" variant="tonal">
-                  <span>{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
-                </v-avatar>
-                <div class="borrower-details">
-                  <span class="borrower-name">{{ borrower.firstName }} {{ borrower.lastName }}</span>
-                  <span class="borrower-email">{{ borrower.email }}</span>
-                  <span class="borrower-meta">{{ borrower.contactNumber }} | {{ formatEmployment(borrower.employmentType) }}</span>
-                </div>
-                <div v-if="formData.borrowerId === borrower.id" class="selected-indicator">
-                  <v-icon color="success">mdi-check-circle</v-icon>
-                </div>
+          <div v-else-if="borrowerResults.length > 0" class="borrower-results">
+            <div
+              v-for="borrower in borrowerResults"
+              :key="borrower.id"
+              class="borrower-option"
+              :class="{ 'borrower-option--selected': formData.borrowerId === borrower.id }"
+              role="radio"
+              tabindex="0"
+              :aria-checked="formData.borrowerId === borrower.id"
+              :aria-label="`${borrower.firstName} ${borrower.lastName}`"
+              @click="selectBorrower(borrower)"
+              @keydown.enter="selectBorrower(borrower)"
+              @keydown.space.prevent="selectBorrower(borrower)"
+            >
+              <v-avatar size="48" color="primary" variant="tonal">
+                <span>{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
+              </v-avatar>
+              <div class="borrower-details">
+                <span class="borrower-name">{{ borrower.firstName }} {{ borrower.lastName }}</span>
+                <span class="borrower-email">{{ borrower.email }}</span>
+                <span class="borrower-meta">{{ borrower.contactNumber }} | {{ formatEmployment(borrower.employmentType) }}</span>
               </div>
-            </div>
-
-            <div v-else-if="borrowerSearch && !borrowersLoading" class="no-results">
-              <v-icon size="48" color="grey-lighten-1">mdi-account-search-outline</v-icon>
-              <p>No borrowers found matching "{{ borrowerSearch }}"</p>
-              <v-btn variant="text" color="primary" @click="borrowerMode = 'new'">
-                Create New Borrower
-              </v-btn>
+              <div v-if="formData.borrowerId === borrower.id" class="selected-indicator">
+                <v-icon color="success">mdi-check-circle</v-icon>
+              </div>
             </div>
           </div>
 
-          <!-- New Borrower Form -->
-          <div v-else class="new-borrower-section">
-            <v-form ref="borrowerFormRef">
-              <div class="form-grid">
-                <v-text-field
-                  v-model="newBorrower.firstName"
-                  label="First Name"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="newBorrower.lastName"
-                  label="Last Name"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="newBorrower.email"
-                  label="Email"
-                  type="email"
-                  :rules="[rules.required, rules.email]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="newBorrower.contactNumber"
-                  label="Contact Number"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="newBorrower.address"
-                  label="Address"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                  class="full-width"
-                />
-                <v-select
-                  v-model="newBorrower.employmentType"
-                  :items="employmentTypes"
-                  item-title="label"
-                  item-value="value"
-                  label="Employment Type"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="newBorrower.employer"
-                  label="Employer/Business Name"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model.number="newBorrower.monthlyIncome"
-                  label="Monthly Income"
-                  type="number"
-                  prefix="PHP"
-                  :rules="[rules.required, rules.positiveNumber]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-              </div>
-            </v-form>
+          <div v-else-if="borrowerSearch && !borrowersLoading" class="no-results">
+            <v-icon size="48" color="grey-lighten-1">mdi-account-search-outline</v-icon>
+            <p>No accounts found matching "{{ borrowerSearch }}"</p>
+            <v-btn variant="text" color="primary" @click="openNewAccountPage">
+              Create New Account
+            </v-btn>
           </div>
 
           <!-- Co-Borrower Toggle -->
@@ -667,7 +591,6 @@ const stepItems = [
 ]
 
 // Form refs
-const borrowerFormRef = ref()
 const loanDetailsFormRef = ref()
 
 // Form data
@@ -684,7 +607,6 @@ const formData = ref({
 })
 
 // Borrower state
-const borrowerMode = ref<'existing' | 'new'>('existing')
 const borrowerSearch = ref('')
 const borrowerResults = ref<Borrower[]>([])
 const borrowersLoading = ref(false)
@@ -692,16 +614,6 @@ const hasCoBorrower = ref(false)
 const coBorrowerSearch = ref('')
 const coBorrowerResults = ref<Borrower[]>([])
 
-const newBorrower = ref({
-  firstName: '',
-  lastName: '',
-  email: '',
-  contactNumber: '',
-  address: '',
-  employmentType: 'employed',
-  employer: '',
-  monthlyIncome: 0,
-})
 
 // Document state
 const uploadedDocuments = ref<UploadedDocument[]>([])
@@ -721,15 +633,6 @@ const snackbar = ref({
   message: '',
   color: 'success',
 })
-
-// Employment types
-const employmentTypes = [
-  { label: 'Employed', value: 'employed' },
-  { label: 'Self-Employed', value: 'self_employed' },
-  { label: 'Business Owner', value: 'business_owner' },
-  { label: 'OFW', value: 'ofw' },
-  { label: 'Other', value: 'other' },
-]
 
 // Validation rules
 const rules = {
@@ -762,13 +665,6 @@ const missingRequiredDocuments = computed(() => {
 })
 
 const selectedBorrower = computed(() => {
-  if (borrowerMode.value === 'new') {
-    return {
-      firstName: newBorrower.value.firstName,
-      lastName: newBorrower.value.lastName,
-      email: newBorrower.value.email,
-    }
-  }
   return borrowerResults.value.find(b => b.id === formData.value.borrowerId)
 })
 
@@ -795,12 +691,7 @@ const canProceed = computed(() => {
     case 1:
       return !!formData.value.loanTypeId
     case 2:
-      if (borrowerMode.value === 'existing') {
-        return !!formData.value.borrowerId
-      }
-      return !!(newBorrower.value.firstName && newBorrower.value.lastName &&
-               newBorrower.value.email && newBorrower.value.contactNumber &&
-               newBorrower.value.address && newBorrower.value.monthlyIncome > 0)
+      return !!formData.value.borrowerId
     case 3:
       return formData.value.loanDetails.requestedAmount > 0 &&
              formData.value.loanDetails.requestedTerm > 0 &&
@@ -930,6 +821,11 @@ const selectCoBorrower = (borrower: Borrower) => {
   formData.value.coBorrowerId = borrower.id
 }
 
+// Navigate to create account page
+const openNewAccountPage = () => {
+  navigateTo('/officer/accounts/new?returnTo=/officer/applications/new')
+}
+
 // Validation helpers
 const validateAmount = (v: number) => {
   if (!selectedLoanType.value) return true
@@ -1017,12 +913,6 @@ const removeUploadedDocument = (docName: string) => {
 
 // Navigation
 const nextStep = async () => {
-  // Validate current step
-  if (currentStep.value === 2 && borrowerMode.value === 'new') {
-    const { valid } = await borrowerFormRef.value?.validate()
-    if (!valid) return
-  }
-
   if (currentStep.value === 3) {
     const { valid } = await loanDetailsFormRef.value?.validate()
     if (!valid) return
@@ -1040,24 +930,12 @@ const previousStep = () => {
 }
 
 // Submit methods
-const createBorrowerIfNeeded = async (): Promise<string> => {
-  if (borrowerMode.value === 'existing') {
-    return formData.value.borrowerId
-  }
-
-  // Create new borrower
-  const result = await borrowersStore.createBorrower(newBorrower.value)
-  return (result as any).id
-}
-
 const saveAsDraft = async () => {
   saving.value = true
   try {
-    const borrowerId = await createBorrowerIfNeeded()
-
     await loansStore.createApplication({
       loanTypeId: formData.value.loanTypeId,
-      borrowerId,
+      borrowerId: formData.value.borrowerId,
       coBorrowerId: formData.value.coBorrowerId || undefined,
       loanDetails: formData.value.loanDetails,
     })
@@ -1080,12 +958,10 @@ const submitApplication = async () => {
 
   submitting.value = true
   try {
-    const borrowerId = await createBorrowerIfNeeded()
-
     // Create application
     const result = await loansStore.createApplication({
       loanTypeId: formData.value.loanTypeId,
-      borrowerId,
+      borrowerId: formData.value.borrowerId,
       coBorrowerId: formData.value.coBorrowerId || undefined,
       loanDetails: formData.value.loanDetails,
     })
@@ -1116,9 +992,32 @@ const showSnackbar = (message: string, color: string) => {
   snackbar.value = { show: true, message, color }
 }
 
+// Auto-select borrower returned from the create account page
+const autoSelectBorrower = async (borrowerId: string) => {
+  try {
+    await borrowersStore.fetchBorrowerById(borrowerId)
+    const borrower = borrowersStore.currentBorrower
+    if (borrower) {
+      borrowerResults.value = [borrower, ...borrowerResults.value.filter(b => b.id !== borrower.id)]
+      formData.value.borrowerId = borrower.id
+      borrowerSearch.value = `${borrower.firstName} ${borrower.lastName}`
+      currentStep.value = 2
+      showSnackbar('Account created and selected', 'success')
+    }
+  } catch {
+    // Borrower fetch failed — user can search manually
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   loadLoanTypes()
+
+  // Check if returning from create account page
+  const borrowerId = route.query.borrowerId as string
+  if (borrowerId) {
+    autoSelectBorrower(borrowerId)
+  }
 
   // Check for duplicate parameter
   const duplicateId = route.query.duplicate as string
@@ -1128,11 +1027,9 @@ onMounted(() => {
       if (app) {
         formData.value.loanTypeId = app.loanTypeId
         formData.value.loanDetails = { ...app.loanDetails }
-        // Apply defaults from the loan type (interest rate, term)
         const loanType = loanTypesStore.loanTypes.find(lt => lt.id === app.loanTypeId)
         if (loanType) {
           applyLoanTypeDefaults(loanType)
-          // Restore the duplicated loan details on top of defaults
           formData.value.loanDetails = { ...app.loanDetails }
         }
       }
@@ -1390,17 +1287,19 @@ onMounted(() => {
 }
 
 /* Borrower Section */
-.borrower-mode-toggle {
-  margin-bottom: 24px;
+.borrower-search-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.existing-borrower-section,
-.new-borrower-section {
-  margin-bottom: 24px;
+.borrower-search-row .borrower-search {
+  flex: 1;
 }
 
 .borrower-search {
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .borrower-search :deep(.v-field) {
@@ -1525,7 +1424,7 @@ onMounted(() => {
   margin-bottom: 28px;
 }
 
-.loan-details-form .form-section {
+.form-section {
   margin-bottom: 28px;
 }
 
@@ -1758,13 +1657,6 @@ onMounted(() => {
 /* Dialog */
 .upload-dialog {
   border-radius: 16px;
-}
-
-.dialog-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 600;
-  padding: 20px 24px 16px;
 }
 
 .upload-label {

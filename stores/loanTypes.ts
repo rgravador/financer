@@ -210,6 +210,40 @@ export const useLoanTypesStore = defineStore('loanTypes', {
     },
 
     /**
+     * Set a loan type as the default for the tenant
+     */
+    async setDefaultLoanType(loanTypeId: string) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { authenticatedFetch } = useAuth()
+        const loanType = await authenticatedFetch<LoanType>(
+          `/api/tenant/loan-types/${loanTypeId}/default`,
+          { method: 'PATCH' }
+        )
+
+        // Unset isDefault on all other loan types locally
+        this.loanTypes.forEach((lt) => {
+          lt.isDefault = lt.id === loanTypeId
+        })
+
+        // Update the returned loan type in list
+        const index = this.loanTypes.findIndex((lt) => lt.id === loanTypeId)
+        if (index !== -1) {
+          this.loanTypes[index] = { ...this.loanTypes[index], ...loanType }
+        }
+
+        return loanType
+      } catch (error: any) {
+        this.error = error.data?.statusMessage || 'Failed to set default loan type'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    /**
      * Clear error
      */
     clearError() {

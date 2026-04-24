@@ -277,125 +277,88 @@
     </div>
 
     <!-- Create/Edit Dialog -->
-    <v-dialog v-model="showFormDialog" max-width="650" persistent scrollable>
+    <!-- Edit Account Dialog -->
+    <v-dialog v-model="showFormDialog" max-width="750" persistent scrollable>
       <v-card class="form-dialog">
         <v-card-title class="dialog-title">
-          <v-icon start :color="editingBorrower ? 'primary' : 'success'">
-            {{ editingBorrower ? 'mdi-pencil' : 'mdi-account-plus' }}
-          </v-icon>
-          {{ editingBorrower ? 'Edit Account' : 'Create Account' }}
+          <v-icon start color="primary">mdi-pencil</v-icon>
+          Edit Account
         </v-card-title>
         <v-card-text class="dialog-content">
           <v-form ref="formRef">
-            <!-- Personal Info -->
+            <!-- Basic Identity -->
             <div class="form-section">
-              <h4 class="form-section-title">Personal Information</h4>
+              <h4 class="form-section-title">Basic Identity</h4>
               <div class="form-grid">
-                <v-text-field
-                  v-model="formData.firstName"
-                  label="First Name"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="formData.lastName"
-                  label="Last Name"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
+                <v-text-field v-model="formData.firstName" label="First Name" :rules="[rules.required]" variant="outlined" density="comfortable" />
+                <v-text-field v-model="formData.middleName" label="Middle Name" variant="outlined" density="comfortable" />
               </div>
-              <v-text-field
-                v-model="formData.email"
-                label="Email Address"
-                type="email"
-                :rules="[rules.required, rules.email]"
-                variant="outlined"
-                density="comfortable"
-                class="mt-4"
-              />
-              <v-text-field
-                v-model="formData.contactNumber"
-                label="Contact Number"
-                :rules="[rules.required]"
-                variant="outlined"
-                density="comfortable"
-                class="mt-4"
-              />
-              <v-text-field
-                v-model="formData.address"
-                label="Address"
-                :rules="[rules.required]"
-                variant="outlined"
-                density="comfortable"
-                class="mt-4"
-              />
+              <div class="form-grid mt-4">
+                <v-text-field v-model="formData.lastName" label="Last Name" :rules="[rules.required]" variant="outlined" density="comfortable" />
+                <v-text-field v-model="formData.suffix" label="Suffix" variant="outlined" density="comfortable" />
+              </div>
+              <v-text-field v-model="formData.dateOfBirth" label="Date of Birth" type="date" variant="outlined" density="comfortable" class="mt-4" />
+              <div class="form-grid mt-4">
+                <v-text-field v-model="formData.email" label="Email Address" type="email" :rules="[rules.required, rules.email]" variant="outlined" density="comfortable" />
+                <v-text-field v-model="formData.contactNumber" label="Contact Number" :rules="[rules.required]" variant="outlined" density="comfortable" />
+              </div>
             </div>
 
-            <!-- Employment Info -->
+            <!-- Stability -->
             <div class="form-section">
-              <h4 class="form-section-title">Employment Information</h4>
-              <div class="form-grid">
-                <v-select
-                  v-model="formData.employmentType"
-                  :items="employmentTypes"
-                  item-title="label"
-                  item-value="value"
-                  label="Employment Type"
-                  :rules="[rules.required]"
-                  variant="outlined"
-                  density="comfortable"
-                />
-                <v-text-field
-                  v-model="formData.employer"
-                  label="Employer/Business Name"
-                  variant="outlined"
-                  density="comfortable"
-                />
+              <h4 class="form-section-title">Stability</h4>
+              <v-text-field v-model="formData.address" label="Current Address" :rules="[rules.required]" variant="outlined" density="comfortable" />
+              <div class="form-grid mt-4">
+                <v-select v-model="formData.housingStatus" :items="housingStatuses" item-title="label" item-value="value" label="Housing Status" variant="outlined" density="comfortable" />
+                <v-text-field v-model.number="formData.yearsAtCurrentAddress" label="Years at Current Address" type="number" min="0" variant="outlined" density="comfortable" />
               </div>
-              <v-text-field
-                v-model.number="formData.monthlyIncome"
-                label="Monthly Income"
-                type="number"
-                prefix="PHP"
-                :rules="[rules.required, rules.positiveNumber]"
-                variant="outlined"
-                density="comfortable"
-                class="mt-4"
-              />
+              <v-text-field v-model="formData.previousAddress" label="Previous Address" variant="outlined" density="comfortable" class="mt-4" />
+              <div class="form-grid mt-4">
+                <v-select v-model="formData.employmentType" :items="employmentTypes" item-title="label" item-value="value" label="Employment Status" :rules="[rules.required]" variant="outlined" density="comfortable" />
+                <v-text-field v-model="formData.employer" label="Employer / Business" variant="outlined" density="comfortable" />
+              </div>
+              <div class="form-grid mt-4">
+                <v-text-field v-model.number="formData.employmentYears" label="Employment Length (Years)" type="number" min="0" variant="outlined" density="comfortable" />
+                <v-text-field v-model.number="formData.employmentMonths" label="Months" type="number" min="0" max="11" variant="outlined" density="comfortable" />
+              </div>
             </div>
 
-            <!-- Additional Info -->
+            <!-- Income & Capacity -->
             <div class="form-section">
-              <h4 class="form-section-title">Additional Information</h4>
-              <v-text-field
-                v-model="formData.dateOfBirth"
-                label="Date of Birth"
-                type="date"
-                variant="outlined"
-                density="comfortable"
-              />
-              <v-textarea
-                v-model="formData.notes"
-                label="Notes (optional)"
-                variant="outlined"
-                density="comfortable"
-                rows="2"
-                class="mt-4"
-              />
+              <h4 class="form-section-title">Income & Capacity</h4>
+              <div class="form-grid">
+                <v-select v-model="formData.incomeSource" :items="incomeSources" item-title="label" item-value="value" label="Source of Income" variant="outlined" density="comfortable" clearable />
+                <v-text-field v-model.number="formData.monthlyIncome" label="Monthly Income" type="number" prefix="₱" :rules="[rules.required, rules.positiveNumber]" variant="outlined" density="comfortable" />
+              </div>
+              <v-text-field v-model.number="formData.existingObligations" label="Existing Obligations" type="number" prefix="₱" variant="outlined" density="comfortable" class="mt-4" />
+              <div class="form-grid mt-4">
+                <v-text-field v-model.number="formData.dependentsCount" label="Dependents" type="number" min="0" variant="outlined" density="comfortable" />
+                <v-text-field v-model.number="formData.monthlyRent" label="Monthly Rent" type="number" prefix="₱" variant="outlined" density="comfortable" />
+              </div>
+            </div>
+
+            <!-- Banking -->
+            <div class="form-section">
+              <h4 class="form-section-title">Banking</h4>
+              <div class="form-grid">
+                <v-text-field v-model="formData.bankName" label="Bank Name" variant="outlined" density="comfortable" />
+                <v-text-field v-model="formData.bankAccountNumber" label="Account Number" variant="outlined" density="comfortable" />
+              </div>
+              <v-checkbox v-model="formData.hasBankStatements" label="Bank statements provided" color="primary" hide-details density="compact" class="mt-2" />
+            </div>
+
+            <!-- Notes -->
+            <div class="form-section">
+              <h4 class="form-section-title">Notes</h4>
+              <v-textarea v-model="formData.notes" label="Notes (optional)" variant="outlined" density="comfortable" rows="2" />
             </div>
           </v-form>
         </v-card-text>
         <v-card-actions class="dialog-actions">
           <v-spacer />
           <v-btn variant="text" @click="closeFormDialog">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            :loading="formLoading"
-            @click="submitForm"
-          >
-            {{ editingBorrower ? 'Save Changes' : 'Create Account' }}
+          <v-btn color="primary" :loading="formLoading" @click="submitForm">
+            Save Changes
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -509,14 +472,28 @@ const formRef = ref()
 
 const formData = ref({
   firstName: '',
+  middleName: '',
   lastName: '',
+  suffix: '',
   email: '',
   contactNumber: '',
+  dateOfBirth: '',
   address: '',
+  housingStatus: 'renting',
+  previousAddress: '',
+  yearsAtCurrentAddress: null as number | null,
   employmentType: 'employed',
   employer: '',
+  employmentYears: null as number | null,
+  employmentMonths: null as number | null,
+  incomeSource: '',
   monthlyIncome: 0,
-  dateOfBirth: '',
+  existingObligations: null as number | null,
+  dependentsCount: null as number | null,
+  monthlyRent: null as number | null,
+  bankName: '',
+  bankAccountNumber: '',
+  hasBankStatements: false,
   notes: '',
 })
 
@@ -538,6 +515,25 @@ const employmentTypes = [
   { label: 'Self-Employed', value: 'self_employed' },
   { label: 'Business Owner', value: 'business_owner' },
   { label: 'OFW', value: 'ofw' },
+  { label: 'Other', value: 'other' },
+]
+
+const housingStatuses = [
+  { label: 'Owned', value: 'owned' },
+  { label: 'Renting', value: 'renting' },
+  { label: 'Living with Relatives', value: 'living_with_relatives' },
+  { label: 'Company-Provided', value: 'company_provided' },
+  { label: 'Other', value: 'other' },
+]
+
+const incomeSources = [
+  { label: 'Salary', value: 'salary' },
+  { label: 'Business', value: 'business' },
+  { label: 'Freelance', value: 'freelance' },
+  { label: 'Remittance', value: 'remittance' },
+  { label: 'Pension', value: 'pension' },
+  { label: 'Rental Income', value: 'rental' },
+  { label: 'Investments', value: 'investments' },
   { label: 'Other', value: 'other' },
 ]
 
@@ -622,34 +618,35 @@ const formatCurrency = (amount: number) => {
 }
 
 const openCreateDialog = () => {
-  editingBorrower.value = null
-  formData.value = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    contactNumber: '',
-    address: '',
-    employmentType: 'employed',
-    employer: '',
-    monthlyIncome: 0,
-    dateOfBirth: '',
-    notes: '',
-  }
-  showFormDialog.value = true
+  navigateTo('/officer/accounts/new')
 }
 
 const openEditDialog = (borrower: Borrower) => {
   editingBorrower.value = borrower
   formData.value = {
     firstName: borrower.firstName,
+    middleName: borrower.middleName || '',
     lastName: borrower.lastName,
+    suffix: borrower.suffix || '',
     email: borrower.email,
     contactNumber: borrower.contactNumber,
+    dateOfBirth: borrower.dateOfBirth ? new Date(borrower.dateOfBirth).toISOString().split('T')[0] : '',
     address: borrower.address,
+    housingStatus: borrower.housingStatus || 'renting',
+    previousAddress: borrower.previousAddress || '',
+    yearsAtCurrentAddress: borrower.yearsAtCurrentAddress ?? null,
     employmentType: borrower.employmentType,
     employer: borrower.employer || '',
+    employmentYears: borrower.employmentLength != null ? Math.floor(borrower.employmentLength / 12) : null,
+    employmentMonths: borrower.employmentLength != null ? borrower.employmentLength % 12 : null,
+    incomeSource: borrower.incomeSource || '',
     monthlyIncome: borrower.monthlyIncome,
-    dateOfBirth: borrower.dateOfBirth ? new Date(borrower.dateOfBirth).toISOString().split('T')[0] : '',
+    existingObligations: borrower.existingObligations ?? null,
+    dependentsCount: borrower.dependentsCount ?? null,
+    monthlyRent: borrower.monthlyRent ?? null,
+    bankName: borrower.bankName || '',
+    bankAccountNumber: borrower.bankAccountNumber || '',
+    hasBankStatements: borrower.hasBankStatements || false,
     notes: borrower.notes || '',
   }
   showFormDialog.value = true
@@ -666,32 +663,38 @@ const submitForm = async () => {
 
   formLoading.value = true
   try {
+    const d = formData.value
     const payload = {
-      firstName: formData.value.firstName,
-      lastName: formData.value.lastName,
-      email: formData.value.email,
-      contactNumber: formData.value.contactNumber,
-      address: formData.value.address,
-      employmentType: formData.value.employmentType,
-      employer: formData.value.employer || undefined,
-      monthlyIncome: formData.value.monthlyIncome,
-      dateOfBirth: formData.value.dateOfBirth || undefined,
-      notes: formData.value.notes || undefined,
+      firstName: d.firstName,
+      middleName: d.middleName || undefined,
+      lastName: d.lastName,
+      suffix: d.suffix || undefined,
+      email: d.email,
+      contactNumber: d.contactNumber,
+      dateOfBirth: d.dateOfBirth || undefined,
+      address: d.address,
+      housingStatus: d.housingStatus || undefined,
+      previousAddress: d.previousAddress || undefined,
+      yearsAtCurrentAddress: d.yearsAtCurrentAddress ?? undefined,
+      employmentType: d.employmentType,
+      employer: d.employer || undefined,
+      employmentLength: (d.employmentYears || d.employmentMonths)
+        ? ((d.employmentYears ?? 0) * 12) + (d.employmentMonths ?? 0)
+        : undefined,
+      incomeSource: d.incomeSource || undefined,
+      monthlyIncome: d.monthlyIncome,
+      existingObligations: d.existingObligations ?? undefined,
+      dependentsCount: d.dependentsCount ?? undefined,
+      monthlyRent: d.monthlyRent ?? undefined,
+      bankName: d.bankName || undefined,
+      bankAccountNumber: d.bankAccountNumber || undefined,
+      hasBankStatements: d.hasBankStatements || undefined,
+      notes: d.notes || undefined,
     }
 
     if (editingBorrower.value) {
       await borrowersStore.updateBorrower(editingBorrower.value.id, payload)
       showSnackbar('Account updated successfully', 'success')
-    } else {
-      const created = await borrowersStore.createBorrower(payload)
-      showSnackbar('Account created successfully', 'success')
-
-      // Check if we should redirect back to loan application
-      const returnTo = route.query.returnTo as string
-      if (returnTo) {
-        navigateTo(`${returnTo}?borrowerId=${(created as any).id}`)
-        return
-      }
     }
 
     closeFormDialog()

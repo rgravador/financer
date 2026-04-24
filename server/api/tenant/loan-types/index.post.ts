@@ -135,6 +135,7 @@ export default defineEventHandler(async (event) => {
     maxLoanAmount: loanType.maxLoanAmount,
     availableTerms: loanType.availableTerms,
     requiredDocuments: loanType.requiredDocuments,
+    isDefault: loanType.isDefault || false,
     isActive: loanType.isActive,
     createdAt: loanType.createdAt,
     updatedAt: loanType.updatedAt,

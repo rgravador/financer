@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
       description: doc.description,
       isRequired: doc.isRequired,
     })),
+    isDefault: loanType.isDefault || false,
     isActive: loanType.isActive,
     createdAt: loanType.createdAt,
     updatedAt: loanType.updatedAt,

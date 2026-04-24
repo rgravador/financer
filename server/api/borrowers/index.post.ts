@@ -42,6 +42,24 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Validate income source if provided
+  const validIncomeSources = ['salary', 'business', 'freelance', 'remittance', 'pension', 'rental', 'investments', 'other']
+  if (body.incomeSource && !validIncomeSources.includes(body.incomeSource)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Invalid income source. Must be one of: ${validIncomeSources.join(', ')}`,
+    })
+  }
+
+  // Validate government ID type if provided
+  const validIdTypes = ['passport', 'drivers_license', 'sss', 'philhealth', 'pagibig', 'tin', 'voters_id', 'postal_id', 'umid', 'national_id', 'other']
+  if (body.governmentIdType && !validIdTypes.includes(body.governmentIdType)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Invalid government ID type. Must be one of: ${validIdTypes.join(', ')}`,
+    })
+  }
+
   // Check if borrower with same email already exists in this tenant
   const existingBorrower = await Borrower.findOne({
     tenantId: user.tenantId,
@@ -58,16 +76,53 @@ export default defineEventHandler(async (event) => {
   // Create borrower
   const borrower = await Borrower.create({
     tenantId: user.tenantId,
+
+    // Basic Identity
     firstName: body.firstName.trim(),
+    middleName: body.middleName?.trim(),
     lastName: body.lastName.trim(),
+    suffix: body.suffix?.trim(),
     email: body.email.toLowerCase().trim(),
     contactNumber: body.contactNumber.trim(),
+    dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : undefined,
+    governmentIdType: body.governmentIdType,
+    governmentIdNumber: body.governmentIdNumber?.trim(),
+
+    // Stability Indicators
     address: body.address.trim(),
+    housingStatus: body.housingStatus,
+    previousAddress: body.previousAddress?.trim(),
+    yearsAtCurrentAddress: body.yearsAtCurrentAddress,
     employmentType: body.employmentType,
     employer: body.employer?.trim(),
+    employmentLength: body.employmentLength,
+
+    // Income & Capacity
+    incomeSource: body.incomeSource,
     monthlyIncome: body.monthlyIncome,
-    dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : undefined,
+    annualIncome: body.annualIncome,
+    existingObligations: body.existingObligations,
+    dependentsCount: body.dependentsCount,
+    monthlyRent: body.monthlyRent,
+
+    // Creditworthiness
+    creditScore: body.creditScore,
+    creditHistory: body.creditHistory?.trim(),
+    pastLoans: body.pastLoans || [],
+    hasDefaults: body.hasDefaults,
+    hasLatePayments: body.hasLatePayments,
+
+    // Banking
+    bankName: body.bankName?.trim(),
+    bankAccountNumber: body.bankAccountNumber?.trim(),
+    hasBankStatements: body.hasBankStatements,
+
+    // References
+    references: body.references || [],
+
+    // Notes
     notes: body.notes?.trim(),
+
     isActive: true,
   })
 

@@ -79,6 +79,7 @@ export interface LoanType {
   maxLoanAmount: number
   availableTerms: number[]
   requiredDocuments: RequiredDocument[]
+  isDefault: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -102,27 +103,89 @@ export interface Notification {
 // Employment type
 export type EmploymentType = 'employed' | 'self_employed' | 'business_owner' | 'ofw' | 'other'
 
+// Housing status type
+export type HousingStatus = 'owned' | 'renting' | 'living_with_relatives' | 'company_provided' | 'other'
+
+// Income source type
+export type IncomeSource = 'salary' | 'business' | 'freelance' | 'remittance' | 'pension' | 'rental' | 'investments' | 'other'
+
+// Government ID type
+export type GovernmentIdType = 'passport' | 'drivers_license' | 'sss' | 'philhealth' | 'pagibig' | 'tin' | 'voters_id' | 'postal_id' | 'umid' | 'national_id' | 'other'
+
 // Application status
 export type ApplicationStatus = 'draft' | 'submitted' | 'under_review' | 'pending_documents' | 'approved' | 'rejected' | 'disbursed'
 
 // Document status
 export type DocumentStatus = 'uploaded' | 'pending' | 'waived'
 
+// Borrower reference
+export interface BorrowerReference {
+  name: string
+  relationship: string
+  contactNumber: string
+  address?: string
+}
+
+// Borrower past loan
+export interface BorrowerPastLoan {
+  lender: string
+  amount: number
+  status: 'paid' | 'current' | 'defaulted' | 'restructured'
+  remarks?: string
+}
+
 // Borrower interface
 export interface Borrower {
   id: string
   tenantId: string
+
+  // Basic Identity
   firstName: string
+  middleName?: string
   lastName: string
+  suffix?: string
   fullName?: string
   email: string
   contactNumber: string
+  dateOfBirth?: Date
+  governmentIdType?: GovernmentIdType
+  governmentIdNumber?: string
+
+  // Stability Indicators
   address: string
+  housingStatus?: HousingStatus
+  previousAddress?: string
+  yearsAtCurrentAddress?: number
   employmentType: EmploymentType
   employer?: string
+  employmentLength?: number
+
+  // Income & Capacity
+  incomeSource?: IncomeSource
   monthlyIncome: number
-  dateOfBirth?: Date
+  annualIncome?: number
+  existingObligations?: number
+  dependentsCount?: number
+  monthlyRent?: number
+
+  // Creditworthiness
+  creditScore?: number
+  creditHistory?: string
+  pastLoans?: BorrowerPastLoan[]
+  hasDefaults?: boolean
+  hasLatePayments?: boolean
+
+  // Banking & Financial Footprint
+  bankName?: string
+  bankAccountNumber?: string
+  hasBankStatements?: boolean
+
+  // References
+  references?: BorrowerReference[]
+
+  // Notes
   notes?: string
+
   isActive: boolean
   createdAt: Date
   updatedAt: Date
