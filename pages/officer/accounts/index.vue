@@ -836,7 +836,8 @@ onMounted(() => {
 }
 
 .status-filter {
-  min-width: 160px;
+  width: 140px;
+  flex: none;
 }
 
 .search-field :deep(.v-field),

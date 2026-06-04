@@ -19,9 +19,13 @@ export const useNotificationsStore = defineStore('notifications', {
     // Helper to get auth headers
     getAuthHeaders() {
       const authStore = useAuthStore()
-      return {
+      const headers: Record<string, string> = {
         Authorization: `Bearer ${authStore.accessToken}`,
       }
+      if (authStore.csrfToken) {
+        headers['x-csrf-token'] = authStore.csrfToken
+      }
+      return headers
     },
 
     async fetchNotifications(unreadOnly: boolean = false) {
