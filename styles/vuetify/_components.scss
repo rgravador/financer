@@ -1,53 +1,81 @@
-// Reduce Material Design's prominent shadows
+// =============================================================================
+// CARD STYLES — minimal elevation, border-defined, premium spacing
+// =============================================================================
+
 .v-card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: var(--shadow-card) !important;
+  border: 1px solid var(--border-color);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 
-  &.v-card--elevation-2 {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-  }
-
-  &.v-card--elevation-3 {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: var(--shadow-card-hover) !important;
   }
 }
 
-// Clean table styling
+// =============================================================================
+// TABLE STYLES — clean, spacious, refined
+// =============================================================================
+
 .v-data-table {
   .v-data-table__tr:hover {
-    background-color: rgba(30, 58, 138, 0.06) !important; // Navy blue hover
+    background-color: var(--bg-hover) !important;
   }
 
   .v-data-table__th {
+    font-family: var(--font-display) !important;
+    font-size: 11px !important;
     font-weight: 600 !important;
-    color: #475569 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted) !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .v-data-table__td {
+    padding: 14px 20px !important;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border-color-light) !important;
+  }
+
+  .v-data-table-footer {
+    border-top: 1px solid var(--border-color) !important;
   }
 }
 
-// Button refinements
+// =============================================================================
+// BUTTON STYLES — understated elegance
+// =============================================================================
+
 .v-btn {
   font-weight: 500 !important;
   letter-spacing: 0.01em !important;
+  transition: all var(--transition-base) !important;
 
   &.v-btn--elevated:not(.v-btn--disabled) {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: none !important;
 
     &:hover {
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+      box-shadow: var(--shadow-md) !important;
     }
   }
 
-  // Ensure primary buttons have white text
+  // Primary buttons
   &.bg-primary {
     color: rgb(var(--v-theme-on-primary)) !important;
   }
 
-  // Ensure secondary (gold) buttons have dark text
+  // Secondary buttons
   &.bg-secondary {
     color: rgb(var(--v-theme-on-secondary)) !important;
   }
 }
 
-// Avatar text visibility
+// =============================================================================
+// AVATAR STYLES
+// =============================================================================
+
 .v-avatar {
   &.bg-primary {
     color: rgb(var(--v-theme-on-primary)) !important;
@@ -58,7 +86,43 @@
   }
 }
 
-// Navigation items with primary color
+// =============================================================================
+// INPUT FIELD STYLES — refined borders, subtle focus
+// =============================================================================
+
+.v-text-field,
+.v-select {
+  .v-field__outline {
+    --v-field-border-opacity: 0.4;
+  }
+
+  &:hover .v-field__outline {
+    --v-field-border-opacity: 0.7;
+  }
+}
+
+// =============================================================================
+// NAVIGATION DRAWER — clean border, no shadow
+// =============================================================================
+
+.v-navigation-drawer {
+  border-right: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+// =============================================================================
+// APP BAR — subtle bottom border
+// =============================================================================
+
+.v-app-bar {
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+// =============================================================================
+// LIST ITEMS — refined active state
+// =============================================================================
+
 .v-list-item {
   &.v-list-item--active {
     .v-list-item__content,
@@ -69,29 +133,36 @@
   }
 }
 
-// Input field refinements
-.v-text-field,
-.v-select {
-  .v-field__outline {
-    --v-field-border-opacity: 0.3;
-  }
+// =============================================================================
+// CHIP STYLES — refined
+// =============================================================================
 
-  &:hover .v-field__outline {
-    --v-field-border-opacity: 0.6;
-  }
-}
-
-// Navigation drawer
-.v-navigation-drawer {
-  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
-
-// App bar
-.v-app-bar {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
-
-// Chip styling
 .v-chip {
   font-weight: 500 !important;
+  letter-spacing: 0.01em;
+}
+
+// =============================================================================
+// DIALOG / MODAL — premium overlay
+// =============================================================================
+
+.v-overlay__scrim {
+  background: rgb(0 0 0 / 0.6) !important;
+  backdrop-filter: blur(4px);
+}
+
+// =============================================================================
+// SNACKBAR — refined
+// =============================================================================
+
+.v-snackbar__wrapper {
+  border-radius: 12px !important;
+}
+
+// =============================================================================
+// STEPPER — refined header
+// =============================================================================
+
+.v-stepper-header {
+  box-shadow: none !important;
 }

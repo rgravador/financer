@@ -8,6 +8,11 @@
     class="app-sidebar"
     :aria-label="'Main navigation'"
   >
+    <!-- Sidebar ambient glow -->
+    <div class="sidebar-glow" aria-hidden="true">
+      <div class="sidebar-orb"></div>
+    </div>
+
     <!-- Logo Section -->
     <div class="sidebar-header">
       <div class="logo-container">
@@ -113,13 +118,45 @@ const isActiveRoute = (path: string) => {
 .app-sidebar {
   background: var(--bg-sidebar-gradient) !important;
   border-right: 1px solid var(--sidebar-border) !important;
-  box-shadow: var(--sidebar-shadow);
+  box-shadow: none !important;
   transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+/* Sidebar ambient glow */
+.sidebar-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sidebar-orb {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #3B82F6 0%, #6366F1 50%, transparent 70%);
+  filter: blur(60px);
+  opacity: 0.06;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: sidebar-pulse 15s ease-in-out infinite;
+}
+
+@keyframes sidebar-pulse {
+  0%, 100% { opacity: 0.05; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.08; transform: translateX(-50%) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-orb { animation: none; }
 }
 
 /* Header / Logo */
 .sidebar-header {
-  padding: 20px 24px;
+  padding: 28px 24px 24px;
   border-bottom: 1px solid var(--sidebar-border);
 }
 
@@ -130,38 +167,39 @@ const isActiveRoute = (path: string) => {
 }
 
 .logo-image {
-  width: 140px;
+  width: 130px;
   height: auto;
   object-fit: contain;
+  opacity: 0.9;
 }
 
 /* Navigation Section */
 .nav-section {
-  padding: 20px 16px;
+  padding: 24px 16px;
 }
 
 .nav-label {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
-  margin: 0 0 12px 8px;
+  margin: 0 0 16px 12px;
 }
 
 .nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: var(--border-radius);
+  gap: 14px;
+  padding: 11px 14px;
+  border-radius: 10px;
   text-decoration: none;
   transition: all var(--transition-base);
   position: relative;
@@ -173,20 +211,20 @@ const isActiveRoute = (path: string) => {
 }
 
 .nav-item-icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--border-radius-sm);
-  background: var(--bg-sidebar-hover);
+  border-radius: 9px;
+  background: transparent;
   color: var(--sidebar-text);
   transition: all var(--transition-base);
 }
 
 .nav-item-text {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--sidebar-text);
   flex: 1;
@@ -198,9 +236,9 @@ const isActiveRoute = (path: string) => {
   background: var(--accent-primary);
   color: var(--text-inverse);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  border-radius: var(--border-radius-sm);
+  border-radius: 6px;
 }
 
 /* Hover State */
@@ -209,7 +247,6 @@ const isActiveRoute = (path: string) => {
 }
 
 .nav-item:hover .nav-item-icon {
-  background: var(--bg-sidebar-active);
   color: var(--sidebar-text-hover);
 }
 
@@ -236,7 +273,7 @@ const isActiveRoute = (path: string) => {
   background: var(--accent-primary);
 }
 
-/* Active indicator */
+/* Active indicator — thin gold line */
 .nav-item.active::before {
   content: '';
   position: absolute;
@@ -244,8 +281,8 @@ const isActiveRoute = (path: string) => {
   top: 50%;
   transform: translateY(-50%);
   width: 3px;
-  height: 24px;
+  height: 20px;
   background: var(--accent-primary);
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 3px 3px 0;
 }
 </style>

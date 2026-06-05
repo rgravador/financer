@@ -148,7 +148,8 @@ const handleLogout = async () => {
 .app-topbar {
   background-color: var(--bg-card) !important;
   border-bottom: 1px solid var(--border-color) !important;
-  padding: 0 32px !important;
+  box-shadow: none !important;
+  padding: 0 40px !important;
   transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 

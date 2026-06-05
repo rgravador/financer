@@ -1116,8 +1116,7 @@ onMounted(() => {
 
 <style scoped>
 .new-application-page {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 100%;
   padding-bottom: 100px;
 }
 

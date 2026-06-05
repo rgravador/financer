@@ -15,9 +15,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         light: {
           dark: false,
           colors: {
-            primary: '#2563EB',
+            primary: '#3B82F6',
             secondary: '#64748B',
-            accent: '#0EA5E9',
+            accent: '#F97316',
+            gold: '#F97316',
             success: '#10B981',
             warning: '#F59E0B',
             error: '#EF4444',
@@ -26,59 +27,65 @@ export default defineNuxtPlugin((nuxtApp) => {
             surface: '#FFFFFF',
             'surface-variant': '#F1F5F9',
             'on-primary': '#FFFFFF',
-            'on-secondary': '#000000',
+            'on-secondary': '#FFFFFF',
             'on-success': '#FFFFFF',
             'on-warning': '#000000',
             'on-error': '#FFFFFF',
-            'on-background': '#1E293B',
-            'on-surface': '#1E293B',
+            'on-background': '#0F172A',
+            'on-surface': '#0F172A',
           }
         },
         dark: {
           dark: true,
           colors: {
             primary: '#3B82F6',
-            secondary: '#94A3B8',
-            accent: '#38BDF8',
+            secondary: '#475569',
+            accent: '#F97316',
+            gold: '#F97316',
             success: '#34D399',
             warning: '#FBBF24',
-            error: '#F87171',
+            error: '#FB7185',
             info: '#60A5FA',
-            background: '#0F172A',
-            surface: '#1E293B',
-            'surface-variant': '#334155',
+            background: '#080C18',
+            surface: '#101828',
+            'surface-variant': '#1A2440',
             'on-primary': '#FFFFFF',
-            'on-secondary': '#000000',
-            'on-success': '#000000',
-            'on-warning': '#000000',
-            'on-error': '#000000',
-            'on-background': '#F1F5F9',
-            'on-surface': '#F1F5F9',
+            'on-secondary': '#E2E8F0',
+            'on-success': '#080C18',
+            'on-warning': '#080C18',
+            'on-error': '#080C18',
+            'on-background': '#E2E8F0',
+            'on-surface': '#E2E8F0',
           }
         }
       }
     },
     defaults: {
       VBtn: {
-        style: 'text-transform: none;',
+        style: 'text-transform: none; letter-spacing: 0.01em;',
         rounded: 'lg',
         elevation: 0,
       },
       VCard: {
-        elevation: 1,
-        rounded: 'lg',
+        elevation: 0,
+        rounded: 'xl',
       },
       VTextField: {
         variant: 'outlined',
         density: 'comfortable',
+        rounded: 'lg',
       },
       VSelect: {
         variant: 'outlined',
         density: 'comfortable',
+        rounded: 'lg',
       },
       VDataTable: {
         density: 'comfortable',
-      }
+      },
+      VChip: {
+        rounded: 'lg',
+      },
     }
   })
 

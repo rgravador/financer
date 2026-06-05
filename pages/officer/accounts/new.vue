@@ -709,8 +709,7 @@ const submitForm = async () => {
 
 <style scoped>
 .new-account-page {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 100%;
   padding-bottom: 100px;
 }
 
