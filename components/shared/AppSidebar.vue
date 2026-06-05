@@ -187,10 +187,9 @@ const isActiveRoute = (path: string) => {
 
 <style scoped>
 .app-sidebar {
-  background: var(--glass-heavy) !important;
-  border: 1px solid var(--glass-border-soft) !important;
-  border-radius: 20px !important;
+  background: #F0F0F4 !important;
   border: 1px solid var(--glass-border) !important;
+  border-radius: 20px !important;
   box-shadow: var(--shadow-card), var(--depth-edge), var(--shadow-glass-inset) !important;
   transition: all var(--transition-base);
   margin: 0 !important;
@@ -204,9 +203,10 @@ const isActiveRoute = (path: string) => {
 
 /* Dark mode — glassmorphic sidebar with blur */
 :root.dark .app-sidebar {
+  background: rgba(15, 15, 25, 0.85) !important;
   backdrop-filter: var(--glass-blur) !important;
   -webkit-backdrop-filter: var(--glass-blur) !important;
-  border: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 /* Dark mode — nav items become translucent, no solid bg */
@@ -300,7 +300,7 @@ const isActiveRoute = (path: string) => {
 .nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
 .nav-item {
@@ -314,8 +314,7 @@ const isActiveRoute = (path: string) => {
   position: relative;
   background: var(--glass-light);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: var(--depth-edge-xs), 0 2px 4px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  margin-bottom: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.03), var(--depth-edge-xs), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .nav-item:focus-visible {
@@ -331,7 +330,7 @@ const isActiveRoute = (path: string) => {
   justify-content: center;
   border-radius: 10px;
   background: transparent;
-  color: var(--sidebar-text);
+  color: var(--text-primary);
   transition: all var(--transition-base);
 }
 
@@ -339,7 +338,7 @@ const isActiveRoute = (path: string) => {
   font-family: var(--font-sans);
   font-size: 13.5px;
   font-weight: 500;
-  color: var(--sidebar-text);
+  color: var(--text-primary);
   flex: 1;
   transition: color var(--transition-base);
 }

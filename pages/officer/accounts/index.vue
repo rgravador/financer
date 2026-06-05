@@ -707,8 +707,7 @@ const submitForm = async () => {
 }
 
 const viewBorrower = (borrower: Borrower) => {
-  viewingBorrower.value = borrower
-  showViewDialog.value = true
+  navigateTo(`/officer/accounts/${borrower.id}`)
 }
 
 const openEditFromView = () => {

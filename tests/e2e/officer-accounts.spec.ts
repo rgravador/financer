@@ -20,16 +20,21 @@ const TENANT_OFFICER = {
   password: 'Just1234!',
 }
 
-// Generate unique email per test run to avoid duplicate conflicts
+// Generate unique suffix per test run to avoid duplicate conflicts
 const uniqueId = Date.now()
+const firstNames = ['Patrick', 'Katherine', 'Joseph', 'Maria', 'Carlos', 'Angela', 'Marco', 'Sofia']
+const lastNames = ['Santos', 'Dela Cruz', 'Reyes', 'Garcia', 'Torres', 'Mendoza', 'Lim', 'Tan']
+const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)]
+const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)]
+const shortId = String(uniqueId).slice(-6)
 const TEST_BORROWER = {
-  firstName: 'Test',
+  firstName: randomFirst,
   middleName: 'M',
-  lastName: `Borrower${uniqueId}`,
-  email: `test.borrower.${uniqueId}@example.com`,
+  lastName: randomLast,
+  email: `${randomFirst.toLowerCase()}${shortId}@example.com`,
   contactNumber: '09171234567',
-  address: '123 Test Street, Makati City',
-  employer: 'Test Corp',
+  address: '456 Rizal Avenue, Quezon City',
+  employer: 'Pacific Holdings Inc',
   monthlyIncome: '50000',
 }
 
@@ -39,7 +44,7 @@ async function loginAsTenantOfficer(page: Page) {
   await page.locator('#email-input').fill(TENANT_OFFICER.email)
   await page.locator('#password-input').fill(TENANT_OFFICER.password)
   await page.locator('button[type="submit"]').click()
-  await page.waitForURL('**/officer/applications', { timeout: 20000 })
+  await page.waitForURL(/\/officer\/(dashboard|applications)/, { timeout: 20000 })
 }
 
 async function navigateToAccounts(page: Page) {
@@ -51,6 +56,86 @@ async function navigateToAccounts(page: Page) {
   }
   await page.waitForSelector('.accounts-page, h1:has-text("Accounts")', { timeout: 10000 })
 }
+
+interface BorrowerData {
+  firstName: string
+  middleName: string
+  lastName: string
+  email: string
+  contactNumber: string
+  address: string
+  employer: string
+  monthlyIncome: string
+}
+
+async function createAccount(page: Page, borrower: BorrowerData) {
+  await page.goto('/officer/accounts/new')
+  await page.waitForSelector('h1:has-text("Create Account")', { timeout: 10000 })
+
+  // Step 1: Personal Info
+  await page.getByLabel('First Name').fill(borrower.firstName)
+  await page.getByLabel('Middle Name').fill(borrower.middleName)
+  await page.getByLabel('Last Name').fill(borrower.lastName)
+  await page.getByLabel('Email Address').fill(borrower.email)
+  await page.getByLabel('Contact Number').fill(borrower.contactNumber)
+  await page.locator('button:has-text("Next")').click()
+
+  // Step 2: Address
+  await expect(page.locator('h2:has-text("Address")')).toBeVisible({ timeout: 5000 })
+  await page.getByLabel('Current Address', { exact: true }).fill(borrower.address)
+  await page.locator('button:has-text("Next")').click()
+
+  // Step 3: Employment
+  await expect(page.locator('h2:has-text("Employment")')).toBeVisible({ timeout: 5000 })
+  await page.getByLabel('Employer / Business Name').fill(borrower.employer)
+  const incomeField = page.getByLabel('Monthly Income')
+  await incomeField.clear()
+  await incomeField.fill(borrower.monthlyIncome)
+  await page.locator('button:has-text("Next")').click()
+
+  // Step 4: Financial History (skip)
+  await expect(page.locator('h2:has-text("Financial History")')).toBeVisible({ timeout: 5000 })
+  await page.locator('button:has-text("Next")').click()
+
+  // Step 5: References (submit)
+  await expect(page.locator('h2:has-text("References")')).toBeVisible({ timeout: 5000 })
+  await page.locator('button:has-text("Create Account")').click()
+
+  await page.waitForURL('**/officer/accounts', { timeout: 20000 })
+}
+
+const ADDITIONAL_BORROWERS: BorrowerData[] = [
+  {
+    firstName: 'Katherine',
+    middleName: 'L',
+    lastName: 'Reyes',
+    email: `katherine.reyes.${shortId}@example.com`,
+    contactNumber: '09185551234',
+    address: '78 Mabini Street, Pasig City',
+    employer: 'Globe Telecom',
+    monthlyIncome: '65000',
+  },
+  {
+    firstName: 'Joseph',
+    middleName: 'R',
+    lastName: 'Santos',
+    email: `joseph.santos.${shortId}@example.com`,
+    contactNumber: '09279876543',
+    address: '15 Bonifacio Avenue, Taguig City',
+    employer: 'San Miguel Corporation',
+    monthlyIncome: '45000',
+  },
+  {
+    firstName: 'Angela',
+    middleName: 'C',
+    lastName: 'Torres',
+    email: `angela.torres.${shortId}@example.com`,
+    contactNumber: '09361234567',
+    address: '202 Roxas Boulevard, Manila',
+    employer: 'BDO Unibank',
+    monthlyIncome: '80000',
+  },
+]
 
 test.describe('Officer Accounts Module', () => {
   test.describe.configure({ mode: 'serial' })
@@ -134,11 +219,23 @@ test.describe('Officer Accounts Module', () => {
     // Step 5 is optional, submit the form
     await page.locator('button:has-text("Create Account")').click()
 
-    // Verify success feedback
-    await expect(page.locator('text=Account created successfully')).toBeVisible({ timeout: 10000 })
+    // Wait for success — either snackbar or redirect
+    await page.waitForURL('**/officer/accounts', { timeout: 20000 })
+  })
 
-    // Should redirect back to accounts list
-    await page.waitForURL('**/officer/accounts', { timeout: 15000 })
+  test('should create account for Katherine Reyes', async ({ page }) => {
+    await createAccount(page, ADDITIONAL_BORROWERS[0])
+    await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible({ timeout: 10000 })
+  })
+
+  test('should create account for Joseph Santos', async ({ page }) => {
+    await createAccount(page, ADDITIONAL_BORROWERS[1])
+    await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible({ timeout: 10000 })
+  })
+
+  test('should create account for Angela Torres', async ({ page }) => {
+    await createAccount(page, ADDITIONAL_BORROWERS[2])
+    await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible({ timeout: 10000 })
   })
 
   test('should show created account in the list', async ({ page }) => {

@@ -906,8 +906,8 @@ onUnmounted(() => {
 
 /* Status Filter Dropdown - Fixed visibility */
 .status-filter {
-  min-width: 170px;
-  max-width: 180px;
+  width: 220px;
+  flex-shrink: 0;
 }
 
 .status-filter :deep(.v-field) {

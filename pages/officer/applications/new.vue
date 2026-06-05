@@ -155,7 +155,8 @@
                     density="comfortable"
                     hide-details
                     clearable
-                    autocomplete="off"
+                    autocomplete="new-password"
+                    name="borrower-search-nofill"
                     class="borrower-search"
                     v-bind="menuProps"
                     @update:model-value="debouncedSearchBorrowers"
@@ -250,7 +251,8 @@
                       density="comfortable"
                       hide-details
                       clearable
-                      autocomplete="off"
+                      autocomplete="new-password"
+                      name="coborrower-search-nofill"
                       class="borrower-search"
                       v-bind="coMenuProps"
                       @update:model-value="debouncedSearchCoBorrowers"
@@ -900,7 +902,6 @@ const loadRecentBorrowers = async () => {
 }
 
 const onBorrowerSearchFocus = () => {
-  showBorrowerDropdown.value = true
   if (!borrowerSearch.value && borrowerResults.value.length === 0) {
     loadRecentBorrowers()
   }
@@ -908,7 +909,6 @@ const onBorrowerSearchFocus = () => {
 
 const onBorrowerSearchClear = () => {
   borrowerSearch.value = ''
-  showBorrowerDropdown.value = true
   loadRecentBorrowers()
 }
 
@@ -961,7 +961,6 @@ const searchCoBorrowers = async () => {
 }
 
 const onCoBorrowerSearchFocus = () => {
-  showCoBorrowerDropdown.value = true
   if (!coBorrowerSearch.value && coBorrowerResults.value.length === 0) {
     loadRecentCoBorrowers()
   }
@@ -1732,7 +1731,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 16px;
+  padding: 0 16px;
+  height: 48px;
   border-radius: 12px;
   background: rgba(var(--v-theme-warning), 0.06);
   font-size: 13px;

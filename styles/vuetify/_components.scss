@@ -164,18 +164,12 @@
 .v-chip {
   font-weight: 500 !important;
   letter-spacing: 0.01em;
-  border: 1px solid var(--glass-border);
-  box-shadow:
-    var(--depth-edge-xs),
-    0 2px 4px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  border: none !important;
+  box-shadow: none !important;
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      0 3px 0 #D5D5D9,
-      0 3px 8px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+    transform: none;
+    box-shadow: none !important;
   }
 }
 
@@ -205,10 +199,13 @@
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &.v-list-item--active {
+    background: rgba(var(--v-theme-primary), 0.10) !important;
+
     .v-list-item__content,
     .v-list-item-title,
     .v-icon {
-      color: rgb(var(--v-theme-on-primary)) !important;
+      color: rgb(var(--v-theme-primary)) !important;
+      font-weight: 600;
     }
   }
 }
@@ -231,6 +228,15 @@
   box-shadow:
     var(--shadow-lg),
     var(--depth-edge-sm) !important;
+}
+
+// =============================================================================
+// STATUS FILTER SELECTS — constrained width
+// =============================================================================
+
+.status-filter {
+  width: 220px;
+  flex-shrink: 0;
 }
 
 // =============================================================================
