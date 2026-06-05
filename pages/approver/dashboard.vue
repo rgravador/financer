@@ -4,11 +4,11 @@
     <header class="greeting-row">
       <div class="greeting-left">
         <div class="greeting-avatar">
-          <v-icon size="32" color="primary">mdi-shield-crown-outline</v-icon>
+          <v-icon size="32" color="primary">mdi-clipboard-check-outline</v-icon>
         </div>
         <div>
-          <h1 class="greeting-title">Good {{ greeting }}, Admin</h1>
-          <p class="greeting-sub">Here's what's happening across your platform today.</p>
+          <h1 class="greeting-title">Good {{ greeting }}, {{ userName }}</h1>
+          <p class="greeting-sub">Here's your review activity and queue status.</p>
         </div>
       </div>
       <div class="period-toggle">
@@ -16,8 +16,9 @@
       </div>
     </header>
 
-    <!-- KPIs (2x2) + Revenue chart side by side -->
+    <!-- Main grid: KPIs (2x2) + Right card -->
     <section class="main-grid">
+      <!-- Left: 2x2 KPI cards -->
       <div class="kpi-zone">
         <article v-for="kpi in kpiCards" :key="kpi.label" class="kpi-card">
           <div class="kpi-deco" aria-hidden="true"></div>
@@ -37,26 +38,84 @@
       <article class="chart-card-wide">
         <div class="card-head">
           <div>
-            <h3 class="card-title">Platform Revenue</h3>
-            <span class="card-subtitle">{{ period === 'Yearly' ? '2025' : 'Jan 2026' }}</span>
+            <h3 class="card-title">Daily Reviews</h3>
+            <span class="card-subtitle">Last 14 days</span>
           </div>
           <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
         </div>
         <div class="chart-area">
-          <Line :data="revenueData" :options="areaLineOptions" />
+          <Bar :data="dailyReviewData" :options="stackedBarOptions" />
         </div>
       </article>
     </section>
 
-    <!-- User Distribution -->
+    <!-- Row: Decision donut + Stats -->
+    <section class="bottom-grid">
+      <article class="side-card" style="min-height: 300px;">
+        <div class="card-head">
+          <h3 class="card-title">Decision Breakdown</h3>
+          <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
+        </div>
+        <div class="donut-wrap">
+          <Doughnut :data="decisionDonutData" :options="donutOptions" />
+        </div>
+      </article>
+
+      <!-- Right: Stat cards stacked -->
+      <div class="stat-stack">
+        <article class="mini-stat-card">
+          <div class="mini-stat-top">
+            <span class="mini-stat-label">Processing Time</span>
+          </div>
+          <span class="mini-stat-value">2.4h</span>
+          <div class="mini-stat-bottom">
+            <span class="mini-trend trend-up">-18% vs last month</span>
+            <button class="see-all-btn">Details <v-icon size="14">mdi-arrow-right</v-icon></button>
+          </div>
+        </article>
+
+        <article class="mini-stat-card">
+          <div class="mini-stat-top">
+            <span class="mini-stat-label">Consistency Score</span>
+          </div>
+          <span class="mini-stat-value">94%</span>
+          <div class="mini-stat-bottom">
+            <span class="mini-trend trend-up">+2% this month</span>
+            <button class="see-all-btn">Details <v-icon size="14">mdi-arrow-right</v-icon></button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Extra bottom row: Queue by Type + Next in Queue list -->
     <section class="bottom-grid">
       <article class="chart-card-wide">
         <div class="card-head">
-          <h3 class="card-title">User Distribution</h3>
+          <div>
+            <h3 class="card-title">Queue by Loan Type</h3>
+            <span class="card-subtitle">Current queue</span>
+          </div>
           <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
         </div>
-        <div class="donut-wrap" style="height: 260px; padding: 12px 20px 20px;">
-          <Doughnut :data="userDistData" :options="donutOptions" />
+        <div class="chart-area">
+          <Bar :data="queueByTypeData" :options="horizontalBarOptions" />
+        </div>
+      </article>
+
+      <article class="side-card" style="padding: 0;">
+        <div class="card-head" style="padding: 20px 20px 0;">
+          <h3 class="card-title">Next in Queue</h3>
+          <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
+        </div>
+        <div class="queue-list">
+          <div v-for="item in queueItems" :key="item.name" class="queue-row">
+            <div class="queue-avatar" :style="{ background: item.bg }">{{ item.initials }}</div>
+            <div class="queue-info">
+              <span class="queue-name">{{ item.name }}</span>
+              <span class="queue-meta">{{ item.type }} &middot; ₱{{ item.amount }}</span>
+            </div>
+            <span class="wait-badge" :class="item.urgent ? 'wait-urgent' : 'wait-normal'">{{ item.waiting }}</span>
+          </div>
         </div>
       </article>
     </section>
@@ -64,34 +123,54 @@
 </template>
 
 <script setup lang="ts">
-import { Line, Doughnut } from 'vue-chartjs'
+import { Bar, Doughnut } from 'vue-chartjs'
+import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({ middleware: ['role'], meta: { allowedRoles: ['system_admin'] } })
+definePageMeta({ middleware: ['role'], meta: { allowedRoles: ['tenant_approver'] } })
 
+const authStore = useAuthStore()
 const period = ref('Monthly')
 const periods = ['Weekly', 'Monthly', 'Yearly']
 const greeting = computed(() => { const h = new Date().getHours(); return h < 12 ? 'Morning' : h < 18 ? 'Afternoon' : 'Evening' })
+const userName = computed(() => authStore.user?.firstName || 'Approver')
 
 const kpiCards = [
-  { label: 'Active Tenants', value: '24', icon: 'mdi-office-building', iconBg: 'rgba(139, 92, 246, 0.12)', iconColor: '#8B5CF6', trend: '+3', trendUp: true },
-  { label: 'Total Users', value: '1,247', icon: 'mdi-account-group', iconBg: 'rgba(34, 211, 238, 0.12)', iconColor: '#22D3EE', trend: '+120', trendUp: true },
-  { label: 'Loans Processed', value: '3,892', icon: 'mdi-file-document-multiple', iconBg: 'rgba(251, 113, 133, 0.12)', iconColor: '#FB7185', trend: '+340', trendUp: true },
-  { label: 'Revenue', value: '₱48.2M', icon: 'mdi-cash-multiple', iconBg: 'rgba(16, 185, 129, 0.12)', iconColor: '#10B981', trend: '+15%', trendUp: true },
+  { label: 'Queue Size', value: '12', icon: 'mdi-clipboard-text-clock-outline', iconBg: 'rgba(251, 191, 36, 0.12)', iconColor: '#FBBF24', trend: '-3', trendUp: true },
+  { label: 'Reviewed Today', value: '8', icon: 'mdi-check-decagram-outline', iconBg: 'rgba(139, 92, 246, 0.12)', iconColor: '#8B5CF6', trend: '+2', trendUp: true },
+  { label: 'Avg Processing', value: '2.4h', icon: 'mdi-timer-outline', iconBg: 'rgba(34, 211, 238, 0.12)', iconColor: '#22D3EE', trend: '-18%', trendUp: true },
+  { label: 'Approval Rate', value: '82%', icon: 'mdi-thumb-up-outline', iconBg: 'rgba(16, 185, 129, 0.12)', iconColor: '#10B981', trend: '+4%', trendUp: true },
 ]
 
-const userDistData = {
-  labels: ['Officers', 'Approvers', 'Tenant Admins', 'System Admins'],
-  datasets: [{ data: [680, 198, 345, 24], backgroundColor: ['#8B5CF6', '#22D3EE', '#FBBF24', '#10B981'], borderWidth: 0, spacing: 3 }]
+const decisionDonutData = {
+  labels: ['Approved', 'Rejected', 'Returned'],
+  datasets: [{ data: [312, 68, 45], backgroundColor: ['#10B981', '#FB7185', '#FBBF24'], borderWidth: 0, spacing: 3 }]
 }
 
-const months = ['04 Jan', '08 Jan', '12 Jan', '16 Jan', '20 Jan', '24 Jan', '28 Jan', '30 Jan', '31 Jan']
-const revenueData = {
-  labels: months,
-  datasets: [{ label: 'Revenue', data: [180, 220, 280, 420, 620, 480, 350, 310, 340], borderColor: '#8B5CF6', backgroundColor: 'rgba(139, 92, 246, 0.06)', fill: true, pointBackgroundColor: '#8B5CF6', pointRadius: 3 }]
+const days = Array.from({ length: 14 }, (_, i) => `D${i + 1}`)
+const dailyReviewData = {
+  labels: days,
+  datasets: [
+    { label: 'Approved', data: [5, 7, 4, 8, 6, 3, 0, 7, 9, 5, 8, 6, 4, 8], backgroundColor: '#10B981' },
+    { label: 'Rejected', data: [1, 2, 1, 1, 2, 0, 0, 1, 2, 1, 1, 2, 0, 1], backgroundColor: '#FB7185' },
+  ]
 }
+
+const queueByTypeData = {
+  labels: ['Personal', 'Business', 'Salary', 'Emergency', 'Housing'],
+  datasets: [{ label: 'In Queue', data: [4, 3, 2, 2, 1], backgroundColor: ['#8B5CF6', '#22D3EE', '#FB7185', '#FBBF24', '#10B981'] }]
+}
+
+const queueItems = [
+  { name: 'Miguel Torres', initials: 'MT', type: 'Personal Loan', amount: '200,000', waiting: '3h', urgent: false, bg: 'rgba(139, 92, 246, 0.10)' },
+  { name: 'Carmen Reyes', initials: 'CR', type: 'Business Loan', amount: '750,000', waiting: '6h', urgent: false, bg: 'rgba(34, 211, 238, 0.10)' },
+  { name: 'Roberto Lim', initials: 'RL', type: 'Salary Loan', amount: '50,000', waiting: '12h', urgent: true, bg: 'rgba(251, 113, 133, 0.10)' },
+  { name: 'Grace Tan', initials: 'GT', type: 'Emergency', amount: '30,000', waiting: '1d', urgent: true, bg: 'rgba(251, 191, 36, 0.10)' },
+  { name: 'Paulo Santos', initials: 'PS', type: 'Housing Loan', amount: '1,500,000', waiting: '2h', urgent: false, bg: 'rgba(16, 185, 129, 0.10)' },
+]
 
 const donutOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' as const, labels: { boxWidth: 10, padding: 14, font: { size: 12 } } } }, cutout: '60%' }
-const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(99,102,241,0.06)' } }, x: { grid: { display: false } } } }
+const stackedBarOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' as const, labels: { boxWidth: 10, padding: 14, font: { size: 12 } } } }, scales: { y: { beginAtZero: true, stacked: true, grid: { color: 'rgba(99,102,241,0.06)' } }, x: { stacked: true, grid: { display: false } } } }
+const horizontalBarOptions = { responsive: true, maintainAspectRatio: false, indexAxis: 'y' as const, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(99,102,241,0.06)' } }, y: { grid: { display: false } } } }
 </script>
 
 <style scoped>
@@ -99,12 +178,11 @@ const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins:
 
 /* Greeting + period toggle */
 .greeting-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-
 .period-toggle { display: flex; gap: 4px; background: var(--glass-heavy); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border-soft); border-radius: 12px; padding: 4px; box-shadow: var(--shadow-sm); }
 .period-btn { padding: 8px 18px; border-radius: 10px; border: none; background: transparent; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all var(--transition-base); }
 .period-btn.active { background: var(--accent-primary); color: #fff; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25); }
 .greeting-left { display: flex; align-items: center; gap: 18px; }
-.greeting-avatar { width: 56px; height: 56px; border-radius: 14px; background: var(--glass-heavy); border: 1px solid var(--glass-border-soft); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); flex-shrink: 0; }
+.greeting-avatar { width: 56px; height: 56px; border-radius: 14px; background: var(--glass-heavy); border: 1px solid var(--glass-border-soft); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
 .greeting-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0; line-height: 1.2; }
 .greeting-sub { font-size: 14px; color: var(--text-muted); margin: 2px 0 0; }
 
@@ -163,6 +241,18 @@ const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins:
 .mini-trend { font-size: 12px; font-weight: 600; }
 .see-all-btn { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--accent-primary); background: none; border: none; cursor: pointer; padding: 0; }
 
+/* Queue list in side card */
+.queue-list { padding: 8px 20px 16px; display: flex; flex-direction: column; }
+.queue-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--glass-border-soft); }
+.queue-row:last-child { border-bottom: none; }
+.queue-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
+.queue-info { flex: 1; min-width: 0; }
+.queue-name { font-size: 13px; font-weight: 600; color: var(--text-primary); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.queue-meta { font-size: 11px; color: var(--text-muted); }
+.wait-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; flex-shrink: 0; }
+.wait-normal { background: rgba(139, 92, 246, 0.10); color: #7C3AED; }
+.wait-urgent { background: rgba(239, 68, 68, 0.10); color: #DC2626; }
+
 @media (max-width: 1200px) {
   .main-grid { grid-template-columns: 1fr; }
   .kpi-zone { grid-column: span 1; }
@@ -170,7 +260,6 @@ const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins:
 }
 @media (max-width: 640px) {
   .kpi-zone { grid-template-columns: 1fr; }
-  .dash-topbar { flex-direction: column; align-items: stretch; }
-  .search-box { max-width: none; }
+  .greeting-row { flex-direction: column; align-items: stretch; }
 }
 </style>

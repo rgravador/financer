@@ -3,89 +3,96 @@
 @use './components';
 
 /**
- * ASCENDENT THEME - Slate with Warm Amber Accents
+ * ASCENDENT THEME — Glassmorphism
  *
- * A professional, industrial palette with warm gold accents.
- * The slate foundation conveys trust and professionalism,
- * while amber/gold adds warmth and prosperity associations.
+ * Light mode: Soft pastel gradient background (lavender/periwinkle/sky)
+ *   with frosted white glass panels, violet/coral/cyan accents.
  *
- * Light Mode:
- *   - Backgrounds: White to Slate-50
- *   - Text: Slate-900 (primary) to Slate-500 (muted)
- *   - Accent: Amber-500 (warm gold)
- *
- * Dark Mode:
- *   - Backgrounds: Slate-950 to Slate-900
- *   - Text: White to Slate-400
- *   - Accent: Amber-400 (brighter gold)
+ * Dark mode: Deep violet-navy background with subtle glass panels,
+ *   same accent family at higher brightness.
  */
 
 // =============================================================================
 // CSS CUSTOM PROPERTIES - LIGHT MODE (Default)
 // =============================================================================
+// * {
+//   outline: 1px solid red;
+// }
 
 :root {
-  // Core palette — Deep Slate (cool, dark, glassmorphic)
-  --color-slate-950: #040712;
-  --color-slate-900: #080C18;
-  --color-slate-800: #101828;
-  --color-slate-700: #1A2440;
-  --color-slate-600: #334155;
-  --color-slate-500: #475569;
-  --color-slate-400: #64748B;
-  --color-slate-300: #94A3B8;
-  --color-slate-200: #CBD5E1;
-  --color-slate-100: #E2E8F0;
-  --color-slate-50: #F1F5F9;
+  // Core palette
+  --color-violet-700: #6D28D9;
+  --color-violet-600: #7C3AED;
+  --color-violet-500: #8B5CF6;
+  --color-violet-400: #A78BFA;
+  --color-violet-300: #C4B5FD;
+  --color-violet-200: #DDD6FE;
+  --color-violet-100: #EDE9FE;
+  --color-violet-50: #F5F3FF;
 
-  // Accent — Electric blue + Warm orange (dual accent)
-  --color-blue-600: #2563EB;
-  --color-blue-500: #3B82F6;
-  --color-blue-400: #60A5FA;
-  --color-blue-300: #93C5FD;
-  --color-orange-500: #F97316;
-  --color-orange-400: #FB923C;
+  --color-indigo-500: #6366F1;
+  --color-coral-500: #FB7185;
+  --color-coral-600: #F43F5E;
+  --color-cyan-500: #22D3EE;
+  --color-amber-400: #FBBF24;
 
-  // Status colors
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
-  --color-info: #3B82F6;
+  --color-info: #22D3EE;
 
-  // Semantic tokens - Backgrounds (light mode)
-  --bg-primary: #F8FAFC;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --bg-sidebar: #ffffff;
-  --bg-sidebar-gradient: linear-gradient(180deg, #ffffff 0%, #F1F5F9 100%);
-  --bg-sidebar-hover: var(--color-slate-50);
-  --bg-sidebar-active: rgba(59, 130, 246, 0.08);
-  --bg-input: #ffffff;
-  --bg-hover: var(--color-slate-50);
+  // Glass surface tokens — LIGHT MODE (solid white gradient cards)
+  --glass-heavy: linear-gradient(165deg, #FFFFFF 0%, #F3F3F6 100%);
+  --glass-heavy-flat: rgba(255, 255, 255, 0.92);
+  --glass-medium: rgba(255, 255, 255, 0.70);
+  --glass-light: rgba(255, 255, 255, 0.45);
+  --glass-tint: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.60);
+  --glass-border-soft: rgba(255, 255, 255, 0.35);
+  --glass-shadow: rgba(0, 0, 0, 0.06);
+  --glass-shadow-heavy: rgba(0, 0, 0, 0.08);
+  --glass-blur: blur(28px) saturate(1.5);
+  --glass-blur-light: blur(16px) saturate(1.3);
+
+  // Backgrounds — soft pastel gradient canvas
+  --bg-primary: #E4E4E8;
+  --bg-secondary: var(--glass-heavy);
+  --bg-card: var(--glass-heavy);
+  --bg-sidebar: var(--glass-heavy);
+  --bg-sidebar-gradient: var(--glass-heavy);
+  --bg-sidebar-hover: rgba(139, 92, 246, 0.08);
+  --bg-sidebar-active: rgba(139, 92, 246, 0.12);
+  --bg-input: rgba(255, 255, 255, 0.60);
+  --bg-hover: rgba(139, 92, 246, 0.06);
 
   // Sidebar specific
-  --sidebar-text: var(--color-slate-400);
-  --sidebar-text-hover: var(--color-slate-800);
-  --sidebar-text-active: var(--color-blue-600);
-  --sidebar-border: var(--color-slate-100);
-  --sidebar-shadow: none;
+  --sidebar-text: #6366F1;
+  --sidebar-text-hover: #4338CA;
+  --sidebar-text-active: #7C3AED;
+  --sidebar-border: var(--glass-border-soft);
+  --sidebar-shadow: var(--shadow-card);
 
   // Text colors
-  --text-primary: #0F172A;
-  --text-secondary: var(--color-slate-500);
-  --text-muted: var(--color-slate-400);
+  --text-primary: #1E1B4B;
+  --text-secondary: #4338CA;
+  --text-muted: #6366F1;
   --text-inverse: #ffffff;
-  --text-link: var(--color-blue-500);
+  --text-link: #7C3AED;
+  --text-light: #818CF8;
 
   // Accent colors
-  --accent-primary: var(--color-blue-500);
-  --accent-hover: var(--color-blue-400);
-  --accent-active: var(--color-blue-600);
+  --accent-primary: #8B5CF6;
+  --accent-hover: #A78BFA;
+  --accent-active: #7C3AED;
+  --accent-coral: #FB7185;
+  --accent-coral-glow: rgba(251, 113, 133, 0.35);
+  --accent-cyan: #22D3EE;
+  --accent-violet-glow: rgba(139, 92, 246, 0.30);
 
   // Border colors
-  --border-color: var(--color-slate-100);
-  --border-color-light: rgba(0, 0, 0, 0.04);
-  --border-color-focus: var(--color-blue-500);
+  --border-color: var(--glass-border-soft);
+  --border-color-light: rgba(255, 255, 255, 0.2);
+  --border-color-focus: #8B5CF6;
 
   // Border radius
   --border-radius-sm: 8px;
@@ -106,22 +113,28 @@
   --z-tooltip: 900;
   --z-skip-link: 2000;
 
-  // Shadows — barely-there, luxury feel
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.02);
-  --shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.06);
-  --shadow-lg: 0 8px 24px -4px rgb(0 0 0 / 0.08);
-  --shadow-xl: 0 16px 40px -8px rgb(0 0 0 / 0.1);
-  --shadow-card: none;
-  --shadow-card-hover: 0 8px 24px -4px rgb(0 0 0 / 0.06);
+  // Shadows — deep ambient + spread
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.10), 0 6px 16px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.10), 0 10px 24px rgba(0, 0, 0, 0.10), 0 24px 48px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.10), 0 14px 32px rgba(0, 0, 0, 0.12), 0 32px 64px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 6px 12px rgba(0, 0, 0, 0.12), 0 20px 48px rgba(0, 0, 0, 0.14), 0 48px 80px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 3px 6px rgba(0, 0, 0, 0.08), 0 10px 28px rgba(0, 0, 0, 0.10), 0 28px 56px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 6px 12px rgba(0, 0, 0, 0.10), 0 16px 36px rgba(0, 0, 0, 0.12), 0 36px 72px rgba(0, 0, 0, 0.08);
+  --shadow-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+  // 3D thickness edges — darker, thicker
+  --depth-edge: 0 5px 0 #C8C8CE;
+  --depth-edge-sm: 0 4px 0 #CACACF;
+  --depth-edge-xs: 0 3px 0 #D0D0D5;
 
   // Typography
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Sora', var(--font-sans);
 
-  // Transitions — slightly slower for premium feel
+  // Transitions
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  --transition-slow: 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 // =============================================================================
@@ -129,98 +142,123 @@
 // =============================================================================
 
 .dark {
-  // Semantic tokens - Backgrounds (deep navy, glassmorphic)
-  --bg-primary: #080C18;
-  --bg-secondary: #101828;
-  --bg-card: rgba(16, 24, 40, 0.6);
-  --bg-card-solid: #101828;
-  --bg-sidebar: #060A14;
-  --bg-sidebar-gradient: linear-gradient(180deg, #0C1220 0%, #060A14 100%);
-  --bg-sidebar-hover: rgb(255 255 255 / 0.04);
-  --bg-sidebar-active: rgba(59, 130, 246, 0.10);
-  --bg-input: rgba(16, 24, 40, 0.5);
-  --bg-hover: rgb(255 255 255 / 0.03);
+  // Glassmorphic dark — translucent surfaces with blur, no hard borders
+  --glass-heavy: rgba(255, 255, 255, 0.07);
+  --glass-heavy-flat: rgba(255, 255, 255, 0.07);
+  --glass-medium: rgba(255, 255, 255, 0.05);
+  --glass-light: rgba(255, 255, 255, 0.035);
+  --glass-tint: rgba(255, 255, 255, 0.02);
+  --glass-border: transparent;
+  --glass-border-soft: transparent;
+  --glass-shadow: rgba(0, 0, 0, 0.4);
+  --glass-shadow-heavy: rgba(0, 0, 0, 0.5);
+  --glass-blur: blur(32px) saturate(1.4);
+  --glass-blur-light: blur(16px) saturate(1.2);
 
-  // Sidebar specific - dark mode
-  --sidebar-text: #475569;
-  --sidebar-text-hover: #E2E8F0;
-  --sidebar-text-active: #60A5FA;
-  --sidebar-border: rgb(255 255 255 / 0.06);
-  --sidebar-shadow: none;
+  // Backgrounds
+  --bg-primary: #0E0C1A;
+  --bg-secondary: rgba(255, 255, 255, 0.06);
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-card-solid: #1A1730;
+  --bg-sidebar: rgba(255, 255, 255, 0.04);
+  --bg-sidebar-gradient: rgba(255, 255, 255, 0.04);
+  --bg-sidebar-hover: rgba(167, 139, 250, 0.10);
+  --bg-sidebar-active: rgba(167, 139, 250, 0.16);
+  --bg-input: rgba(255, 255, 255, 0.06);
+  --bg-hover: rgba(167, 139, 250, 0.06);
 
-  // Text colors — cool white
-  --text-primary: #E2E8F0;
-  --text-secondary: #94A3B8;
-  --text-muted: #475569;
-  --text-inverse: #080C18;
+  // Sidebar text
+  --sidebar-text: #9B97B8;
+  --sidebar-text-hover: #E0DCF0;
+  --sidebar-text-active: #C4B5FD;
+  --sidebar-border: rgba(255, 255, 255, 0.05);
+  --sidebar-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
-  // Accent colors — electric blue
-  --accent-primary: #3B82F6;
-  --accent-hover: #60A5FA;
-  --accent-active: #2563EB;
+  // Text — readable
+  --text-primary: #F0ECF8;
+  --text-secondary: #B8B0D0;
+  --text-muted: #8880A8;
+  --text-inverse: #0E0C1A;
+  --text-light: #7068A0;
 
-  // Border colors — glassmorphic hairline
-  --border-color: rgb(255 255 255 / 0.08);
-  --border-color-light: rgb(255 255 255 / 0.04);
-  --border-color-focus: #3B82F6;
+  // Accents
+  --accent-primary: #A78BFA;
+  --accent-hover: #C4B5FD;
+  --accent-active: #8B5CF6;
+  --accent-coral: #FB7185;
+  --accent-coral-glow: rgba(251, 113, 133, 0.2);
+  --accent-cyan: #67E8F9;
+  --accent-violet-glow: rgba(167, 139, 250, 0.2);
 
-  // Shadows — subtle blue-tinted glow
-  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 16px -2px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 8px 32px -4px rgb(0 0 0 / 0.5);
-  --shadow-xl: 0 20px 50px -10px rgb(0 0 0 / 0.6);
-  --shadow-card: 0 2px 8px rgb(0 0 0 / 0.2);
-  --shadow-card-hover: 0 8px 32px -4px rgb(0 0 0 / 0.4);
+  // No hard borders — just soft transparency
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-color-light: rgba(255, 255, 255, 0.03);
+  --border-color-focus: #A78BFA;
+
+  // Shadows — elevated glow
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35), 0 18px 40px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.4), 0 24px 56px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 12px 28px rgba(0, 0, 0, 0.4), 0 36px 72px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 10px 24px rgba(0, 0, 0, 0.4), 0 28px 60px rgba(0, 0, 0, 0.3);
+  --shadow-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  // No solid depth edges in dark — rely on shadow + blur for elevation
+  --depth-edge: 0 0 0 transparent;
+  --depth-edge-sm: 0 0 0 transparent;
+  --depth-edge-xs: 0 0 0 transparent;
 }
 
 // =============================================================================
 // GLOBAL BASE STYLES
 // =============================================================================
 
-// Base body text - Plus Jakarta Sans for excellent readability
 body {
   font-family: var(--font-sans);
   font-weight: 400;
   line-height: 1.6;
   color: var(--text-primary);
-  background-color: var(--bg-primary);
-  transition: background-color var(--transition-base), color var(--transition-base);
+  background: #E4E4E8;
+  background-attachment: fixed;
+  transition: background var(--transition-base), color var(--transition-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-// Dark mode body
 .dark body,
 body.dark {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background: #0E0C1A;
+  background-attachment: fixed;
 }
 
-// Vuetify app container - respect our theme
+// Vuetify app container
 .v-application {
-  background-color: var(--bg-primary) !important;
+  background: transparent !important;
   color: var(--text-primary) !important;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition: color var(--transition-base);
 }
 
-// Vuetify main content area
+// Vuetify main content area — transparent so gradient shows through
 .v-main {
-  background-color: var(--bg-primary);
-  transition: background-color var(--transition-base);
+  background: transparent;
+  transition: background var(--transition-base);
 }
 
-// Vuetify cards - glassmorphic in dark, solid in light
+// Vuetify cards — 3D slab (light) / glassmorphic (dark)
 .v-card {
-  background-color: var(--bg-card) !important;
+  background: var(--glass-heavy) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--border-color);
-  transition: background-color var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card), var(--depth-edge), var(--shadow-glass-inset) !important;
+  transition: all var(--transition-base);
 }
 
 .dark .v-card,
 .v-theme--dark .v-card {
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: none;
 }
 
 .v-card-text {
@@ -229,34 +267,44 @@ body.dark {
 
 // Vuetify tables
 .v-table {
-  background-color: var(--bg-card) !important;
+  background: #FFFFFF !important;
   color: var(--text-primary) !important;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition: all var(--transition-base);
 }
 
+.dark .v-table { background: #1E1B2E !important; }
+
 .v-table th {
-  color: var(--text-secondary) !important;
-  background-color: var(--bg-hover) !important;
+  color: var(--text-muted) !important;
+  background: var(--glass-light) !important;
 }
 
 .v-table td {
-  border-color: var(--border-color) !important;
+  border-color: var(--glass-border-soft) !important;
 }
 
 // Vuetify dialogs/modals
 .v-dialog > .v-overlay__content > .v-card {
-  background-color: var(--bg-card) !important;
+  background: #FFFFFF !important;
 }
 
-// Vuetify text fields
+.dark .v-dialog > .v-overlay__content > .v-card { background: #1E1B2E !important; }
+
+// Vuetify text fields — recessed with visible background
 .v-field {
-  background-color: var(--bg-input) !important;
-  transition: background-color var(--transition-base);
+  background: #F5F5F8 !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  transition: background var(--transition-base), box-shadow var(--transition-base);
+}
+
+.dark .v-field {
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 .v-field__outline {
   --v-field-border-opacity: 1;
-  color: var(--border-color) !important;
+  color: var(--glass-border-soft) !important;
 }
 
 .v-field--focused .v-field__outline {
@@ -268,14 +316,32 @@ body.dark {
 }
 
 .v-label {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
-// Vuetify menus and lists
+// Vuetify menus and lists — solid opaque
 .v-menu > .v-overlay__content,
 .v-list {
-  background-color: var(--bg-card) !important;
-  border: 1px solid var(--border-color);
+  background: #FFFFFF !important;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-lg), var(--depth-edge-sm) !important;
+  border-radius: 12px;
+}
+
+.dark .v-menu > .v-overlay__content,
+.dark .v-list {
+  background: #1E1B2E !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 24px 56px rgba(0,0,0,0.3) !important;
+}
+
+.dark .v-autocomplete__content,
+.dark .v-select__content {
+  background: #1E1B2E !important;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 24px 56px rgba(0,0,0,0.3) !important;
 }
 
 .v-list-item {
@@ -283,16 +349,16 @@ body.dark {
 }
 
 .v-list-item:hover {
-  background-color: var(--bg-hover) !important;
+  background: var(--bg-hover) !important;
 }
 
 // Vuetify dividers
 .v-divider {
-  border-color: var(--border-color) !important;
+  border-color: var(--glass-border-soft) !important;
 }
 
 // =============================================================================
-// HEADINGS - Sora for modern, authoritative headlines
+// HEADINGS
 // =============================================================================
 
 h1, h2, h3, h4, h5, h6,
@@ -310,10 +376,9 @@ h1, .text-h1 {
 }
 
 // =============================================================================
-// UI ELEMENTS - Sora for consistent, modern interface
+// UI ELEMENTS
 // =============================================================================
 
-// Buttons
 .v-btn {
   font-family: var(--font-display);
   font-weight: 500;
@@ -321,43 +386,37 @@ h1, .text-h1 {
   transition: all var(--transition-base);
 }
 
-// Navigation items
 .v-list-item-title,
 .v-tab,
 .v-breadcrumbs-item {
   font-family: var(--font-display);
 }
 
-// Card titles
 .v-card-title {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
-// Chips and badges
 .v-chip {
   font-family: var(--font-display);
   font-weight: 500;
 }
 
-// Toolbar titles
 .v-toolbar-title {
   font-family: var(--font-display);
   font-weight: 600;
 }
 
-// App bar
 .v-app-bar-title {
   font-family: var(--font-display);
   font-weight: 600;
 }
 
 // =============================================================================
-// FORM ELEMENTS - Plus Jakarta Sans for clarity
+// FORM ELEMENTS
 // =============================================================================
 
-// Form inputs and labels
 .v-field,
 .v-label,
 .v-text-field,
@@ -368,23 +427,20 @@ h1, .text-h1 {
   font-family: var(--font-sans);
 }
 
-// Form field labels
 .v-field-label {
   font-family: var(--font-sans);
   font-weight: 500;
 }
 
-// Helper text and hints
 .v-messages,
 .v-counter {
   font-family: var(--font-sans);
 }
 
 // =============================================================================
-// DATA DISPLAY - Plus Jakarta Sans with tabular figures
+// DATA DISPLAY
 // =============================================================================
 
-// Data and numbers - use tabular figures for perfect alignment
 .data-text,
 .number-text,
 .currency-text,
@@ -395,12 +451,10 @@ table td,
   font-variant-numeric: tabular-nums;
 }
 
-// Data table headers
 .v-data-table th {
   font-weight: 600;
 }
 
-// Stats and metrics
 .stat-value,
 .metric-value {
   font-family: var(--font-sans);
@@ -409,20 +463,17 @@ table td,
 }
 
 // =============================================================================
-// CONTENT ELEMENTS - Plus Jakarta Sans for readability
+// CONTENT ELEMENTS
 // =============================================================================
 
-// Paragraphs and body content
 p, .body-text, .v-card-text {
   font-family: var(--font-sans);
 }
 
-// Lists
 .v-list-item-subtitle {
   font-family: var(--font-sans);
 }
 
-// Alerts and notifications
 .v-alert {
   font-family: var(--font-sans);
 }
@@ -432,18 +483,15 @@ p, .body-text, .v-card-text {
   font-weight: 600;
 }
 
-// Dialogs
 .v-dialog-title,
 .v-card-title {
   font-family: var(--font-display);
 }
 
-// Tooltips
 .v-tooltip {
   font-family: var(--font-sans);
 }
 
-// Snackbar
 .v-snackbar {
   font-family: var(--font-sans);
 }
@@ -452,32 +500,45 @@ p, .body-text, .v-card-text {
 // UTILITY CLASSES
 // =============================================================================
 
-// Force heading font
 .font-heading {
   font-family: var(--font-display) !important;
 }
 
-// Force UI font
 .font-ui {
   font-family: var(--font-display) !important;
 }
 
-// Force body font
 .font-body {
   font-family: var(--font-sans) !important;
 }
 
-// Force data font with tabular figures
 .font-data {
   font-family: var(--font-sans) !important;
   font-variant-numeric: tabular-nums;
+}
+
+// Glass utility — apply to any element
+.glass-panel {
+  background: var(--glass-heavy);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-soft);
+  box-shadow: var(--shadow-card), var(--shadow-glass-inset);
+  border-radius: var(--border-radius-xl);
+}
+
+.glass-panel-light {
+  background: var(--glass-medium);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-soft);
+  border-radius: var(--border-radius-lg);
 }
 
 // =============================================================================
 // DARK MODE TRANSITION HELPERS
 // =============================================================================
 
-// Smooth transitions for theme switching
 .color-mode-transition {
   transition:
     background-color var(--transition-base),
@@ -487,22 +548,24 @@ p, .body-text, .v-card-text {
     stroke var(--transition-base);
 }
 
-// Cards with dark mode support
 .theme-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-card);
+  background: var(--glass-heavy);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-soft);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-card), var(--shadow-glass-inset);
   transition: all var(--transition-base);
 
   &:hover {
-    box-shadow: var(--shadow-card-hover);
+    box-shadow: var(--shadow-card-hover), var(--shadow-glass-inset);
   }
 }
 
-// Sidebar with dark mode support
 .theme-sidebar {
-  background: var(--bg-sidebar-gradient);
+  background: var(--bg-sidebar);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-right: 1px solid var(--sidebar-border);
   box-shadow: var(--sidebar-shadow);
   transition: all var(--transition-base);

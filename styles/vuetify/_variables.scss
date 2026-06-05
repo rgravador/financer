@@ -52,75 +52,69 @@
 // TYPOGRAPHY VARIABLES
 // =============================================================================
 
-// Sora: Modern geometric sans-serif for headlines and UI elements
-// - Tech-forward aesthetic that conveys innovation and professionalism
-// - Variable weight allows precise control (100-800)
-// - Best for: h1-h6, navigation, buttons, cards titles, brand elements
 $heading-font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
 $ui-font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
-
-// Plus Jakarta Sans: Humanist sans-serif for body and data
-// - Excellent readability at small sizes
-// - Friendly yet professional character
-// - Great tabular figures for financial data
-// - Best for: paragraphs, form inputs, labels, data tables, descriptions
 $body-font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
 $data-font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
 
 // =============================================================================
-// COLOR PALETTE - Deep Slate with Electric Blue + Orange dual accent
+// COLOR PALETTE — Glassmorphism: Violet/Coral/Cyan
 // =============================================================================
 
-// Slate - Cool deep palette (glassmorphic dashboard)
-$slate-950: #040712 !default;
-$slate-900: #080C18 !default;
-$slate-800: #101828 !default;
-$slate-700: #1A2440 !default;
-$slate-600: #334155 !default;
-$slate-500: #475569 !default;
-$slate-400: #64748B !default;
-$slate-300: #94A3B8 !default;
-$slate-200: #CBD5E1 !default;
-$slate-100: #E2E8F0 !default;
-$slate-50: #F1F5F9 !default;
+// Violet scale (primary)
+$violet-700: #6D28D9 !default;
+$violet-600: #7C3AED !default;
+$violet-500: #8B5CF6 !default;
+$violet-400: #A78BFA !default;
+$violet-300: #C4B5FD !default;
+$violet-200: #DDD6FE !default;
+$violet-100: #EDE9FE !default;
+$violet-50: #F5F3FF !default;
 
-// Blue - Electric blue accent (primary)
-$blue-600: #2563EB !default;
-$blue-500: #3B82F6 !default;
-$blue-400: #60A5FA !default;
+// Indigo support
+$indigo-600: #4F46E5 !default;
+$indigo-500: #6366F1 !default;
+$indigo-400: #818CF8 !default;
 
-// Orange - Warm orange accent (secondary highlight)
-$orange-500: #F97316 !default;
-$orange-400: #FB923C !default;
+// Coral accent
+$coral-500: #FB7185 !default;
+$coral-400: #FDA4AF !default;
+$coral-600: #F43F5E !default;
+
+// Cyan accent
+$cyan-500: #22D3EE !default;
+$cyan-400: #67E8F9 !default;
+
+// Deep text tones
+$text-deep: #1E1B4B !default;
+$text-violet: #4338CA !default;
+$text-body-color: #3730A3 !default;
+$text-muted-color: #6366F1 !default;
 
 // Status colors
 $color-success: #10B981 !default;
 $color-warning: #F59E0B !default;
 $color-error: #EF4444 !default;
-$color-info: #3B82F6 !default;
+$color-info: #22D3EE !default;
 
 // =============================================================================
-// SEMANTIC COLOR TOKENS
+// GLASS SURFACE TOKENS
 // =============================================================================
 
-// Background colors (light mode defaults)
-$bg-primary: $slate-50 !default;
-$bg-secondary: #ffffff !default;
-$bg-card: #ffffff !default;
-$bg-sidebar: #ffffff !default;
+// These are defined as SCSS vars for reference but primarily used via CSS custom properties
+$glass-heavy: rgba(255, 255, 255, 0.55) !default;
+$glass-medium: rgba(255, 255, 255, 0.35) !default;
+$glass-light: rgba(255, 255, 255, 0.20) !default;
+$glass-tint: rgba(255, 255, 255, 0.12) !default;
+$glass-border: rgba(255, 255, 255, 0.60) !default;
+$glass-border-soft: rgba(255, 255, 255, 0.35) !default;
 
-// Text colors (light mode defaults)
-$text-primary: $slate-900 !default;
-$text-secondary: $slate-500 !default;
-$text-muted: $slate-400 !default;
-$text-inverse: #ffffff !default;
-
-// Accent colors
-$accent-primary: $blue-500 !default;
-$accent-hover: $blue-400 !default;
-
-// Border colors
-$border-color: $slate-100 !default;
+// Dark mode glass
+$glass-dark-heavy: rgba(255, 255, 255, 0.08) !default;
+$glass-dark-medium: rgba(255, 255, 255, 0.05) !default;
+$glass-dark-light: rgba(255, 255, 255, 0.03) !default;
+$glass-dark-border: rgba(255, 255, 255, 0.10) !default;
+$glass-dark-border-soft: rgba(255, 255, 255, 0.06) !default;
 
 // =============================================================================
 // SPACING & LAYOUT
@@ -134,24 +128,23 @@ $border-radius-root: 12px !default;
 $border-radius-lg: 16px !default;
 
 // =============================================================================
-// SHADOWS - Soft and layered for depth
+// SHADOWS — Soft neutral, physical depth (near crispness + far diffusion)
 // =============================================================================
 
-$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.02) !default;
-$shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.06) !default;
-$shadow-lg: 0 8px 24px -4px rgb(0 0 0 / 0.08) !default;
-$shadow-card: none !default;
-$shadow-card-hover: 0 8px 24px -4px rgb(0 0 0 / 0.06) !default;
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.10), 0 6px 16px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.05) !default;
+$shadow-md: 0 3px 6px rgba(0, 0, 0, 0.10), 0 10px 24px rgba(0, 0, 0, 0.10), 0 24px 48px rgba(0, 0, 0, 0.06) !default;
+$shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.10), 0 14px 32px rgba(0, 0, 0, 0.12), 0 32px 64px rgba(0, 0, 0, 0.08) !default;
+$shadow-card: 0 3px 6px rgba(0, 0, 0, 0.08), 0 10px 28px rgba(0, 0, 0, 0.10), 0 28px 56px rgba(0, 0, 0, 0.06) !default;
+$shadow-card-hover: 0 6px 12px rgba(0, 0, 0, 0.10), 0 16px 36px rgba(0, 0, 0, 0.12), 0 36px 72px rgba(0, 0, 0, 0.08) !default;
 
-// Vuetify shadow opacity overrides — minimal
-$shadow-key-umbra-opacity: 0.04 !default;
-$shadow-key-penumbra-opacity: 0.03 !default;
-$shadow-key-ambient-opacity: 0.02 !default;
+$shadow-key-umbra-opacity: 0.05 !default;
+$shadow-key-penumbra-opacity: 0.04 !default;
+$shadow-key-ambient-opacity: 0.03 !default;
 
 // =============================================================================
 // TRANSITIONS
 // =============================================================================
 
 $transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1) !default;
-$transition-base: 250ms cubic-bezier(0.25, 0.1, 0.25, 1) !default;
-$transition-slow: 400ms cubic-bezier(0.25, 0.1, 0.25, 1) !default;
+$transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1) !default;
+$transition-slow: 500ms cubic-bezier(0.16, 1, 0.3, 1) !default;

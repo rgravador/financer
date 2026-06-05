@@ -1,20 +1,19 @@
 // =============================================================================
-// CARD STYLES — minimal elevation, border-defined, premium spacing
+// CARD STYLES — 3D slab with visible thickness
 // =============================================================================
 
 .v-card {
-  box-shadow: var(--shadow-card) !important;
-  border: 1px solid var(--border-color);
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-card), var(--depth-edge), var(--shadow-glass-inset) !important;
+  border: 1px solid var(--glass-border);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: var(--shadow-card-hover) !important;
+    box-shadow: var(--shadow-card-hover), var(--depth-edge), var(--shadow-glass-inset) !important;
   }
 }
 
 // =============================================================================
-// TABLE STYLES — clean, spacious, refined
+// TABLE STYLES
 // =============================================================================
 
 .v-data-table {
@@ -30,7 +29,7 @@
     letter-spacing: 0.06em;
     color: var(--text-muted) !important;
     padding: 16px 20px !important;
-    border-bottom: 1px solid var(--border-color) !important;
+    border-bottom: 1px solid var(--glass-border-soft) !important;
   }
 
   .v-data-table__td {
@@ -40,35 +39,90 @@
   }
 
   .v-data-table-footer {
-    border-top: 1px solid var(--border-color) !important;
+    border-top: 1px solid var(--glass-border-soft) !important;
   }
 }
 
 // =============================================================================
-// BUTTON STYLES — understated elegance
+// BUTTON STYLES — 3D raised key with visible bottom edge
 // =============================================================================
 
 .v-btn {
   font-weight: 500 !important;
   letter-spacing: 0.01em !important;
-  transition: all var(--transition-base) !important;
+  transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 
-  &.v-btn--elevated:not(.v-btn--disabled) {
-    box-shadow: none !important;
+  // Solid/elevated buttons — thick 3D key
+  &:not(.v-btn--icon):not(.v-btn--variant-text):not(.v-btn--variant-plain) {
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      var(--depth-edge-xs),
+      0 2px 6px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 
     &:hover {
-      box-shadow: var(--shadow-md) !important;
+      transform: translateY(-1px);
+      box-shadow:
+        0 3px 0 #D1D1D5,
+        0 4px 10px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    }
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 0 0 #D1D1D5,
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        inset 0 2px 4px rgba(0, 0, 0, 0.08) !important;
     }
   }
 
-  // Primary buttons
+  // Primary — deeper colored edge
   &.bg-primary {
     color: rgb(var(--v-theme-on-primary)) !important;
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      0 3px 0 rgba(109, 40, 217, 0.5),
+      0 4px 12px rgba(139, 92, 246, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 4px 0 rgba(109, 40, 217, 0.5),
+        0 6px 18px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    }
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 0 0 rgba(109, 40, 217, 0.5),
+        0 1px 4px rgba(139, 92, 246, 0.2),
+        inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+    }
   }
 
-  // Secondary buttons
   &.bg-secondary {
     color: rgb(var(--v-theme-on-secondary)) !important;
+  }
+
+  // Outlined — subtle edge
+  &.v-btn--variant-outlined {
+    box-shadow:
+      var(--depth-edge-xs),
+      0 2px 4px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+    }
+  }
+
+  &.v-btn--disabled {
+    box-shadow: none !important;
+    border: none !important;
   }
 }
 
@@ -77,53 +131,79 @@
 // =============================================================================
 
 .v-avatar {
-  &.bg-primary {
-    color: rgb(var(--v-theme-on-primary)) !important;
-  }
-
-  &.bg-secondary {
-    color: rgb(var(--v-theme-on-secondary)) !important;
-  }
+  &.bg-primary { color: rgb(var(--v-theme-on-primary)) !important; }
+  &.bg-secondary { color: rgb(var(--v-theme-on-secondary)) !important; }
 }
 
 // =============================================================================
-// INPUT FIELD STYLES — refined borders, subtle focus
+// INPUT FIELD STYLES — inset/recessed (pressed into surface)
 // =============================================================================
 
 .v-text-field,
 .v-select {
   .v-field__outline {
-    --v-field-border-opacity: 0.4;
+    --v-field-border-opacity: 0.5;
   }
 
   &:hover .v-field__outline {
-    --v-field-border-opacity: 0.7;
+    --v-field-border-opacity: 0.8;
+  }
+
+  .v-field {
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.06),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.04),
+      0 1px 0 rgba(255, 255, 255, 0.8) !important;
   }
 }
 
 // =============================================================================
-// NAVIGATION DRAWER — clean border, no shadow
+// CHIP STYLES — small 3D pill
+// =============================================================================
+
+.v-chip {
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    var(--depth-edge-xs),
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 3px 0 #D5D5D9,
+      0 3px 8px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  }
+}
+
+// =============================================================================
+// NAVIGATION DRAWER
 // =============================================================================
 
 .v-navigation-drawer {
-  border-right: 1px solid var(--border-color) !important;
-  box-shadow: none !important;
+  border-right: 1px solid var(--glass-border-soft) !important;
+  box-shadow: var(--sidebar-shadow), var(--depth-edge) !important;
 }
 
 // =============================================================================
-// APP BAR — subtle bottom border
+// APP BAR
 // =============================================================================
 
 .v-app-bar {
-  border-bottom: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--glass-border-soft) !important;
   box-shadow: none !important;
 }
 
 // =============================================================================
-// LIST ITEMS — refined active state
+// LIST ITEMS
 // =============================================================================
 
 .v-list-item {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
   &.v-list-item--active {
     .v-list-item__content,
     .v-list-item-title,
@@ -134,35 +214,40 @@
 }
 
 // =============================================================================
-// CHIP STYLES — refined
-// =============================================================================
-
-.v-chip {
-  font-weight: 500 !important;
-  letter-spacing: 0.01em;
-}
-
-// =============================================================================
-// DIALOG / MODAL — premium overlay
+// DIALOG / MODAL
 // =============================================================================
 
 .v-overlay__scrim {
-  background: rgb(0 0 0 / 0.6) !important;
-  backdrop-filter: blur(4px);
+  background: rgba(30, 27, 75, 0.5) !important;
+  backdrop-filter: blur(8px);
 }
 
 // =============================================================================
-// SNACKBAR — refined
+// SNACKBAR
 // =============================================================================
 
 .v-snackbar__wrapper {
   border-radius: 12px !important;
+  box-shadow:
+    var(--shadow-lg),
+    var(--depth-edge-sm) !important;
 }
 
 // =============================================================================
-// STEPPER — refined header
+// STEPPER
 // =============================================================================
 
 .v-stepper-header {
   box-shadow: none !important;
+}
+
+// =============================================================================
+// MENU — 3D floating panel
+// =============================================================================
+
+.v-menu > .v-overlay__content {
+  box-shadow:
+    var(--shadow-lg),
+    var(--depth-edge-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }

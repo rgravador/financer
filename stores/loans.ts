@@ -40,6 +40,20 @@ export const useLoansStore = defineStore('loans', {
       return headers
     },
 
+    async fetchWithCSRFRetry(url: string, options: any) {
+      try {
+        return await $fetch(url, options)
+      } catch (error: any) {
+        if (error.statusCode === 403 && error.data?.statusMessage?.includes('CSRF')) {
+          const authStore = useAuthStore()
+          await authStore.fetchCSRFToken()
+          options.headers = this.getAuthHeaders()
+          return await $fetch(url, options)
+        }
+        throw error
+      }
+    },
+
     async fetchApplications(params?: {
       status?: string
       assignedOfficerId?: string
@@ -97,7 +111,7 @@ export const useLoansStore = defineStore('loans', {
     }) {
       this.loading = true
       try {
-        const data = await $fetch('/api/loans', {
+        const data = await this.fetchWithCSRFRetry('/api/loans', {
           method: 'POST',
           body: payload,
           headers: this.getAuthHeaders(),

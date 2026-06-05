@@ -302,9 +302,9 @@ const handleLogin = async () => {
     } else if (role === 'tenant_admin') {
       router.push('/tenant/dashboard')
     } else if (role === 'tenant_officer') {
-      router.push('/officer/applications')
+      router.push('/officer/dashboard')
     } else if (role === 'tenant_approver') {
-      router.push('/approver/queue')
+      router.push('/approver/dashboard')
     } else {
       router.push('/')
     }

@@ -25,6 +25,7 @@
     "@nuxtjs/color-mode": "^4.0.0",
     "ant-design-vue": "^4.2.6",
     "bcrypt": "^5.1.1",
+    "chart.js": "^4.5.1",
     "cloudinary": "^2.9.0",
     "dotenv": "^17.3.1",
     "ioredis": "^5.3.2",
@@ -33,6 +34,7 @@
     "nodemailer": "^6.9.7",
     "sass": "^1.97.3",
     "validator": "^13.11.0",
+    "vue-chartjs": "^5.3.3",
     "vuetify": "^4.0.0",
     "vuetify-nuxt-module": "^0.19.5",
     "zxcvbn": "^4.4.2"

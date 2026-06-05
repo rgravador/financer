@@ -19,9 +19,10 @@
     <v-stepper
       v-model="currentStep"
       class="application-stepper"
-      :items="stepItems"
+      :items="computedStepItems"
       flat
       hide-actions
+      alt-labels
     >
       <!-- Step 1: Loan Type -->
       <template #item.1>
@@ -123,152 +124,196 @@
         </div>
       </template>
 
-      <!-- Step 2: Borrower Information -->
+      <!-- Step 2: Borrower Information (2-column) -->
       <template #item.2>
         <div class="step-content">
           <h2 class="step-title">Borrower Information</h2>
           <p class="step-description">Search for an existing account or create a new one</p>
 
-          <!-- Search + New Account Button -->
-          <div class="borrower-search-row">
-            <v-menu
-              v-model="showBorrowerDropdown"
-              :close-on-content-click="false"
-              location="bottom start"
-              origin="top start"
-              :offset="4"
-              max-height="300"
-            >
-              <template #activator="{ props: menuProps }">
-                <v-text-field
-                  v-model="borrowerSearch"
-                  placeholder="Search accounts by name or email..."
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details
-                  clearable
-                  class="borrower-search"
-                  v-bind="menuProps"
-                  @update:model-value="debouncedSearchBorrowers"
-                  @focus="onBorrowerSearchFocus"
-                  @click:clear="onBorrowerSearchClear"
-                />
-              </template>
+          <div class="borrower-columns">
+            <!-- LEFT: Primary Borrower -->
+            <div class="borrower-col">
+              <div class="col-label-row">
+                <h3 class="col-label">Primary Borrower</h3>
+              </div>
 
-              <v-card class="borrower-dropdown-card" rounded="lg">
-                <div v-if="borrowersLoading" class="dropdown-loading">
-                  <v-progress-circular indeterminate color="primary" size="20" width="2" />
-                  <span>Searching...</span>
-                </div>
-
-                <template v-else-if="borrowerResults.length > 0">
-                  <div v-if="!borrowerSearch" class="dropdown-label">Recent Accounts</div>
-                  <v-list density="compact" class="pa-1">
-                    <v-list-item
-                      v-for="borrower in borrowerResults"
-                      :key="borrower.id"
-                      class="dropdown-list-item"
-                      rounded="lg"
-                      @click="selectBorrowerFromDropdown(borrower)"
-                    >
-                      <template #prepend>
-                        <v-avatar size="32" color="primary" variant="tonal" class="mr-3">
-                          <span style="font-size: 12px; font-weight: 600;">{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
-                        </v-avatar>
-                      </template>
-                      <v-list-item-title style="font-size: 13px; font-weight: 600;">
-                        {{ borrower.firstName }} {{ borrower.lastName }}
-                      </v-list-item-title>
-                      <v-list-item-subtitle style="font-size: 12px;">
-                        {{ borrower.email }}
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
+              <v-menu
+                v-model="showBorrowerDropdown"
+                :close-on-content-click="false"
+                location="bottom start"
+                origin="top start"
+                :offset="4"
+                max-height="300"
+              >
+                <template #activator="{ props: menuProps }">
+                  <v-text-field
+                    v-model="borrowerSearch"
+                    placeholder="Search by name or email..."
+                    prepend-inner-icon="mdi-magnify"
+                    append-inner-icon="mdi-plus-circle-outline"
+                    variant="outlined"
+                    density="comfortable"
+                    hide-details
+                    clearable
+                    autocomplete="off"
+                    class="borrower-search"
+                    v-bind="menuProps"
+                    @update:model-value="debouncedSearchBorrowers"
+                    @focus="onBorrowerSearchFocus"
+                    @click:clear="onBorrowerSearchClear"
+                    @click:append-inner="openNewAccountPage"
+                  />
                 </template>
 
-                <div v-else-if="borrowerSearch && !borrowersLoading" class="dropdown-empty">
-                  <v-icon size="32" color="grey-lighten-1">mdi-account-search-outline</v-icon>
-                  <span>No accounts found</span>
-                  <v-btn variant="text" color="primary" size="small" @click="openNewAccountPage">
-                    Create New Account
-                  </v-btn>
-                </div>
-              </v-card>
-            </v-menu>
+                  <v-card class="borrower-dropdown-card" rounded="lg">
+                    <div v-if="borrowersLoading" class="dropdown-loading">
+                      <v-progress-circular indeterminate color="primary" size="20" width="2" />
+                      <span>Searching...</span>
+                    </div>
+                    <template v-else-if="borrowerResults.length > 0">
+                      <div v-if="!borrowerSearch" class="dropdown-label">Recent Accounts</div>
+                      <v-list density="compact" class="pa-1">
+                        <v-list-item
+                          v-for="borrower in borrowerResults"
+                          :key="borrower.id"
+                          class="dropdown-list-item"
+                          rounded="lg"
+                          @click="selectBorrowerFromDropdown(borrower)"
+                        >
+                          <template #prepend>
+                            <v-avatar size="32" color="primary" variant="tonal" class="mr-3">
+                              <span style="font-size: 12px; font-weight: 600;">{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
+                            </v-avatar>
+                          </template>
+                          <v-list-item-title style="font-size: 13px; font-weight: 600;">{{ borrower.firstName }} {{ borrower.lastName }}</v-list-item-title>
+                          <v-list-item-subtitle style="font-size: 12px;">{{ borrower.email }}</v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </template>
+                    <div v-else-if="borrowerSearch && !borrowersLoading" class="dropdown-empty">
+                      <v-icon size="32" color="grey-lighten-1">mdi-account-search-outline</v-icon>
+                      <span>No accounts found</span>
+                      <v-btn variant="text" color="primary" size="small" @click="openNewAccountPage">Create New Account</v-btn>
+                    </div>
+                  </v-card>
+                </v-menu>
 
-            <v-btn
-              color="primary"
-              variant="tonal"
-              size="large"
-              icon="mdi-plus"
-              @click="openNewAccountPage"
-            />
-          </div>
 
-          <!-- Selected Borrower Card -->
-          <Transition name="fade-slide">
-            <div v-if="selectedBorrower" class="selected-borrower-card">
-              <v-avatar size="44" color="primary" variant="tonal">
-                <span style="font-size: 15px; font-weight: 600;">{{ selectedBorrower.firstName?.[0] }}{{ selectedBorrower.lastName?.[0] }}</span>
-              </v-avatar>
-              <div class="selected-borrower-info">
-                <span class="selected-borrower-name">{{ selectedBorrower.firstName }} {{ selectedBorrower.lastName }}</span>
-                <span class="selected-borrower-meta">{{ selectedBorrower.email }} · {{ selectedBorrower.contactNumber }}</span>
-              </div>
-              <v-chip size="small" color="success" variant="tonal" class="selected-borrower-badge">
-                <v-icon start size="14">mdi-check-circle</v-icon>
-                Selected
-              </v-chip>
-              <v-btn
-                icon="mdi-close"
-                variant="text"
-                size="x-small"
-                @click="clearSelectedBorrower"
-              />
-            </div>
-          </Transition>
-
-          <!-- Co-Borrower Toggle -->
-          <div class="co-borrower-section">
-            <v-switch
-              v-model="hasCoBorrower"
-              label="Add a co-borrower"
-              color="primary"
-              hide-details
-            />
-
-            <div v-if="hasCoBorrower" class="co-borrower-search">
-              <v-text-field
-                v-model="coBorrowerSearch"
-                placeholder="Search for co-borrower..."
-                prepend-inner-icon="mdi-magnify"
-                variant="outlined"
-                density="comfortable"
-                hide-details
-                clearable
-                @update:model-value="debouncedSearchCoBorrowers"
-              />
-
-              <div v-if="coBorrowerResults.length > 0" class="borrower-results compact">
-                <div
-                  v-for="borrower in coBorrowerResults"
-                  :key="borrower.id"
-                  class="borrower-option compact"
-                  :class="{ 'borrower-option--selected': formData.coBorrowerId === borrower.id }"
-                  @click="selectCoBorrower(borrower)"
-                >
-                  <v-avatar size="36" color="secondary" variant="tonal">
-                    <span class="avatar-text-small">{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
+              <Transition name="fade-slide">
+                <div v-if="selectedBorrower" class="selected-borrower-card">
+                  <v-avatar size="40" color="primary" variant="tonal">
+                    <span style="font-size: 14px; font-weight: 600;">{{ selectedBorrower.firstName?.[0] }}{{ selectedBorrower.lastName?.[0] }}</span>
                   </v-avatar>
-                  <div class="borrower-details">
-                    <span class="borrower-name">{{ borrower.firstName }} {{ borrower.lastName }}</span>
-                    <span class="borrower-email">{{ borrower.email }}</span>
+                  <div class="selected-borrower-info">
+                    <span class="selected-borrower-name">{{ selectedBorrower.firstName }} {{ selectedBorrower.lastName }}</span>
+                    <span class="selected-borrower-meta">{{ selectedBorrower.email }}</span>
                   </div>
-                  <div v-if="formData.coBorrowerId === borrower.id" class="selected-indicator">
-                    <v-icon color="success" size="20">mdi-check-circle</v-icon>
-                  </div>
+                  <v-chip size="small" color="success" variant="tonal">
+                    <v-icon start size="14">mdi-check-circle</v-icon>
+                    Selected
+                  </v-chip>
+                  <v-btn icon="mdi-close" variant="text" size="x-small" @click="clearSelectedBorrower" />
                 </div>
+              </Transition>
+            </div>
+
+            <!-- RIGHT: Co-Borrower -->
+            <div class="borrower-col">
+              <div class="col-label-row">
+                <h3 class="col-label">Co-Borrower</h3>
+                <v-switch
+                  v-model="waiveCoBorrower"
+                  label="Waive"
+                  color="warning"
+                  density="compact"
+                  hide-details
+                  class="co-toggle"
+                />
+              </div>
+
+              <template v-if="!waiveCoBorrower">
+                <v-menu
+                  v-model="showCoBorrowerDropdown"
+                  :close-on-content-click="false"
+                  location="bottom start"
+                  origin="top start"
+                  :offset="4"
+                  max-height="300"
+                >
+                  <template #activator="{ props: coMenuProps }">
+                    <v-text-field
+                      v-model="coBorrowerSearch"
+                      placeholder="Search for co-borrower..."
+                      prepend-inner-icon="mdi-magnify"
+                      append-inner-icon="mdi-plus-circle-outline"
+                      variant="outlined"
+                      density="comfortable"
+                      hide-details
+                      clearable
+                      autocomplete="off"
+                      class="borrower-search"
+                      v-bind="coMenuProps"
+                      @update:model-value="debouncedSearchCoBorrowers"
+                      @focus="onCoBorrowerSearchFocus"
+                      @click:clear="coBorrowerResults = []; showCoBorrowerDropdown = false"
+                      @click:append-inner="openNewAccountPage"
+                    />
+                  </template>
+
+                  <v-card class="borrower-dropdown-card" rounded="lg">
+                    <div v-if="coBorrowersLoading" class="dropdown-loading">
+                      <v-progress-circular indeterminate color="primary" size="20" width="2" />
+                      <span>Searching...</span>
+                    </div>
+                    <template v-else-if="coBorrowerResults.length > 0">
+                      <div v-if="!coBorrowerSearch" class="dropdown-label">Recent Accounts</div>
+                      <v-list density="compact" class="pa-1">
+                        <v-list-item
+                          v-for="borrower in coBorrowerResults"
+                          :key="borrower.id"
+                          class="dropdown-list-item"
+                          rounded="lg"
+                          @click="selectCoBorrowerFromDropdown(borrower)"
+                        >
+                          <template #prepend>
+                            <v-avatar size="32" color="primary" variant="tonal" class="mr-3">
+                              <span style="font-size: 12px; font-weight: 600;">{{ borrower.firstName?.[0] }}{{ borrower.lastName?.[0] }}</span>
+                            </v-avatar>
+                          </template>
+                          <v-list-item-title style="font-size: 13px; font-weight: 600;">{{ borrower.firstName }} {{ borrower.lastName }}</v-list-item-title>
+                          <v-list-item-subtitle style="font-size: 12px;">{{ borrower.email }}</v-list-item-subtitle>
+                        </v-list-item>
+                      </v-list>
+                    </template>
+                    <div v-else-if="coBorrowerSearch && !coBorrowersLoading" class="dropdown-empty">
+                      <v-icon size="32" color="grey-lighten-1">mdi-account-search-outline</v-icon>
+                      <span>No accounts found</span>
+                      <v-btn variant="text" color="primary" size="small" @click="openNewAccountPage">Create New Account</v-btn>
+                    </div>
+                  </v-card>
+                </v-menu>
+
+                <Transition name="fade-slide">
+                  <div v-if="selectedCoBorrower" class="selected-borrower-card">
+                    <v-avatar size="40" color="secondary" variant="tonal">
+                      <span style="font-size: 14px; font-weight: 600;">{{ selectedCoBorrower.firstName?.[0] }}{{ selectedCoBorrower.lastName?.[0] }}</span>
+                    </v-avatar>
+                    <div class="selected-borrower-info">
+                      <span class="selected-borrower-name">{{ selectedCoBorrower.firstName }} {{ selectedCoBorrower.lastName }}</span>
+                      <span class="selected-borrower-meta">{{ selectedCoBorrower.email }}</span>
+                    </div>
+                    <v-chip size="small" color="info" variant="tonal">
+                      <v-icon start size="14">mdi-account-plus</v-icon>
+                      Co-Borrower
+                    </v-chip>
+                    <v-btn icon="mdi-close" variant="text" size="x-small" @click="clearSelectedCoBorrower" />
+                  </div>
+                </Transition>
+              </template>
+
+              <div v-if="waiveCoBorrower" class="waived-notice">
+                <v-icon size="18" color="warning">mdi-information-outline</v-icon>
+                <span>Co-borrower requirement has been waived</span>
               </div>
             </div>
           </div>
@@ -552,8 +597,9 @@
     <!-- Navigation Footer -->
     <div class="navigation-footer">
       <v-btn
-        v-if="currentStep > 1"
-        variant="text"
+        variant="outlined"
+        color="primary"
+        :disabled="currentStep <= 1"
         @click="previousStep"
       >
         <v-icon start>mdi-arrow-left</v-icon>
@@ -626,6 +672,14 @@ const stepItems = [
   { title: 'Review', value: 5 },
 ]
 
+const computedStepItems = computed(() =>
+  stepItems.map(item => ({
+    ...item,
+    complete: item.value < currentStep.value,
+    icon: item.value < currentStep.value ? 'mdi-check' : undefined,
+  }))
+)
+
 // Form refs
 const loanDetailsFormRef = ref()
 
@@ -648,9 +702,12 @@ const borrowerResults = ref<Borrower[]>([])
 const borrowersLoading = ref(false)
 const showBorrowerDropdown = ref(false)
 const selectedBorrower = ref<Borrower | null>(null)
-const hasCoBorrower = ref(false)
+const waiveCoBorrower = ref(false)
 const coBorrowerSearch = ref('')
 const coBorrowerResults = ref<Borrower[]>([])
+const coBorrowersLoading = ref(false)
+const showCoBorrowerDropdown = ref(false)
+const selectedCoBorrower = ref<Borrower | null>(null)
 
 
 // Document state
@@ -710,10 +767,6 @@ const selectedBorrowerName = computed(() => {
 const selectedBorrowerEmail = computed(() => {
   return selectedBorrower.value?.email || 'N/A'
 })
-
-const selectedCoBorrower = computed(() =>
-  coBorrowerResults.value.find(b => b.id === formData.value.coBorrowerId)
-)
 
 const selectedCoBorrowerName = computed(() => {
   const b = selectedCoBorrower.value
@@ -877,17 +930,54 @@ const debouncedSearchCoBorrowers = () => {
   searchTimeout = setTimeout(searchCoBorrowers, 300)
 }
 
+const loadRecentCoBorrowers = async () => {
+  coBorrowersLoading.value = true
+  try {
+    await borrowersStore.fetchBorrowers({ sort: 'recent', limit: 3 })
+    coBorrowerResults.value = borrowersStore.borrowers.filter(b => b.id !== formData.value.borrowerId)
+  } catch (err) {
+    console.error('Failed to load recent co-borrowers:', err)
+  } finally {
+    coBorrowersLoading.value = false
+  }
+}
+
 const searchCoBorrowers = async () => {
   if (!coBorrowerSearch.value || coBorrowerSearch.value.length < 2) {
     coBorrowerResults.value = []
+    if (!coBorrowerSearch.value) loadRecentCoBorrowers()
     return
   }
+  coBorrowersLoading.value = true
   try {
     await borrowersStore.fetchBorrowers({ search: coBorrowerSearch.value })
     coBorrowerResults.value = borrowersStore.borrowers.filter(b => b.id !== formData.value.borrowerId)
+    showCoBorrowerDropdown.value = true
   } catch (err) {
     console.error('Failed to search co-borrowers:', err)
+  } finally {
+    coBorrowersLoading.value = false
   }
+}
+
+const onCoBorrowerSearchFocus = () => {
+  showCoBorrowerDropdown.value = true
+  if (!coBorrowerSearch.value && coBorrowerResults.value.length === 0) {
+    loadRecentCoBorrowers()
+  }
+}
+
+const selectCoBorrowerFromDropdown = (borrower: Borrower) => {
+  selectedCoBorrower.value = borrower
+  formData.value.coBorrowerId = borrower.id
+  coBorrowerSearch.value = ''
+  coBorrowerResults.value = []
+  showCoBorrowerDropdown.value = false
+}
+
+const clearSelectedCoBorrower = () => {
+  selectedCoBorrower.value = null
+  formData.value.coBorrowerId = ''
 }
 
 const selectBorrower = (borrower: Borrower) => {
@@ -1157,7 +1247,35 @@ onMounted(() => {
   border-radius: 16px;
   padding: 8px;
   margin-bottom: 32px;
-  box-shadow: none;
+  box-shadow: var(--shadow-card), var(--depth-edge);
+}
+
+/* Completed step — green check icon */
+.application-stepper :deep(.v-stepper-item--complete .v-stepper-item__avatar) {
+  background: #10B981 !important;
+  color: #fff !important;
+}
+
+.application-stepper :deep(.v-stepper-item--complete .v-stepper-item__avatar .v-icon) {
+  color: #fff !important;
+  font-size: 18px;
+}
+
+/* Current step — primary color */
+.application-stepper :deep(.v-stepper-item--selected .v-stepper-item__avatar) {
+  background: var(--accent-primary) !important;
+  color: #fff !important;
+}
+
+/* Inactive steps */
+.application-stepper :deep(.v-stepper-item__avatar) {
+  background: rgba(var(--v-theme-on-surface), 0.08) !important;
+}
+
+.application-stepper :deep(.v-stepper-item__title) {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* Step Content */
@@ -1362,19 +1480,14 @@ onMounted(() => {
 }
 
 /* Borrower Section */
-.borrower-search-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.borrower-search-row .borrower-search {
-  flex: 1;
-}
-
 .borrower-search {
   margin-bottom: 0;
+}
+
+/* Plus icon inside input */
+.borrower-search :deep(.v-field__append-inner) {
+  cursor: pointer;
+  color: var(--accent-primary);
 }
 
 .borrower-search :deep(.v-field) {
@@ -1383,9 +1496,15 @@ onMounted(() => {
 
 /* Dropdown */
 .borrower-dropdown-card {
-  min-width: 360px;
+  width: 100%;
   border: 1px solid rgba(var(--v-theme-on-surface), 0.1);
 }
+
+.borrower-col :deep(.v-overlay__content) {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
 
 .dropdown-loading {
   display: flex;
@@ -1483,8 +1602,11 @@ onMounted(() => {
 }
 
 .borrower-option.compact {
-  padding: 12px;
-  gap: 12px;
+  padding: 8px 12px;
+  gap: 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
 }
 
 .borrower-option:hover {
@@ -1518,6 +1640,9 @@ onMounted(() => {
   font-size: 13px;
   color: rgba(var(--v-theme-on-surface), 0.6);
 }
+
+.compact-details .borrower-name { font-size: 13px; }
+.compact-details .borrower-email { font-size: 12px; }
 
 .borrower-meta {
   font-size: 12px;
@@ -1554,13 +1679,70 @@ onMounted(() => {
 }
 
 /* Co-Borrower Section */
-.co-borrower-section {
-  padding-top: 20px;
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+/* 2-column borrower layout */
+.borrower-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 8px;
+  align-items: start;
 }
 
-.co-borrower-search {
-  margin-top: 16px;
+.borrower-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.col-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.col-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 32px;
+}
+
+.co-toggle {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.co-toggle :deep(.v-input__control) {
+  min-height: auto !important;
+}
+
+.co-toggle :deep(.v-selection-control) {
+  min-height: auto !important;
+}
+
+.co-toggle :deep(.v-label) {
+  font-size: 12px !important;
+  opacity: 0.7;
+}
+
+.waived-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(var(--v-theme-warning), 0.06);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 960px) {
+  .borrower-columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Loan Details Form */
@@ -1791,13 +1973,14 @@ onMounted(() => {
 .navigation-footer {
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 312px;
   right: 0;
   display: flex;
   align-items: center;
   padding: 16px 32px;
-  background: rgb(var(--v-theme-surface));
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  background: var(--glass-heavy);
+  border-top: 1px solid var(--glass-border-soft);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
   z-index: 100;
 }
 

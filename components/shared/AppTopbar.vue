@@ -146,11 +146,13 @@ const handleLogout = async () => {
 
 <style scoped>
 .app-topbar {
-  background-color: var(--bg-card) !important;
-  border-bottom: 1px solid var(--border-color) !important;
+  background: transparent !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none !important;
   box-shadow: none !important;
   padding: 0 40px !important;
-  transition: background-color var(--transition-base), border-color var(--transition-base);
+  transition: all var(--transition-base);
 }
 
 .hamburger-btn {
@@ -167,7 +169,7 @@ const handleLogout = async () => {
 .topbar-divider {
   width: 1px;
   height: 24px;
-  background: var(--border-color);
+  background: var(--glass-border-soft);
   margin: 0 8px;
 }
 
@@ -199,6 +201,7 @@ const handleLogout = async () => {
   border-radius: var(--border-radius-sm);
   overflow: hidden;
   flex-shrink: 0;
+  border: 2px solid var(--glass-border-soft);
 }
 
 .user-avatar-small .avatar-img {
@@ -211,12 +214,14 @@ const handleLogout = async () => {
   color: var(--text-muted);
 }
 
-/* User Dropdown */
+/* User Dropdown — glass panel */
 .user-dropdown {
-  background: var(--bg-card);
+  background: var(--glass-heavy);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--glass-border-soft);
+  box-shadow: var(--shadow-lg), var(--shadow-glass-inset);
   min-width: 240px;
   padding: 8px;
   margin-top: 8px;
@@ -235,6 +240,7 @@ const handleLogout = async () => {
   border-radius: var(--border-radius);
   overflow: hidden;
   flex-shrink: 0;
+  border: 2px solid var(--glass-border-soft);
 }
 
 .dropdown-avatar .avatar-img {
@@ -268,7 +274,7 @@ const handleLogout = async () => {
 
 .dropdown-divider {
   height: 1px;
-  background: var(--border-color);
+  background: var(--glass-border-soft);
   margin: 8px 0;
 }
 
@@ -303,7 +309,7 @@ const handleLogout = async () => {
 }
 
 .dropdown-item.logout-item:hover {
-  background: rgb(var(--v-theme-error) / 0.1);
+  background: rgba(239, 68, 68, 0.08);
 }
 
 /* Responsive */

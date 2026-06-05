@@ -4,11 +4,11 @@
     <header class="greeting-row">
       <div class="greeting-left">
         <div class="greeting-avatar">
-          <v-icon size="32" color="primary">mdi-shield-crown-outline</v-icon>
+          <v-icon size="32" color="primary">mdi-file-document-edit-outline</v-icon>
         </div>
         <div>
-          <h1 class="greeting-title">Good {{ greeting }}, Admin</h1>
-          <p class="greeting-sub">Here's what's happening across your platform today.</p>
+          <h1 class="greeting-title">Good {{ greeting }}, {{ userName }}</h1>
+          <p class="greeting-sub">Here's your loan origination activity at a glance.</p>
         </div>
       </div>
       <div class="period-toggle">
@@ -16,8 +16,9 @@
       </div>
     </header>
 
-    <!-- KPIs (2x2) + Revenue chart side by side -->
+    <!-- Main grid: KPIs (2x2) + Right card -->
     <section class="main-grid">
+      <!-- Left: 2x2 KPI cards -->
       <div class="kpi-zone">
         <article v-for="kpi in kpiCards" :key="kpi.label" class="kpi-card">
           <div class="kpi-deco" aria-hidden="true"></div>
@@ -37,26 +38,47 @@
       <article class="chart-card-wide">
         <div class="card-head">
           <div>
-            <h3 class="card-title">Platform Revenue</h3>
-            <span class="card-subtitle">{{ period === 'Yearly' ? '2025' : 'Jan 2026' }}</span>
+            <h3 class="card-title">Weekly Submissions</h3>
+            <span class="card-subtitle">Last 12 weeks</span>
           </div>
           <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
         </div>
         <div class="chart-area">
-          <Line :data="revenueData" :options="areaLineOptions" />
+          <Line :data="weeklySubmissionData" :options="areaLineOptions" />
         </div>
       </article>
     </section>
 
-    <!-- User Distribution -->
-    <section class="bottom-grid">
-      <article class="chart-card-wide">
+    <!-- Row: Status donut + Disbursement + Pending Actions -->
+    <section class="triple-grid">
+      <article class="side-card">
         <div class="card-head">
-          <h3 class="card-title">User Distribution</h3>
+          <h3 class="card-title">Application Status</h3>
           <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
         </div>
-        <div class="donut-wrap" style="height: 260px; padding: 12px 20px 20px;">
-          <Doughnut :data="userDistData" :options="donutOptions" />
+        <div class="donut-wrap"><Doughnut :data="statusDonutData" :options="donutOptions" /></div>
+      </article>
+      <article class="chart-card-wide">
+        <div class="card-head">
+          <div><h3 class="card-title">Disbursement by Type</h3><span class="card-subtitle">This quarter</span></div>
+          <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
+        </div>
+        <div class="chart-area"><Bar :data="disbursementData" :options="horizontalBarOptions" /></div>
+      </article>
+      <article class="side-card" style="padding: 0;">
+        <div class="card-head" style="padding: 20px 20px 0;">
+          <h3 class="card-title">Pending Actions</h3>
+          <v-icon size="16" class="card-more">mdi-dots-horizontal</v-icon>
+        </div>
+        <div class="action-list">
+          <div v-for="action in pendingActions" :key="action.label" class="action-row">
+            <div class="action-dot" :style="{ background: action.color }"></div>
+            <div class="action-info">
+              <span class="action-name">{{ action.label }}</span>
+              <span class="action-desc">{{ action.desc }}</span>
+            </div>
+            <span class="action-count" :style="{ color: action.color }">{{ action.count }}</span>
+          </div>
         </div>
       </article>
     </section>
@@ -64,34 +86,50 @@
 </template>
 
 <script setup lang="ts">
-import { Line, Doughnut } from 'vue-chartjs'
+import { Line, Bar, Doughnut } from 'vue-chartjs'
+import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({ middleware: ['role'], meta: { allowedRoles: ['system_admin'] } })
+definePageMeta({ middleware: ['role'], meta: { allowedRoles: ['tenant_officer'] } })
 
+const authStore = useAuthStore()
 const period = ref('Monthly')
 const periods = ['Weekly', 'Monthly', 'Yearly']
 const greeting = computed(() => { const h = new Date().getHours(); return h < 12 ? 'Morning' : h < 18 ? 'Afternoon' : 'Evening' })
+const userName = computed(() => authStore.user?.firstName || 'Officer')
 
 const kpiCards = [
-  { label: 'Active Tenants', value: '24', icon: 'mdi-office-building', iconBg: 'rgba(139, 92, 246, 0.12)', iconColor: '#8B5CF6', trend: '+3', trendUp: true },
-  { label: 'Total Users', value: '1,247', icon: 'mdi-account-group', iconBg: 'rgba(34, 211, 238, 0.12)', iconColor: '#22D3EE', trend: '+120', trendUp: true },
-  { label: 'Loans Processed', value: '3,892', icon: 'mdi-file-document-multiple', iconBg: 'rgba(251, 113, 133, 0.12)', iconColor: '#FB7185', trend: '+340', trendUp: true },
-  { label: 'Revenue', value: '₱48.2M', icon: 'mdi-cash-multiple', iconBg: 'rgba(16, 185, 129, 0.12)', iconColor: '#10B981', trend: '+15%', trendUp: true },
+  { label: 'My Applications', value: '67', icon: 'mdi-file-document-outline', iconBg: 'rgba(139, 92, 246, 0.12)', iconColor: '#8B5CF6', trend: '+12', trendUp: true },
+  { label: 'Approved', value: '48', icon: 'mdi-check-circle-outline', iconBg: 'rgba(16, 185, 129, 0.12)', iconColor: '#10B981', trend: '+8', trendUp: true },
+  { label: 'Total Disbursed', value: '₱4.8M', icon: 'mdi-cash-check', iconBg: 'rgba(34, 211, 238, 0.12)', iconColor: '#22D3EE', trend: '+28%', trendUp: true },
+  { label: 'Borrowers', value: '52', icon: 'mdi-account-group', iconBg: 'rgba(251, 113, 133, 0.12)', iconColor: '#FB7185', trend: '+6', trendUp: true },
 ]
 
-const userDistData = {
-  labels: ['Officers', 'Approvers', 'Tenant Admins', 'System Admins'],
-  datasets: [{ data: [680, 198, 345, 24], backgroundColor: ['#8B5CF6', '#22D3EE', '#FBBF24', '#10B981'], borderWidth: 0, spacing: 3 }]
+const statusDonutData = {
+  labels: ['Approved', 'Submitted', 'Under Review', 'Draft', 'Rejected'],
+  datasets: [{ data: [48, 8, 4, 4, 3], backgroundColor: ['#10B981', '#8B5CF6', '#FBBF24', '#94A3B8', '#FB7185'], borderWidth: 0, spacing: 3 }]
 }
 
-const months = ['04 Jan', '08 Jan', '12 Jan', '16 Jan', '20 Jan', '24 Jan', '28 Jan', '30 Jan', '31 Jan']
-const revenueData = {
-  labels: months,
-  datasets: [{ label: 'Revenue', data: [180, 220, 280, 420, 620, 480, 350, 310, 340], borderColor: '#8B5CF6', backgroundColor: 'rgba(139, 92, 246, 0.06)', fill: true, pointBackgroundColor: '#8B5CF6', pointRadius: 3 }]
+const weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12']
+const weeklySubmissionData = {
+  labels: weeks,
+  datasets: [{ label: 'Submissions', data: [3, 5, 4, 7, 6, 8, 5, 9, 7, 10, 8, 12], borderColor: '#8B5CF6', backgroundColor: 'rgba(139, 92, 246, 0.06)', fill: true, pointBackgroundColor: '#8B5CF6', pointRadius: 3 }]
 }
+
+const disbursementData = {
+  labels: ['Personal', 'Business', 'Salary', 'Emergency'],
+  datasets: [{ label: 'Amount (₱M)', data: [1.8, 1.2, 0.98, 0.42], backgroundColor: ['#8B5CF6', '#22D3EE', '#FB7185', '#FBBF24'] }]
+}
+
+const pendingActions = [
+  { label: 'Incomplete Drafts', desc: 'Missing documents or info', count: 4, color: '#D97706' },
+  { label: 'Pending Documents', desc: 'Awaiting borrower upload', count: 3, color: '#8B5CF6' },
+  { label: 'Follow-up Required', desc: 'Overdue responses', count: 2, color: '#FB7185' },
+  { label: 'Ready to Submit', desc: 'Complete, needs submission', count: 2, color: '#10B981' },
+]
 
 const donutOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' as const, labels: { boxWidth: 10, padding: 14, font: { size: 12 } } } }, cutout: '60%' }
 const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(99,102,241,0.06)' } }, x: { grid: { display: false } } } }
+const horizontalBarOptions = { responsive: true, maintainAspectRatio: false, indexAxis: 'y' as const, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(99,102,241,0.06)' } }, y: { grid: { display: false } } } }
 </script>
 
 <style scoped>
@@ -99,12 +137,11 @@ const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins:
 
 /* Greeting + period toggle */
 .greeting-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-
 .period-toggle { display: flex; gap: 4px; background: var(--glass-heavy); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border-soft); border-radius: 12px; padding: 4px; box-shadow: var(--shadow-sm); }
 .period-btn { padding: 8px 18px; border-radius: 10px; border: none; background: transparent; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all var(--transition-base); }
 .period-btn.active { background: var(--accent-primary); color: #fff; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25); }
 .greeting-left { display: flex; align-items: center; gap: 18px; }
-.greeting-avatar { width: 56px; height: 56px; border-radius: 14px; background: var(--glass-heavy); border: 1px solid var(--glass-border-soft); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); flex-shrink: 0; }
+.greeting-avatar { width: 56px; height: 56px; border-radius: 14px; background: var(--glass-heavy); border: 1px solid var(--glass-border-soft); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
 .greeting-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0; line-height: 1.2; }
 .greeting-sub { font-size: 14px; color: var(--text-muted); margin: 2px 0 0; }
 
@@ -140,6 +177,10 @@ const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins:
 .donut-wrap { flex: 1; min-height: 0; }
 
 /* Bottom grid: wide chart + stat stack */
+.triple-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 16px; }
+.triple-grid > * { min-height: 340px; }
+.triple-grid .donut-wrap { height: 240px; }
+.triple-grid .chart-area { height: 240px; }
 .bottom-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
 
 .chart-card-wide {
@@ -163,14 +204,25 @@ const areaLineOptions = { responsive: true, maintainAspectRatio: false, plugins:
 .mini-trend { font-size: 12px; font-weight: 600; }
 .see-all-btn { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--accent-primary); background: none; border: none; cursor: pointer; padding: 0; }
 
+/* Action list in side card */
+.action-list { padding: 8px 20px 16px; display: flex; flex-direction: column; }
+.action-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--glass-border-soft); }
+.action-row:last-child { border-bottom: none; }
+.action-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.action-info { flex: 1; }
+.action-name { font-size: 13px; font-weight: 600; color: var(--text-primary); display: block; }
+.action-desc { font-size: 11px; color: var(--text-muted); }
+.action-count { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+
 @media (max-width: 1200px) {
   .main-grid { grid-template-columns: 1fr; }
   .kpi-zone { grid-column: span 1; }
   .bottom-grid { grid-template-columns: 1fr; }
+  .triple-grid { grid-template-columns: 1fr; }
+  .triple-grid > * { min-height: auto; }
 }
 @media (max-width: 640px) {
   .kpi-zone { grid-template-columns: 1fr; }
-  .dash-topbar { flex-direction: column; align-items: stretch; }
-  .search-box { max-width: none; }
+  .greeting-row { flex-direction: column; align-items: stretch; }
 }
 </style>
